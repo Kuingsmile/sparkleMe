@@ -1,10 +1,10 @@
+import { Divider, Input } from '@heroui/react'
 import BasePage from '@renderer/components/base/base-page'
 import RuleItem from '@renderer/components/rules/rule-item'
-import { Virtuoso } from 'react-virtuoso'
-import { useMemo, useState } from 'react'
-import { Divider, Input } from '@heroui/react'
 import { useRules } from '@renderer/hooks/use-rules'
 import { includesIgnoreCase } from '@renderer/utils/includes'
+import { useMemo, useState } from 'react'
+import { Virtuoso } from 'react-virtuoso'
 
 const Rules: React.FC = () => {
   const { rules } = useRules()
@@ -13,7 +13,7 @@ const Rules: React.FC = () => {
   const filteredRules = useMemo(() => {
     if (!rules) return []
     if (filter === '') return rules.rules
-    return rules.rules.filter((rule) => {
+    return rules.rules.filter(rule => {
       return (
         includesIgnoreCase(rule.payload, filter) ||
         includesIgnoreCase(rule.type, filter) ||
@@ -23,30 +23,18 @@ const Rules: React.FC = () => {
   }, [rules, filter])
 
   return (
-    <BasePage title="分流规则">
-      <div className="sticky top-0 z-40">
-        <div className="flex p-2">
-          <Input
-            size="sm"
-            value={filter}
-            placeholder="筛选过滤"
-            isClearable
-            onValueChange={setFilter}
-          />
+    <BasePage title='分流规则'>
+      <div className='sticky top-0 z-40'>
+        <div className='flex p-2'>
+          <Input size='sm' value={filter} placeholder='筛选过滤' isClearable onValueChange={setFilter} />
         </div>
         <Divider />
       </div>
-      <div className="h-[calc(100vh-100px)] mt-px">
+      <div className='h-[calc(100vh-100px)] mt-px'>
         <Virtuoso
           data={filteredRules}
           itemContent={(i, rule) => (
-            <RuleItem
-              index={i}
-              type={rule.type}
-              payload={rule.payload}
-              proxy={rule.proxy}
-              size={rule.size}
-            />
+            <RuleItem index={i} type={rule.type} payload={rule.payload} proxy={rule.proxy} size={rule.size} />
           )}
         />
       </div>

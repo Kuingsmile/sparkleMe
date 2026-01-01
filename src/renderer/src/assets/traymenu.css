@@ -1,6 +1,9 @@
-@import 'tailwindcss';
+@import url('tailwindcss');
+
 @plugin './hero.mjs';
+
 @source '../../../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+
 @custom-variant dark (&:is(.dark *));
 
 html {
@@ -10,7 +13,7 @@ html {
 
 body {
   font-family:
-    'Inter',
+    Inter,
     'SF Pro Display',
     'Microsoft YaHei',
     system-ui,
@@ -32,10 +35,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(128, 128, 128, 0.3);
   border-radius: 2px;
+  background: rgb(128 128 128 / 30%);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(128, 128, 128, 0.5);
+  background: rgb(128 128 128 / 50%);
 }

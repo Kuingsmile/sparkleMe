@@ -1,6 +1,6 @@
-import React, { createContext, useContext, ReactNode } from 'react'
-import useSWR from 'swr'
 import { getAppConfig, patchAppConfig as patch } from '@renderer/utils/ipc'
+import React, { createContext, ReactNode, useContext } from 'react'
+import useSWR from 'swr'
 
 interface AppConfigContextType {
   appConfig: AppConfig | undefined

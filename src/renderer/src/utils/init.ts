@@ -14,6 +14,9 @@ import { getVersion } from './ipc'
 //   originWarn.call(console, args)
 // }
 
+console.log('preload init')
+console.log('window.api', window.api)
+console.log('window.electron', window.electron)
 export const platform: NodeJS.Platform = window.api.platform
 export let version: string = ''
 

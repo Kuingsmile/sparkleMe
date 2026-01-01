@@ -1,4 +1,4 @@
-import os from 'os'
+import os from 'node:os'
 
 export const defaultConfig: AppConfig = {
   core: 'mihomo',
@@ -33,7 +33,7 @@ export const defaultConfig: AppConfig = {
     'resource',
     'override',
     'log',
-    'substore'
+    'substore',
   ],
   siderWidth: 250,
   sysProxy: { enable: false, mode: 'manual' },
@@ -45,7 +45,7 @@ export const defaultConfig: AppConfig = {
   disableGPU: process.platform === 'win32' && parseInt(os.release().split('.')[2], 10) <= 20000,
   proxyDisplayLayout: 'double',
   groupDisplayLayout: 'double',
-  autoLightweightMode: 'core'
+  autoLightweightMode: 'core',
 }
 
 export const defaultControledMihomoConfig: Partial<MihomoConfig> = {
@@ -54,7 +54,7 @@ export const defaultControledMihomoConfig: Partial<MihomoConfig> = {
   'external-ui-url': 'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip',
   'external-controller-cors': {
     'allow-origins': ['https://metacubex.github.io', 'https://board.zash.run.place'],
-    'allow-private-network': false
+    'allow-private-network': false,
   },
   secret: '',
   ipv6: true,
@@ -88,7 +88,7 @@ export const defaultControledMihomoConfig: Partial<MihomoConfig> = {
     'auto-detect-interface': true,
     'dns-hijack': ['any:53'],
     'route-exclude-address': [],
-    mtu: 1500
+    mtu: 1500,
   },
   dns: {
     enable: true,
@@ -102,7 +102,7 @@ export const defaultControledMihomoConfig: Partial<MihomoConfig> = {
     'default-nameserver': ['tls://223.5.5.5'],
     nameserver: ['https://doh.pub/dns-query', 'https://dns.alidns.com/dns-query'],
     'proxy-server-nameserver': [],
-    'direct-nameserver': []
+    'direct-nameserver': [],
   },
   sniffer: {
     enable: true,
@@ -112,11 +112,11 @@ export const defaultControledMihomoConfig: Partial<MihomoConfig> = {
     sniff: {
       HTTP: {
         ports: [80, 443],
-        'override-destination': false
+        'override-destination': false,
       },
       TLS: {
-        ports: [443]
-      }
+        ports: [443],
+      },
     },
     'skip-domain': ['+.push.apple.com'],
     'skip-dst-address': [
@@ -131,12 +131,12 @@ export const defaultControledMihomoConfig: Partial<MihomoConfig> = {
       '2001:67c:4e8::/48',
       '2001:b28:f23c::/47',
       '2001:b28:f23f::/48',
-      '2a0a:f280:203::/48'
-    ]
+      '2a0a:f280:203::/48',
+    ],
   },
   profile: {
     'store-selected': true,
-    'store-fake-ip': true
+    'store-fake-ip': true,
   },
   'geo-auto-update': false,
   'geo-update-interval': 24,
@@ -145,20 +145,20 @@ export const defaultControledMihomoConfig: Partial<MihomoConfig> = {
     geoip: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat',
     geosite: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat',
     mmdb: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb',
-    asn: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb'
-  }
+    asn: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb',
+  },
 }
 
 export const defaultProfileConfig: ProfileConfig = {
-  items: []
+  items: [],
 }
 
 export const defaultOverrideConfig: OverrideConfig = {
-  items: []
+  items: [],
 }
 
 export const defaultProfile: Partial<MihomoConfig> = {
   proxies: [],
   'proxy-groups': [],
-  rules: []
+  rules: [],
 }

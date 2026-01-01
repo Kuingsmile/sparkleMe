@@ -1,12 +1,12 @@
-import React, { createContext, useContext, ReactNode, useEffect } from 'react'
-import useSWR from 'swr'
 import {
-  getOverrideConfig,
-  setOverrideConfig as set,
   addOverrideItem as add,
+  getOverrideConfig,
   removeOverrideItem as remove,
-  updateOverrideItem as update
+  setOverrideConfig as set,
+  updateOverrideItem as update,
 } from '@renderer/utils/ipc'
+import React, { createContext, ReactNode, useContext, useEffect } from 'react'
+import useSWR from 'swr'
 
 interface OverrideConfigContextType {
   overrideConfig: OverrideConfig | undefined
@@ -20,9 +20,7 @@ interface OverrideConfigContextType {
 const OverrideConfigContext = createContext<OverrideConfigContextType | undefined>(undefined)
 
 export const OverrideConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { data: overrideConfig, mutate: mutateOverrideConfig } = useSWR('getOverrideConfig', () =>
-    getOverrideConfig()
-  )
+  const { data: overrideConfig, mutate: mutateOverrideConfig } = useSWR('getOverrideConfig', () => getOverrideConfig())
 
   const setOverrideConfig = async (config: OverrideConfig): Promise<void> => {
     try {
@@ -81,7 +79,7 @@ export const OverrideConfigProvider: React.FC<{ children: ReactNode }> = ({ chil
         mutateOverrideConfig,
         addOverrideItem,
         removeOverrideItem,
-        updateOverrideItem
+        updateOverrideItem,
       }}
     >
       {children}

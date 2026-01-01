@@ -1,19 +1,19 @@
-import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
-import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import BorderSwitch from '@renderer/components/base/border-swtich'
-import { TbDeviceIpadHorizontalBolt } from 'react-icons/tb'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { restartCore } from '@renderer/utils/ipc'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import React from 'react'
+import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
+import BorderSwitch from '@renderer/components/base/border-swtich'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
+import { restartCore } from '@renderer/utils/ipc'
+import React from 'react'
+import { TbDeviceIpadHorizontalBolt } from 'react-icons/tb'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 interface Props {
   iconOnly?: boolean
 }
 
-const TunSwitcher: React.FC<Props> = (props) => {
+const TunSwitcher: React.FC<Props> = props => {
   const { iconOnly } = props
   const location = useLocation()
   const navigate = useNavigate()
@@ -29,9 +29,9 @@ const TunSwitcher: React.FC<Props> = (props) => {
     setNodeRef,
     transform: tf,
     transition,
-    isDragging
+    isDragging,
   } = useSortable({
-    id: 'tun'
+    id: 'tun',
   })
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
   const onChange = async (enable: boolean): Promise<void> => {
@@ -48,9 +48,9 @@ const TunSwitcher: React.FC<Props> = (props) => {
   if (iconOnly) {
     return (
       <div className={`${tunCardStatus} flex justify-center`}>
-        <Tooltip content="虚拟网卡" placement="right">
+        <Tooltip content='虚拟网卡' placement='right'>
           <Button
-            size="sm"
+            size='sm'
             isIconOnly
             color={match ? 'primary' : 'default'}
             variant={match ? 'solid' : 'light'}
@@ -58,7 +58,7 @@ const TunSwitcher: React.FC<Props> = (props) => {
               navigate('/tun')
             }}
           >
-            <TbDeviceIpadHorizontalBolt className="text-[20px]" />
+            <TbDeviceIpadHorizontalBolt className='text-[20px]' />
           </Button>
         </Tooltip>
       </div>
@@ -71,7 +71,7 @@ const TunSwitcher: React.FC<Props> = (props) => {
         position: 'relative',
         transform: CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 'calc(infinity)' : undefined
+        zIndex: isDragging ? 'calc(infinity)' : undefined,
       }}
       className={`${tunCardStatus} tun-card`}
     >
@@ -82,31 +82,18 @@ const TunSwitcher: React.FC<Props> = (props) => {
         {...listeners}
         className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
       >
-        <CardBody className="pb-1 pt-0 px-0 overflow-y-visible">
-          <div className="flex justify-between">
-            <Button
-              isIconOnly
-              className="bg-transparent pointer-events-none"
-              variant="flat"
-              color="default"
-            >
+        <CardBody className='pb-1 pt-0 px-0 overflow-y-visible'>
+          <div className='flex justify-between'>
+            <Button isIconOnly className='bg-transparent pointer-events-none' variant='flat' color='default'>
               <TbDeviceIpadHorizontalBolt
                 className={`${match ? 'text-primary-foreground' : 'text-foreground'} text-[24px] font-bold`}
               />
             </Button>
-            <BorderSwitch
-              isShowBorder={match && enable}
-              isSelected={enable}
-              onValueChange={onChange}
-            />
+            <BorderSwitch isShowBorder={match && enable} isSelected={enable} onValueChange={onChange} />
           </div>
         </CardBody>
-        <CardFooter className="pt-1">
-          <h3
-            className={`text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}
-          >
-            虚拟网卡
-          </h3>
+        <CardFooter className='pt-1'>
+          <h3 className={`text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}>虚拟网卡</h3>
         </CardFooter>
       </Card>
     </div>

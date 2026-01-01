@@ -22,7 +22,7 @@ export async function getUserAgent(): Promise<string> {
     }
 
     return DEFAULT_USER_AGENT
-  } catch (error) {
+  } catch (_error) {
     return DEFAULT_USER_AGENT
   }
 }

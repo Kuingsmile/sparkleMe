@@ -1,18 +1,10 @@
 ---
 body:
   - attributes:
-      description: 在提交之前，请执行并勾选以下所有选项以证明您已经阅读并理解了以下要求，否则该 issue 将被关闭。
-      label: 验证步骤
+      description: 在提交之前，请阅读并勾选统一下面的说明，否则该 issue 将被关闭。
+      label: 前提说明
       options:
-        - label: 我已在标题简短的描述了我所遇到的问题
-        - label: 我使用中文正确地描述了我所遇到的问题
-        - label: 我已在 [Issues](https://github.com/xishang0128/sparkle/issues?q=is%3Aissue) 中寻找过我要提出的问题，但未找到相同的问题
-        - label: 我已在 [常见问题](https://mihomo.party/docs/issues/common) 中寻找过我要提出的问题，并没有找到答案
-        - label: 这是 GUI 程序的问题，而不是内核程序的问题
-        - label: 我已经关闭所有杀毒软件/代理软件后测试过，问题依旧存在
-        - label: 我已经使用最新的测试版本测试过，问题依旧存在
-        - label: 我已经尝试过重启程序/电脑，问题依旧存在
-        - label: 我已确认在其他设备（例如全新虚拟机）上该问题依旧存在
+        - label: 本项目为自用项目，我理解提出的Issue不保证会有回复或修复
     id: ensure
     type: checkboxes
   - attributes:
@@ -33,8 +25,8 @@ body:
     validations:
       required: true
   - attributes:
-      description: 请提供出现问题的 sparkle 版本，需要具体到小版本号，如果没有该 issues 将会被直接关闭
-      label: 发生问题的 sparkle 版本
+      description: 请提供出现问题的软件版本，需要具体到小版本号，如果没有该 issues 将会被直接关闭
+      label: 发生问题的软件版本
     type: input
     validations:
       required: true
@@ -50,6 +42,6 @@ body:
     type: textarea
     validations:
       required: true
-description: 提交 sparkle 漏洞
+description: 提交Bug反馈
 name: 错误反馈
 title: '[Bug] '

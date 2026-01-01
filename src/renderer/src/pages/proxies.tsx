@@ -1,23 +1,18 @@
 import { Avatar, Button, Card, CardBody, Chip } from '@heroui/react'
 import BasePage from '@renderer/components/base/base-page'
-import { useAppConfig } from '@renderer/hooks/use-app-config'
-import {
-  getImageDataURL,
-  mihomoChangeProxy,
-  mihomoCloseAllConnections,
-  mihomoProxyDelay
-} from '@renderer/utils/ipc'
-import { FaLocationCrosshairs } from 'react-icons/fa6'
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
-import { GroupedVirtuoso, GroupedVirtuosoHandle } from 'react-virtuoso'
+import CollapseInput from '@renderer/components/base/collapse-input'
 import ProxyItem from '@renderer/components/proxies/proxy-item'
 import ProxySettingModal from '@renderer/components/proxies/proxy-setting-modal'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
+import { useGroups } from '@renderer/hooks/use-groups'
+import { includesIgnoreCase } from '@renderer/utils/includes'
+import { getImageDataURL, mihomoChangeProxy, mihomoCloseAllConnections, mihomoProxyDelay } from '@renderer/utils/ipc'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { FaLocationCrosshairs } from 'react-icons/fa6'
 import { IoIosArrowBack } from 'react-icons/io'
 import { MdDoubleArrow, MdOutlineSpeed, MdTune } from 'react-icons/md'
-import { useGroups } from '@renderer/hooks/use-groups'
-import CollapseInput from '@renderer/components/base/collapse-input'
-import { includesIgnoreCase } from '@renderer/utils/includes'
-import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
+import { GroupedVirtuoso, GroupedVirtuosoHandle } from 'react-virtuoso'
 
 const Proxies: React.FC = () => {
   const { controledMihomoConfig } = useControledMihomoConfig()
@@ -30,7 +25,7 @@ const Proxies: React.FC = () => {
     proxyDisplayOrder = 'default',
     autoCloseConnection = true,
     proxyCols = 'auto',
-    delayTestConcurrency = 50
+    delayTestConcurrency = 50,
   } = appConfig || {}
   const [cols, setCols] = useState(1)
   const [isOpen, setIsOpen] = useState(Array(groups.length).fill(false))
@@ -44,9 +39,7 @@ const Proxies: React.FC = () => {
     if (groups.length !== searchValue.length) setSearchValue(Array(groups.length).fill(''))
     groups.forEach((group, index) => {
       if (isOpen[index]) {
-        let groupProxies = group.all.filter(
-          (proxy) => proxy && includesIgnoreCase(proxy.name, searchValue[index])
-        )
+        let groupProxies = group.all.filter(proxy => proxy && includesIgnoreCase(proxy.name, searchValue[index]))
         const count = Math.floor(groupProxies.length / cols)
         groupCounts.push(groupProxies.length % cols === 0 ? count : count + 1)
         if (proxyDisplayOrder === 'delay') {
@@ -78,26 +71,23 @@ const Proxies: React.FC = () => {
       }
       mutate()
     },
-    [autoCloseConnection, mutate]
+    [autoCloseConnection, mutate],
   )
 
-  const onProxyDelay = useCallback(
-    async (proxy: string, url?: string): Promise<ControllerProxiesDelay> => {
-      return await mihomoProxyDelay(proxy, url)
-    },
-    []
-  )
+  const onProxyDelay = useCallback(async (proxy: string, url?: string): Promise<ControllerProxiesDelay> => {
+    return await mihomoProxyDelay(proxy, url)
+  }, [])
 
   const onGroupDelay = useCallback(
     async (index: number): Promise<void> => {
       if (allProxies[index].length === 0) {
-        setIsOpen((prev) => {
+        setIsOpen(prev => {
           const newOpen = [...prev]
           newOpen[index] = true
           return newOpen
         })
       }
-      setDelaying((prev) => {
+      setDelaying(prev => {
         const newDelaying = [...prev]
         newDelaying[index] = true
         return newDelaying
@@ -124,13 +114,13 @@ const Proxies: React.FC = () => {
         }
       }
       await Promise.all(result)
-      setDelaying((prev) => {
+      setDelaying(prev => {
         const newDelaying = [...prev]
         newDelaying[index] = false
         return newDelaying
       })
     },
-    [allProxies, groups, delayTestConcurrency, mutate]
+    [allProxies, groups, delayTestConcurrency, mutate],
   )
 
   const calcCols = useCallback((): number => {
@@ -146,7 +136,7 @@ const Proxies: React.FC = () => {
   }, [])
 
   const toggleOpen = useCallback((index: number) => {
-    setIsOpen((prev) => {
+    setIsOpen(prev => {
       const newOpen = [...prev]
       newOpen[index] = !prev[index]
       return newOpen
@@ -154,7 +144,7 @@ const Proxies: React.FC = () => {
   }, [])
 
   const updateSearchValue = useCallback((index: number, value: string) => {
-    setSearchValue((prev) => {
+    setSearchValue(prev => {
       const newSearchValue = [...prev]
       newSearchValue[index] = value
       return newSearchValue
@@ -164,7 +154,7 @@ const Proxies: React.FC = () => {
   const scrollToCurrentProxy = useCallback(
     (index: number) => {
       if (!isOpen[index]) {
-        setIsOpen((prev) => {
+        setIsOpen(prev => {
           const newOpen = [...prev]
           newOpen[index] = true
           return newOpen
@@ -174,15 +164,13 @@ const Proxies: React.FC = () => {
       for (let j = 0; j < index; j++) {
         i += groupCounts[j]
       }
-      i += Math.floor(
-        allProxies[index].findIndex((proxy) => proxy.name === groups[index].now) / cols
-      )
+      i += Math.floor(allProxies[index].findIndex(proxy => proxy.name === groups[index].now) / cols)
       virtuosoRef.current?.scrollToIndex({
         index: Math.floor(i),
-        align: 'start'
+        align: 'start',
       })
     },
-    [isOpen, groupCounts, allProxies, groups, cols]
+    [isOpen, groupCounts, allProxies, groups, cols],
   )
 
   useEffect(() => {
@@ -208,24 +196,22 @@ const Proxies: React.FC = () => {
         groups[index].icon.startsWith('http') &&
         !localStorage.getItem(groups[index].icon)
       ) {
-        getImageDataURL(groups[index].icon).then((dataURL) => {
+        getImageDataURL(groups[index].icon).then(dataURL => {
           localStorage.setItem(groups[index].icon, dataURL)
           mutate()
         })
       }
       return groups[index] ? (
-        <div
-          className={`w-full pt-2 ${index === groupCounts.length - 1 && !isOpen[index] ? 'pb-2' : ''} px-2`}
-        >
-          <Card as="div" isPressable fullWidth onPress={() => toggleOpen(index)}>
-            <CardBody className="w-full h-14">
-              <div className="flex justify-between h-full">
-                <div className="flex text-ellipsis overflow-hidden whitespace-nowrap h-full">
+        <div className={`w-full pt-2 ${index === groupCounts.length - 1 && !isOpen[index] ? 'pb-2' : ''} px-2`}>
+          <Card as='div' isPressable fullWidth onPress={() => toggleOpen(index)}>
+            <CardBody className='w-full h-14'>
+              <div className='flex justify-between h-full'>
+                <div className='flex text-ellipsis overflow-hidden whitespace-nowrap h-full'>
                   {groups[index].icon ? (
                     <Avatar
-                      className="bg-transparent mr-2 w-8 h-8"
-                      size="sm"
-                      radius="sm"
+                      className='bg-transparent mr-2 w-8 h-8'
+                      size='sm'
+                      radius='sm'
                       src={
                         groups[index].icon.startsWith('<svg')
                           ? `data:image/svg+xml;utf8,${groups[index].icon}`
@@ -233,63 +219,56 @@ const Proxies: React.FC = () => {
                       }
                     />
                   ) : null}
-                  <div
-                    className={`flex flex-col h-full ${groupDisplayLayout === 'double' ? '' : 'justify-center'}`}
-                  >
+                  <div className={`flex flex-col h-full ${groupDisplayLayout === 'double' ? '' : 'justify-center'}`}>
                     <div
                       className={`text-ellipsis overflow-hidden whitespace-nowrap leading-tight ${groupDisplayLayout === 'double' ? 'text-md flex-5 flex items-center' : 'text-lg'}`}
                     >
-                      <span className="flag-emoji inline-block">{groups[index].name}</span>
+                      <span className='flag-emoji inline-block'>{groups[index].name}</span>
                       {groupDisplayLayout === 'single' && (
                         <>
-                          <div
-                            title={groups[index].type}
-                            className="inline ml-2 text-sm text-foreground-500"
-                          >
+                          <div title={groups[index].type} className='inline ml-2 text-sm text-foreground-500'>
                             {groups[index].type}
                           </div>
-                          <div className="inline flag-emoji ml-2 text-sm text-foreground-500">
-                            {groups[index].now}
-                          </div>
+                          <div className='inline flag-emoji ml-2 text-sm text-foreground-500'>{groups[index].now}</div>
                         </>
                       )}
                     </div>
                     {groupDisplayLayout === 'double' && (
-                      <div className="text-ellipsis whitespace-nowrap text-[10px] text-foreground-500 leading-tight flex-3 flex items-center">
+                      <div className='text-ellipsis whitespace-nowrap text-[10px] text-foreground-500 leading-tight flex-3 flex items-center'>
                         <span>{groups[index].type}</span>
-                        <span className="flag-emoji ml-1 inline-block">{groups[index].now}</span>
+                        <span className='flag-emoji ml-1 inline-block'>{groups[index].now}</span>
                       </div>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center">
-                  <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
-                    <Chip size="sm" className="my-1 mr-2">
+                <div className='flex items-center'>
+                  <div className='flex items-center' onClick={e => e.stopPropagation()}>
+                    <Chip size='sm' className='my-1 mr-2'>
                       {groups[index].all.length}
                     </Chip>
                     <CollapseInput
-                      title="搜索节点"
+                      title='搜索节点'
                       value={searchValue[index]}
-                      onValueChange={(v) => updateSearchValue(index, v)}
+                      onValueChange={v => updateSearchValue(index, v)}
                     />
                     <Button
-                      title="定位到当前节点"
-                      variant="light"
-                      size="sm"
+                      title='定位到当前节点'
+                      variant='light'
+                      size='sm'
                       isIconOnly
                       onPress={() => scrollToCurrentProxy(index)}
                     >
-                      <FaLocationCrosshairs className="text-lg text-foreground-500" />
+                      <FaLocationCrosshairs className='text-lg text-foreground-500' />
                     </Button>
                     <Button
-                      title="延迟测试"
-                      variant="light"
+                      title='延迟测试'
+                      variant='light'
                       isLoading={delaying[index]}
-                      size="sm"
+                      size='sm'
                       isIconOnly
                       onPress={() => onGroupDelay(index)}
                     >
-                      <MdOutlineSpeed className="text-lg text-foreground-500" />
+                      <MdOutlineSpeed className='text-lg text-foreground-500' />
                     </Button>
                   </div>
                   <IoIosArrowBack
@@ -315,23 +294,19 @@ const Proxies: React.FC = () => {
       updateSearchValue,
       scrollToCurrentProxy,
       onGroupDelay,
-      mutate
-    ]
+      mutate,
+    ],
   )
 
   const itemContent = useCallback(
     (index: number, groupIndex: number) => {
       let innerIndex = index
-      groupCounts.slice(0, groupIndex).forEach((count) => {
+      groupCounts.slice(0, groupIndex).forEach(count => {
         innerIndex -= count
       })
       return allProxies[groupIndex] ? (
         <div
-          style={
-            proxyCols !== 'auto'
-              ? { gridTemplateColumns: `repeat(${proxyCols}, minmax(0, 1fr))` }
-              : {}
-          }
+          style={proxyCols !== 'auto' ? { gridTemplateColumns: `repeat(${proxyCols}, minmax(0, 1fr))` } : {}}
           className={`grid ${proxyCols === 'auto' ? 'sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5' : ''} ${groupIndex === groupCounts.length - 1 && innerIndex === groupCounts[groupIndex] - 1 ? 'pb-2' : ''} gap-2 pt-2 mx-2`}
         >
           {Array.from({ length: cols }).map((_, i) => {
@@ -345,9 +320,7 @@ const Proxies: React.FC = () => {
                 proxy={allProxies[groupIndex][innerIndex * cols + i]}
                 group={groups[groupIndex]}
                 proxyDisplayLayout={proxyDisplayLayout}
-                selected={
-                  allProxies[groupIndex][innerIndex * cols + i]?.name === groups[groupIndex].now
-                }
+                selected={allProxies[groupIndex][innerIndex * cols + i]?.name === groups[groupIndex].now}
               />
             )
           })}
@@ -356,45 +329,35 @@ const Proxies: React.FC = () => {
         <div>Never See This</div>
       )
     },
-    [
-      groupCounts,
-      allProxies,
-      proxyCols,
-      cols,
-      mutate,
-      onProxyDelay,
-      onChangeProxy,
-      groups,
-      proxyDisplayLayout
-    ]
+    [groupCounts, allProxies, proxyCols, cols, mutate, onProxyDelay, onChangeProxy, groups, proxyDisplayLayout],
   )
 
   return (
     <BasePage
-      title="代理组"
+      title='代理组'
       header={
         <Button
-          size="sm"
+          size='sm'
           isIconOnly
-          variant="light"
-          className="app-nodrag"
-          title="代理组设置"
+          variant='light'
+          className='app-nodrag'
+          title='代理组设置'
           onPress={() => setIsSettingModalOpen(true)}
         >
-          <MdTune className="text-lg" />
+          <MdTune className='text-lg' />
         </Button>
       }
     >
       {isSettingModalOpen && <ProxySettingModal onClose={() => setIsSettingModalOpen(false)} />}
       {mode === 'direct' ? (
-        <div className="h-full w-full flex justify-center items-center">
-          <div className="flex flex-col items-center">
-            <MdDoubleArrow className="text-foreground-500 text-[100px]" />
-            <h2 className="text-foreground-500 text-[20px]">直连模式</h2>
+        <div className='h-full w-full flex justify-center items-center'>
+          <div className='flex flex-col items-center'>
+            <MdDoubleArrow className='text-foreground-500 text-[100px]' />
+            <h2 className='text-foreground-500 text-[20px]'>直连模式</h2>
           </div>
         </div>
       ) : (
-        <div className="h-[calc(100vh-50px)]">
+        <div className='h-[calc(100vh-50px)]'>
           <GroupedVirtuoso
             ref={virtuosoRef}
             groupCounts={groupCounts}

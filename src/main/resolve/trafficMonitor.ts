@@ -1,9 +1,10 @@
-import { ChildProcess, spawn } from 'child_process'
+import { ChildProcess, spawn } from 'node:child_process'
+import { existsSync } from 'node:fs'
+import { readFile, rm, writeFile } from 'node:fs/promises'
+import path from 'node:path'
+
 import { getAppConfig } from '../config'
 import { dataDir, resourcesFilesDir } from '../utils/dirs'
-import path from 'path'
-import { existsSync } from 'fs'
-import { readFile, rm, writeFile } from 'fs/promises'
 
 let child: ChildProcess
 
@@ -24,8 +25,8 @@ export async function startMonitor(detached = false): Promise<void> {
   if (!showTraffic) return
   child = spawn(path.join(resourcesFilesDir(), 'TrafficMonitor/TrafficMonitor.exe'), [], {
     cwd: path.join(resourcesFilesDir(), 'TrafficMonitor'),
-    detached: detached,
-    stdio: detached ? 'ignore' : undefined
+    detached,
+    stdio: detached ? 'ignore' : undefined,
   })
   if (detached) {
     if (child && child.pid) {

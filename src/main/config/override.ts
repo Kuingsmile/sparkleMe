@@ -1,12 +1,14 @@
-import { overrideConfigPath, overridePath } from '../utils/dirs'
-import { getControledMihomoConfig } from './controledMihomo'
-import { readFile, writeFile, rm } from 'fs/promises'
-import { existsSync } from 'fs'
+import { existsSync } from 'node:fs'
+import { readFile, rm, writeFile } from 'node:fs/promises'
+import http from 'node:http'
+import https from 'node:https'
+import tls from 'node:tls'
+
 import axios, { AxiosResponse } from 'axios'
-import https from 'https'
-import http from 'http'
-import tls from 'tls'
+
+import { overrideConfigPath, overridePath } from '../utils/dirs'
 import { parseYaml, stringifyYaml } from '../utils/yaml'
+import { getControledMihomoConfig } from './controledMihomo'
 import { getCertFingerprint } from './profile'
 
 let overrideConfig: OverrideConfig // override.yaml
@@ -27,12 +29,12 @@ export async function setOverrideConfig(config: OverrideConfig): Promise<void> {
 
 export async function getOverrideItem(id: string | undefined): Promise<OverrideItem | undefined> {
   const { items } = await getOverrideConfig()
-  return items.find((item) => item.id === id)
+  return items.find(item => item.id === id)
 }
 
 export async function updateOverrideItem(item: OverrideItem): Promise<void> {
   const config = await getOverrideConfig()
-  const index = config.items.findIndex((i) => i.id === item.id)
+  const index = config.items.findIndex(i => i.id === item.id)
   if (index === -1) {
     throw new Error('Override not found')
   }
@@ -54,7 +56,7 @@ export async function addOverrideItem(item: Partial<OverrideItem>): Promise<void
 export async function removeOverrideItem(id: string): Promise<void> {
   const config = await getOverrideConfig()
   const item = await getOverrideItem(id)
-  config.items = config.items?.filter((item) => item.id !== id)
+  config.items = config.items?.filter(item => item.id !== id)
   await setOverrideConfig(config)
   await rm(overridePath(id, item?.ext || 'js'))
 }
@@ -68,7 +70,7 @@ export async function createOverride(item: Partial<OverrideItem>): Promise<Overr
     ext: item.ext || 'js',
     url: item.url,
     global: item.global || false,
-    updated: new Date().getTime()
+    updated: new Date().getTime(),
   } as OverrideItem
   switch (newItem.type) {
     case 'remote': {
@@ -81,11 +83,10 @@ export async function createOverride(item: Partial<OverrideItem>): Promise<Overr
         if (item.fingerprint) {
           const expected = item.fingerprint.replace(/:/g, '').toUpperCase()
           const verify = (s: tls.TLSSocket) => {
-            if (getCertFingerprint(s.getPeerCertificate()) !== expected)
-              s.destroy(new Error('证书指纹不匹配'))
+            if (getCertFingerprint(s.getPeerCertificate()) !== expected) s.destroy(new Error('证书指纹不匹配'))
           }
 
-          if (mixedPort != 0) {
+          if (mixedPort !== 0) {
             const urlObj = new URL(item.url)
             const hostname = urlObj.hostname
             const port = urlObj.port || '443'
@@ -94,7 +95,7 @@ export async function createOverride(item: Partial<OverrideItem>): Promise<Overr
                 host: '127.0.0.1',
                 port: mixedPort,
                 method: 'CONNECT',
-                path: `${hostname}:${port}`
+                path: `${hostname}:${port}`,
               })
 
               req.on('connect', (res, sock, head) => {
@@ -103,14 +104,13 @@ export async function createOverride(item: Partial<OverrideItem>): Promise<Overr
                   return
                 }
                 if (head.length > 0) sock.unshift(head)
-                const tls$ = tls.connect(
-                  { socket: sock, servername: hostname, rejectUnauthorized: false },
-                  () => verify(tls$)
+                const tls$ = tls.connect({ socket: sock, servername: hostname, rejectUnauthorized: false }, () =>
+                  verify(tls$),
                 )
                 cb?.(null, tls$)
               })
 
-              req.on('error', (e) => cb?.(e, null!))
+              req.on('error', e => cb?.(e, null!))
               req.end()
               return null!
             }
@@ -128,11 +128,11 @@ export async function createOverride(item: Partial<OverrideItem>): Promise<Overr
 
         res = await axios.get(item.url, {
           httpsAgent,
-          ...(mixedPort != 0 &&
+          ...(mixedPort !== 0 &&
             !item.fingerprint && {
-              proxy: { protocol: 'http', host: '127.0.0.1', port: mixedPort }
+              proxy: { protocol: 'http', host: '127.0.0.1', port: mixedPort },
             }),
-          responseType: 'text'
+          responseType: 'text',
         })
       } catch (error) {
         if (axios.isAxiosError(error)) {

@@ -1,26 +1,22 @@
+import { existsSync, writeFileSync } from 'node:fs'
+import { copyFile, mkdir, writeFile } from 'node:fs/promises'
+import path from 'node:path'
+import vm from 'node:vm'
+
 import {
+  getAppConfig,
   getControledMihomoConfig,
-  getProfileConfig,
-  getProfile,
-  getProfileStr,
-  getProfileItem,
   getOverride,
-  getOverrideItem,
   getOverrideConfig,
-  getAppConfig
+  getOverrideItem,
+  getProfile,
+  getProfileConfig,
+  getProfileItem,
+  getProfileStr,
 } from '../config'
-import {
-  mihomoProfileWorkDir,
-  mihomoWorkConfigPath,
-  mihomoWorkDir,
-  overridePath
-} from '../utils/dirs'
-import { parseYaml, stringifyYaml } from '../utils/yaml'
-import { copyFile, mkdir, writeFile } from 'fs/promises'
+import { mihomoProfileWorkDir, mihomoWorkConfigPath, mihomoWorkDir, overridePath } from '../utils/dirs'
 import { deepMerge } from '../utils/merge'
-import vm from 'vm'
-import { existsSync, writeFileSync } from 'fs'
-import path from 'path'
+import { parseYaml, stringifyYaml } from '../utils/yaml'
 
 let runtimeConfigStr: string,
   rawProfileStr: string,
@@ -56,17 +52,10 @@ export async function generateProfile(): Promise<void> {
   if (diffWorkDir) {
     await prepareProfileWorkDir(current)
   }
-  await writeFile(
-    diffWorkDir ? mihomoWorkConfigPath(current) : mihomoWorkConfigPath('work'),
-    runtimeConfigStr
-  )
+  await writeFile(diffWorkDir ? mihomoWorkConfigPath(current) : mihomoWorkConfigPath('work'), runtimeConfigStr)
 }
 
-async function cleanProfile(
-  profile: MihomoConfig,
-  controlDns: boolean,
-  controlSniff: boolean
-): Promise<void> {
+async function cleanProfile(profile: MihomoConfig, controlDns: boolean, controlSniff: boolean): Promise<void> {
   if (!['info', 'debug'].includes(profile['log-level'])) {
     profile['log-level'] = 'info'
   }
@@ -92,10 +81,10 @@ function cleanBooleanConfigs(profile: MihomoConfig): void {
     'tcp-concurrent',
     'geodata-mode',
     'geo-auto-update',
-    'disable-keep-alive'
-  ]
+    'disable-keep-alive',
+  ] as Partial<keyof MihomoConfig>[]
 
-  booleanConfigs.forEach((key) => {
+  booleanConfigs.forEach((key: keyof MihomoConfig) => {
     if (!profile[key]) delete (profile as Partial<MihomoConfig>)[key]
   })
 
@@ -113,15 +102,17 @@ function cleanBooleanConfigs(profile: MihomoConfig): void {
 }
 
 function cleanNumberConfigs(profile: MihomoConfig): void {
-  ;[
-    'port',
-    'socks-port',
-    'redir-port',
-    'tproxy-port',
-    'mixed-port',
-    'keep-alive-idle',
-    'keep-alive-interval'
-  ].forEach((key) => {
+  ;(
+    [
+      'port',
+      'socks-port',
+      'redir-port',
+      'tproxy-port',
+      'mixed-port',
+      'keep-alive-idle',
+      'keep-alive-interval',
+    ] as Partial<keyof MihomoConfig>[]
+  ).forEach(key => {
     if (profile[key] === 0) delete (profile as Partial<MihomoConfig>)[key]
   })
 }
@@ -131,8 +122,8 @@ function cleanStringConfigs(profile: MihomoConfig): void {
 
   if (profile.mode === 'rule') delete partialProfile.mode
 
-  const emptyStringConfigs = ['interface-name', 'secret', 'global-client-fingerprint']
-  emptyStringConfigs.forEach((key) => {
+  const emptyStringConfigs = ['interface-name', 'secret', 'global-client-fingerprint'] as Partial<keyof MihomoConfig>[]
+  emptyStringConfigs.forEach(key => {
     if (profile[key] === '') delete partialProfile[key]
   })
 
@@ -198,18 +189,16 @@ function cleanTunConfig(profile: MihomoConfig): void {
     delete tunConfig['auto-detect-interface']
   }
 
-  const tunBooleanConfigs = ['auto-redirect', 'strict-route', 'disable-icmp-forwarding']
-  tunBooleanConfigs.forEach((key) => {
+  const tunBooleanConfigs = ['auto-redirect', 'strict-route', 'disable-icmp-forwarding'] as Partial<
+    keyof MihomoTunConfig
+  >[]
+  tunBooleanConfigs.forEach(key => {
     if (!tunConfig[key]) delete tunConfig[key]
   })
 
   if (tunConfig.device === '') {
     delete tunConfig.device
-  } else if (
-    process.platform === 'darwin' &&
-    tunConfig.device &&
-    !tunConfig.device.startsWith('utun')
-  ) {
+  } else if (process.platform === 'darwin' && tunConfig.device && !tunConfig.device.startsWith('utun')) {
     delete tunConfig.device
   }
 
@@ -231,10 +220,11 @@ function cleanDnsConfig(profile: MihomoConfig, controlDns: boolean): void {
     'fake-ip-filter',
     'proxy-server-nameserver',
     'direct-nameserver',
-    'nameserver'
-  ]
+    'nameserver',
+  ] as Partial<keyof MihomoDNSConfig>[]
 
-  dnsArrayConfigs.forEach((key) => {
+  dnsArrayConfigs.forEach(key => {
+    //@ts-expect-error number
     if (dnsConfig[key]?.length === 0) delete dnsConfig[key]
   })
 
@@ -259,16 +249,16 @@ function cleanSnifferConfig(profile: MihomoConfig, controlSniff: boolean): void 
 
 function cleanProxyConfigs(profile: MihomoConfig): void {
   const partialProfile = profile as Partial<MihomoConfig>
-  const arrayConfigs = ['proxies', 'proxy-groups', 'rules']
-  const objectConfigs = ['proxy-providers', 'rule-providers']
+  const arrayConfigs = ['proxies', 'proxy-groups', 'rules'] as Partial<keyof MihomoConfig>[]
+  const objectConfigs = ['proxy-providers', 'rule-providers'] as Partial<keyof MihomoConfig>[]
 
-  arrayConfigs.forEach((key) => {
+  arrayConfigs.forEach(key => {
     if (Array.isArray(profile[key]) && profile[key]?.length === 0) {
       delete partialProfile[key]
     }
   })
 
-  objectConfigs.forEach((key) => {
+  objectConfigs.forEach(key => {
     const value = profile[key]
     if (
       value === null ||
@@ -296,16 +286,13 @@ async function prepareProfileWorkDir(current: string | undefined): Promise<void>
     copy('geoip.metadb'),
     copy('geoip.dat'),
     copy('geosite.dat'),
-    copy('ASN.mmdb')
+    copy('ASN.mmdb'),
   ])
 }
 
-async function overrideProfile(
-  current: string | undefined,
-  profile: MihomoConfig
-): Promise<MihomoConfig> {
+async function overrideProfile(current: string | undefined, profile: MihomoConfig): Promise<MihomoConfig> {
   const { items = [] } = (await getOverrideConfig()) || {}
-  const globalOverride = items.filter((item) => item.global).map((item) => item.id)
+  const globalOverride = items.filter(item => item.global).map(item => item.id)
   const { override = [] } = (await getProfileItem(current)) || {}
   for (const ov of new Set(globalOverride.concat(override))) {
     const item = await getOverrideItem(ov)
@@ -325,15 +312,11 @@ async function overrideProfile(
   return profile
 }
 
-async function runOverrideScript(
-  profile: MihomoConfig,
-  script: string,
-  item: OverrideItem
-): Promise<MihomoConfig> {
+async function runOverrideScript(profile: MihomoConfig, script: string, item: OverrideItem): Promise<MihomoConfig> {
   const log = (type: string, data: string, flag = 'a'): void => {
     writeFileSync(overridePath(item.id, 'log'), `[${type}] ${data}\n`, {
       encoding: 'utf-8',
-      flag
+      flag,
     })
   }
   try {
@@ -345,13 +328,13 @@ async function runOverrideScript(
         log: (...args: unknown[]) => log('log', args.map(format).join(' ')),
         info: (...args: unknown[]) => log('info', args.map(format).join(' ')),
         error: (...args: unknown[]) => log('error', args.map(format).join(' ')),
-        debug: (...args: unknown[]) => log('debug', args.map(format).join(' '))
+        debug: (...args: unknown[]) => log('debug', args.map(format).join(' ')),
       }),
       fetch,
       yaml: { parse: parseYaml, stringify: stringifyYaml },
       b64d,
       b64e,
-      Buffer
+      Buffer,
     }
     vm.createContext(ctx)
     log('info', '开始执行脚本', 'w')
@@ -362,7 +345,7 @@ async function runOverrideScript(
         if (result instanceof Promise) return await result
         return result
       })()`,
-      ctx
+      ctx,
     )
     const newProfile = await promise
     if (typeof newProfile !== 'object') {

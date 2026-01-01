@@ -1,18 +1,20 @@
-import { Button, Card, CardBody, CardFooter, Chip, Progress, Tooltip } from '@heroui/react'
-import { useProfileConfig } from '@renderer/hooks/use-profile-config'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { calcTraffic, calcPercent } from '@renderer/utils/calc'
-import { CgLoadbarDoc } from 'react-icons/cg'
-import { IoMdRefresh } from 'react-icons/io'
-import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/zh-cn'
+
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import 'dayjs/locale/zh-cn'
-import dayjs from 'dayjs'
-import React, { useState } from 'react'
-import ConfigViewer from './config-viewer'
+import { Button, Card, CardBody, CardFooter, Chip, Progress, Tooltip } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { useProfileConfig } from '@renderer/hooks/use-profile-config'
+import { calcPercent, calcTraffic } from '@renderer/utils/calc'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import React, { useState } from 'react'
+import { CgLoadbarDoc } from 'react-icons/cg'
+import { IoMdRefresh } from 'react-icons/io'
 import { TiFolder } from 'react-icons/ti'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+import ConfigViewer from './config-viewer'
 
 dayjs.extend(relativeTime)
 dayjs.locale('zh-cn')
@@ -21,14 +23,10 @@ interface Props {
   iconOnly?: boolean
 }
 
-const ProfileCard: React.FC<Props> = (props) => {
+const ProfileCard: React.FC<Props> = props => {
   const { appConfig, patchAppConfig } = useAppConfig()
   const { iconOnly } = props
-  const {
-    profileCardStatus = 'col-span-2',
-    profileDisplayDate = 'expire',
-    disableAnimation = false
-  } = appConfig || {}
+  const { profileCardStatus = 'col-span-2', profileDisplayDate = 'expire', disableAnimation = false } = appConfig || {}
   const location = useLocation()
   const navigate = useNavigate()
   const match = location.pathname.includes('/profiles')
@@ -42,15 +40,15 @@ const ProfileCard: React.FC<Props> = (props) => {
     setNodeRef,
     transform: tf,
     transition,
-    isDragging
+    isDragging,
   } = useSortable({
-    id: 'profile'
+    id: 'profile',
   })
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
-  const info = items?.find((item) => item.id === current) ?? {
+  const info = items?.find(item => item.id === current) ?? {
     id: 'default',
     type: 'local',
-    name: '空白订阅'
+    name: '空白订阅',
   }
 
   const extra = info?.extra
@@ -60,9 +58,9 @@ const ProfileCard: React.FC<Props> = (props) => {
   if (iconOnly) {
     return (
       <div className={`${profileCardStatus} flex justify-center`}>
-        <Tooltip content="订阅管理" placement="right">
+        <Tooltip content='订阅管理' placement='right'>
           <Button
-            size="sm"
+            size='sm'
             isIconOnly
             color={match ? 'primary' : 'default'}
             variant={match ? 'solid' : 'light'}
@@ -70,7 +68,7 @@ const ProfileCard: React.FC<Props> = (props) => {
               navigate('/profiles')
             }}
           >
-            <TiFolder className="text-[20px]" />
+            <TiFolder className='text-[20px]' />
           </Button>
         </Tooltip>
       </div>
@@ -83,7 +81,7 @@ const ProfileCard: React.FC<Props> = (props) => {
         position: 'relative',
         transform: CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 'calc(infinity)' : undefined
+        zIndex: isDragging ? 'calc(infinity)' : undefined,
       }}
       className={`${profileCardStatus} profile-card`}
     >
@@ -96,42 +94,35 @@ const ProfileCard: React.FC<Props> = (props) => {
           {...listeners}
           className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
         >
-          <CardBody className="pb-1">
-            <div
-              ref={setNodeRef}
-              {...attributes}
-              {...listeners}
-              className="flex justify-between h-[32px]"
-            >
+          <CardBody className='pb-1'>
+            <div ref={setNodeRef} {...attributes} {...listeners} className='flex justify-between h-[32px]'>
               <h3
                 title={info?.name}
                 className={`text-ellipsis whitespace-nowrap overflow-hidden text-md font-bold leading-[32px] ${match ? 'text-primary-foreground' : 'text-foreground'} `}
               >
                 {info?.name}
               </h3>
-              <div className="flex">
+              <div className='flex'>
                 <Button
                   isIconOnly
-                  size="sm"
-                  title="查看当前运行时配置"
-                  variant="light"
-                  color="default"
+                  size='sm'
+                  title='查看当前运行时配置'
+                  variant='light'
+                  color='default'
                   onPress={() => {
                     setShowRuntimeConfig(true)
                   }}
                 >
-                  <CgLoadbarDoc
-                    className={`text-[24px] ${match ? 'text-primary-foreground' : 'text-foreground'}`}
-                  />
+                  <CgLoadbarDoc className={`text-[24px] ${match ? 'text-primary-foreground' : 'text-foreground'}`} />
                 </Button>
                 {info.type === 'remote' && (
-                  <Tooltip delay={1000} placement="left" content={dayjs(info.updated).fromNow()}>
+                  <Tooltip delay={1000} placement='left' content={dayjs(info.updated).fromNow()}>
                     <Button
                       isIconOnly
-                      size="sm"
+                      size='sm'
                       disabled={updating}
-                      variant="light"
-                      color="default"
+                      variant='light'
+                      color='default'
                       onPress={async () => {
                         setUpdating(true)
                         await addProfileItem(info)
@@ -147,14 +138,12 @@ const ProfileCard: React.FC<Props> = (props) => {
               </div>
             </div>
             {info.type === 'remote' && extra && (
-              <div
-                className={`mt-2 flex justify-between ${match ? 'text-primary-foreground' : 'text-foreground'} `}
-              >
+              <div className={`mt-2 flex justify-between ${match ? 'text-primary-foreground' : 'text-foreground'} `}>
                 <small>{`${calcTraffic(usage)}/${calcTraffic(total)}`}</small>
                 {profileDisplayDate === 'expire' ? (
                   <Button
-                    size="sm"
-                    variant="light"
+                    size='sm'
+                    variant='light'
                     className={`h-[20px] p-1 m-0 ${match ? 'text-primary-foreground' : 'text-foreground'}`}
                     onPress={async () => {
                       await patchAppConfig({ profileDisplayDate: 'update' })
@@ -164,8 +153,8 @@ const ProfileCard: React.FC<Props> = (props) => {
                   </Button>
                 ) : (
                   <Button
-                    size="sm"
-                    variant="light"
+                    size='sm'
+                    variant='light'
                     className={`h-[20px] p-1 m-0 ${match ? 'text-primary-foreground' : 'text-foreground'}`}
                     onPress={async () => {
                       await patchAppConfig({ profileDisplayDate: 'expire' })
@@ -177,14 +166,14 @@ const ProfileCard: React.FC<Props> = (props) => {
               </div>
             )}
           </CardBody>
-          <CardFooter className="pt-0">
+          <CardFooter className='pt-0'>
             {info.type === 'remote' && !extra && (
               <div
                 className={`w-full mt-2 flex justify-between ${match ? 'text-primary-foreground' : 'text-foreground'}`}
               >
                 <Chip
-                  size="sm"
-                  variant="bordered"
+                  size='sm'
+                  variant='bordered'
                   className={`${match ? 'text-primary-foreground border-primary-foreground' : 'border-primary text-primary'}`}
                 >
                   远程
@@ -193,12 +182,10 @@ const ProfileCard: React.FC<Props> = (props) => {
               </div>
             )}
             {info.type === 'local' && (
-              <div
-                className={`mt-2 flex justify-between ${match ? 'text-primary-foreground' : 'text-foreground'}`}
-              >
+              <div className={`mt-2 flex justify-between ${match ? 'text-primary-foreground' : 'text-foreground'}`}>
                 <Chip
-                  size="sm"
-                  variant="bordered"
+                  size='sm'
+                  variant='bordered'
                   className={`${match ? 'text-primary-foreground border-primary-foreground' : 'border-primary text-primary'}`}
                 >
                   本地
@@ -207,7 +194,7 @@ const ProfileCard: React.FC<Props> = (props) => {
             )}
             {extra && (
               <Progress
-                className="w-full"
+                className='w-full'
                 classNames={{ indicator: match ? 'bg-primary-foreground' : 'bg-foreground' }}
                 value={calcPercent(extra?.upload, extra?.download, extra?.total)}
               />
@@ -222,41 +209,30 @@ const ProfileCard: React.FC<Props> = (props) => {
           {...listeners}
           className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
         >
-          <CardBody className="pb-1 pt-0 px-0 overflow-y-visible">
-            <div className="flex justify-between">
-              <Button
-                isIconOnly
-                className="bg-transparent pointer-events-none"
-                variant="flat"
-                color="default"
-              >
+          <CardBody className='pb-1 pt-0 px-0 overflow-y-visible'>
+            <div className='flex justify-between'>
+              <Button isIconOnly className='bg-transparent pointer-events-none' variant='flat' color='default'>
                 <TiFolder
-                  color="default"
+                  color='default'
                   className={`${match ? 'text-primary-foreground' : 'text-foreground'} text-[24px]`}
                 />
               </Button>
               <Button
                 isIconOnly
-                className="bg-transparent"
-                variant="flat"
-                color="default"
-                title="查看当前运行时配置"
+                className='bg-transparent'
+                variant='flat'
+                color='default'
+                title='查看当前运行时配置'
                 onPress={() => {
                   setShowRuntimeConfig(true)
                 }}
               >
-                <CgLoadbarDoc
-                  className={`text-[24px] ${match ? 'text-primary-foreground' : 'text-foreground'}`}
-                />
+                <CgLoadbarDoc className={`text-[24px] ${match ? 'text-primary-foreground' : 'text-foreground'}`} />
               </Button>
             </div>
           </CardBody>
-          <CardFooter className="pt-1">
-            <h3
-              className={`text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}
-            >
-              订阅管理
-            </h3>
+          <CardFooter className='pt-1'>
+            <h3 className={`text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}>订阅管理</h3>
           </CardFooter>
         </Card>
       )}

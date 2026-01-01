@@ -13,3 +13,23 @@
 ### Bug Fixes
 
 - null
+
+### 下载地址：
+
+#### Windows10/11：
+
+- 安装版：[64位](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-windows-1.7.0-x64-setup.exe) | [ARM64](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-windows-1.7.0-arm64-setup.exe)
+
+
+#### macOS 11+：
+
+- PKG：[Intel](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-macos-1.7.0-x64.pkg) | [Apple Silicon](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-macos-1.7.0-arm64.pkg)
+
+
+#### Linux：
+
+- DEB：[64位](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-linux-1.7.0-amd64.deb) | [ARM64](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-linux-1.7.0-arm64.deb) | [loong64](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-linux-1.7.0-loong64.deb) | [loong64(aosc-compatible)](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-linux-1.7.0-loongarch64.deb)
+
+- RPM：[64位](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-linux-1.7.0-x86_64.rpm) | [ARM64](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-linux-1.7.0-aarch64.rpm) | [loong64](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-linux-1.7.0-loongarch64.rpm)
+
+- PACMAN：[64位](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-linux-1.7.0-x64.pkg.tar.xz) | [ARM64](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-linux-1.7.0-aarch64.pkg.tar.xz) | [loong64](https://github.com/xishang0128/sparkle/releases/download/1.7.0/sparkle-linux-1.7.0-loong64.pkg.tar.xz)

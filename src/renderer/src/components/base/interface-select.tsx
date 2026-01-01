@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
 import { Select, SelectItem } from '@heroui/react'
 import { getInterfaces } from '@renderer/utils/ipc'
+import React, { useEffect, useState } from 'react'
 
 const InterfaceSelect: React.FC<{
   value: string
@@ -11,22 +11,22 @@ const InterfaceSelect: React.FC<{
   useEffect(() => {
     const fetchInterfaces = async (): Promise<void> => {
       const names = Object.keys(await getInterfaces())
-      setIfaces(names.filter((name) => !exclude.includes(name)))
+      setIfaces(names.filter(name => !exclude.includes(name)))
     }
     fetchInterfaces()
   }, [])
 
   return (
     <Select
-      size="sm"
-      className="w-[300px]"
+      size='sm'
+      className='w-[300px]'
       selectedKeys={new Set([value])}
       disallowEmptySelection={true}
-      onSelectionChange={(v) => onChange(v.currentKey as string)}
+      onSelectionChange={v => onChange(v.currentKey as string)}
     >
-      <SelectItem key="">禁用</SelectItem>
+      <SelectItem key=''>禁用</SelectItem>
       <>
-        {ifaces.map((name) => (
+        {ifaces.map(name => (
           <SelectItem key={name}>{name}</SelectItem>
         ))}
       </>

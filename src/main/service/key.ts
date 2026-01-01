@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 export interface KeyPair {
   publicKey: string
@@ -10,19 +10,16 @@ export class KeyManager {
   private privateKey: string | null = null
 
   generateKeyPair(): KeyPair {
-    const { publicKey: pubKeyObject, privateKey: privKeyPem } = crypto.generateKeyPairSync(
-      'ed25519',
-      {
-        publicKeyEncoding: {
-          type: 'spki',
-          format: 'pem'
-        },
-        privateKeyEncoding: {
-          type: 'pkcs8',
-          format: 'pem'
-        }
-      }
-    )
+    const { publicKey: pubKeyObject, privateKey: privKeyPem } = crypto.generateKeyPairSync('ed25519', {
+      publicKeyEncoding: {
+        type: 'spki',
+        format: 'pem',
+      },
+      privateKeyEncoding: {
+        type: 'pkcs8',
+        format: 'pem',
+      },
+    })
 
     const pubKeyPem = pubKeyObject as string
     const publicKey = pubKeyPem
@@ -65,7 +62,7 @@ export class KeyManager {
 
     const keyObject = crypto.createPrivateKey({
       key: this.privateKey,
-      format: 'pem'
+      format: 'pem',
     })
 
     const signature = crypto.sign(null, Buffer.from(data), keyObject)
@@ -95,7 +92,7 @@ export function generateKeyPair(): KeyPair {
 export function signData(privateKey: string, data: string): string {
   const keyObject = crypto.createPrivateKey({
     key: privateKey,
-    format: 'pem'
+    format: 'pem',
   })
 
   const signature = crypto.sign(null, Buffer.from(data), keyObject)

@@ -4,10 +4,8 @@ import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 
 const ErrorFallback = ({ error }: FallbackProps): JSX.Element => {
   return (
-    <div className="p-4">
-      <h2 className="my-2 text-lg font-bold">
-        {'应用崩溃了 :( 请将以下信息提交给开发者以排查错误'}
-      </h2>
+    <div className='p-4'>
+      <h2 className='my-2 text-lg font-bold'>{'应用崩溃了 :( 请将以下信息提交给开发者以排查错误'}</h2>
 
       {/* <Button
         size="sm"
@@ -18,29 +16,27 @@ const ErrorFallback = ({ error }: FallbackProps): JSX.Element => {
         GitHub
       </Button> */}
       <Button
-        size="sm"
-        color="primary"
-        variant="flat"
-        className="ml-2"
+        size='sm'
+        color='primary'
+        variant='flat'
+        className='ml-2'
         onPress={() => open('https://t.me/+y7rcYjEKIiI1NzZl')}
       >
         Telegram
       </Button>
 
       <Button
-        size="sm"
-        variant="flat"
-        className="ml-2"
-        onPress={() =>
-          navigator.clipboard.writeText('```\n' + error.message + '\n' + error.stack + '\n```')
-        }
+        size='sm'
+        variant='flat'
+        className='ml-2'
+        onPress={() => navigator.clipboard.writeText('```\n' + error.message + '\n' + error.stack + '\n```')}
       >
         复制报错信息
       </Button>
 
-      <p className="my-2">{error.message}</p>
+      <p className='my-2'>{error.message}</p>
 
-      <details title="Error Stack">
+      <details title='Error Stack'>
         <summary>Error Stack</summary>
         <pre>{error.stack}</pre>
       </details>

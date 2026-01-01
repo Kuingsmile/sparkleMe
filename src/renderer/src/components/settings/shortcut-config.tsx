@@ -1,12 +1,13 @@
 import { Button, Input } from '@heroui/react'
-import SettingCard from '../base/base-setting-card'
-import SettingItem from '../base/base-setting-item'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import React, { KeyboardEvent, useState, useEffect } from 'react'
 import { platform } from '@renderer/utils/init'
 import { registerShortcut } from '@renderer/utils/ipc'
+import React, { KeyboardEvent, useEffect, useState } from 'react'
 
-const keyMap = {
+import SettingCard from '../base/base-setting-card'
+import SettingItem from '../base/base-setting-item'
+
+const keyMap: Record<string, string> = {
   Backquote: '`',
   Backslash: '\\',
   BracketLeft: '[',
@@ -36,7 +37,7 @@ const keyMap = {
   ScrollLock: 'Scrolllock',
   Pause: 'Pause',
   Insert: 'Insert',
-  Suspend: 'Suspend'
+  Suspend: 'Suspend',
 }
 
 const ShortcutConfig: React.FC = () => {
@@ -50,90 +51,66 @@ const ShortcutConfig: React.FC = () => {
     globalModeShortcut = '',
     directModeShortcut = '',
     quitWithoutCoreShortcut = '',
-    restartAppShortcut = ''
+    restartAppShortcut = '',
   } = appConfig || {}
 
   return (
-    <SettingCard title="快捷键设置">
-      <SettingItem title="打开/关闭窗口" divider>
-        <div className="flex justify-end w-[60%]">
-          <ShortcutInput
-            value={showWindowShortcut}
-            patchAppConfig={patchAppConfig}
-            action="showWindowShortcut"
-          />
+    <SettingCard title='快捷键设置'>
+      <SettingItem title='打开/关闭窗口' divider>
+        <div className='flex justify-end w-[60%]'>
+          <ShortcutInput value={showWindowShortcut} patchAppConfig={patchAppConfig} action='showWindowShortcut' />
         </div>
       </SettingItem>
-      <SettingItem title="打开/关闭悬浮窗" divider>
-        <div className="flex justify-end w-[60%]">
+      <SettingItem title='打开/关闭悬浮窗' divider>
+        <div className='flex justify-end w-[60%]'>
           <ShortcutInput
             value={showFloatingWindowShortcut}
             patchAppConfig={patchAppConfig}
-            action="showFloatingWindowShortcut"
+            action='showFloatingWindowShortcut'
           />
         </div>
       </SettingItem>
-      <SettingItem title="打开/关闭系统代理" divider>
-        <div className="flex justify-end w-[60%]">
+      <SettingItem title='打开/关闭系统代理' divider>
+        <div className='flex justify-end w-[60%]'>
           <ShortcutInput
             value={triggerSysProxyShortcut}
             patchAppConfig={patchAppConfig}
-            action="triggerSysProxyShortcut"
+            action='triggerSysProxyShortcut'
           />
         </div>
       </SettingItem>
-      <SettingItem title="打开/关闭虚拟网卡" divider>
-        <div className="flex justify-end w-[60%]">
-          <ShortcutInput
-            value={triggerTunShortcut}
-            patchAppConfig={patchAppConfig}
-            action="triggerTunShortcut"
-          />
+      <SettingItem title='打开/关闭虚拟网卡' divider>
+        <div className='flex justify-end w-[60%]'>
+          <ShortcutInput value={triggerTunShortcut} patchAppConfig={patchAppConfig} action='triggerTunShortcut' />
         </div>
       </SettingItem>
-      <SettingItem title="切换规则模式" divider>
-        <div className="flex justify-end w-[60%]">
-          <ShortcutInput
-            value={ruleModeShortcut}
-            patchAppConfig={patchAppConfig}
-            action="ruleModeShortcut"
-          />
+      <SettingItem title='切换规则模式' divider>
+        <div className='flex justify-end w-[60%]'>
+          <ShortcutInput value={ruleModeShortcut} patchAppConfig={patchAppConfig} action='ruleModeShortcut' />
         </div>
       </SettingItem>
-      <SettingItem title="切换全局模式" divider>
-        <div className="flex justify-end w-[60%]">
-          <ShortcutInput
-            value={globalModeShortcut}
-            patchAppConfig={patchAppConfig}
-            action="globalModeShortcut"
-          />
+      <SettingItem title='切换全局模式' divider>
+        <div className='flex justify-end w-[60%]'>
+          <ShortcutInput value={globalModeShortcut} patchAppConfig={patchAppConfig} action='globalModeShortcut' />
         </div>
       </SettingItem>
-      <SettingItem title="切换直连模式" divider>
-        <div className="flex justify-end w-[60%]">
-          <ShortcutInput
-            value={directModeShortcut}
-            patchAppConfig={patchAppConfig}
-            action="directModeShortcut"
-          />
+      <SettingItem title='切换直连模式' divider>
+        <div className='flex justify-end w-[60%]'>
+          <ShortcutInput value={directModeShortcut} patchAppConfig={patchAppConfig} action='directModeShortcut' />
         </div>
       </SettingItem>
-      <SettingItem title="保留内核退出" divider>
-        <div className="flex justify-end w-[60%]">
+      <SettingItem title='保留内核退出' divider>
+        <div className='flex justify-end w-[60%]'>
           <ShortcutInput
             value={quitWithoutCoreShortcut}
             patchAppConfig={patchAppConfig}
-            action="quitWithoutCoreShortcut"
+            action='quitWithoutCoreShortcut'
           />
         </div>
       </SettingItem>
-      <SettingItem title="重启应用">
-        <div className="flex justify-end w-[60%]">
-          <ShortcutInput
-            value={restartAppShortcut}
-            patchAppConfig={patchAppConfig}
-            action="restartAppShortcut"
-          />
+      <SettingItem title='重启应用'>
+        <div className='flex justify-end w-[60%]'>
+          <ShortcutInput value={restartAppShortcut} patchAppConfig={patchAppConfig} action='restartAppShortcut' />
         </div>
       </SettingItem>
     </SettingCard>
@@ -144,7 +121,7 @@ const ShortcutInput: React.FC<{
   value: string
   action: string
   patchAppConfig: (value: Partial<AppConfig>) => Promise<void>
-}> = (props) => {
+}> = props => {
   const { value, action, patchAppConfig } = props
   const [inputValue, setInputValue] = useState(value)
 
@@ -154,7 +131,7 @@ const ShortcutInput: React.FC<{
 
   const parseShortcut = (
     event: KeyboardEvent,
-    setKey: { (value: React.SetStateAction<string>): void; (arg0: string): void }
+    setKey: { (value: React.SetStateAction<string>): void; (arg0: string): void },
   ): void => {
     event.preventDefault()
     let code = event.code
@@ -205,9 +182,9 @@ const ShortcutInput: React.FC<{
     <>
       {inputValue !== value && (
         <Button
-          color="primary"
-          className="mr-2"
-          size="sm"
+          color='primary'
+          className='mr-2'
+          size='sm'
           onPress={async () => {
             try {
               if (await registerShortcut(value, inputValue, action)) {
@@ -225,14 +202,14 @@ const ShortcutInput: React.FC<{
         </Button>
       )}
       <Input
-        placeholder="点击输入快捷键"
+        placeholder='点击输入快捷键'
         onKeyDown={(e: KeyboardEvent): void => {
           parseShortcut(e, setInputValue)
         }}
-        size="sm"
+        size='sm'
         onClear={() => setInputValue('')}
         value={inputValue}
-        className="w-[calc(100%-72px)] pr-0"
+        className='w-[calc(100%-72px)] pr-0'
       />
     </>
   )

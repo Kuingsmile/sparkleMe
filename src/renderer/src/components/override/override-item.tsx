@@ -1,23 +1,15 @@
-import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger
-} from '@heroui/react'
-import { IoMdMore, IoMdRefresh } from 'react-icons/io'
-import dayjs from 'dayjs'
-import React, { Key, useEffect, useMemo, useState } from 'react'
-import EditFileModal from './edit-file-modal'
-import EditInfoModal from './edit-info-modal'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import ExecLogModal from './exec-log-modal'
+import { Button, Card, CardBody, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@heroui/react'
 import { openFile, restartCore } from '@renderer/utils/ipc'
+import dayjs from 'dayjs'
+import React, { Key, useEffect, useMemo, useState } from 'react'
+import { IoMdMore, IoMdRefresh } from 'react-icons/io'
+
 import ConfirmModal from '../base/base-confirm'
+import EditFileModal from './edit-file-modal'
+import EditInfoModal from './edit-info-modal'
+import ExecLogModal from './exec-log-modal'
 
 interface Props {
   info: OverrideItem
@@ -35,9 +27,8 @@ interface MenuItem {
   className: string
 }
 
-const OverrideItem: React.FC<Props> = (props) => {
-  const { info, addOverrideItem, removeOverrideItem, mutateOverrideConfig, updateOverrideItem } =
-    props
+const OverrideItem: React.FC<Props> = props => {
+  const { info, addOverrideItem, removeOverrideItem, mutateOverrideConfig, updateOverrideItem } = props
   const [updating, setUpdating] = useState(false)
   const [openInfoEditor, setOpenInfoEditor] = useState(false)
   const [openFileEditor, setOpenFileEditor] = useState(false)
@@ -48,9 +39,9 @@ const OverrideItem: React.FC<Props> = (props) => {
     setNodeRef,
     transform: tf,
     transition,
-    isDragging
+    isDragging,
   } = useSortable({
-    id: info.id
+    id: info.id,
   })
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
   const [disableOpen, setDisableOpen] = useState(false)
@@ -62,36 +53,36 @@ const OverrideItem: React.FC<Props> = (props) => {
         label: '编辑信息',
         showDivider: false,
         color: 'default',
-        className: ''
+        className: '',
       } as MenuItem,
       {
         key: 'edit-file',
         label: '编辑文件',
         showDivider: false,
         color: 'default',
-        className: ''
+        className: '',
       } as MenuItem,
       {
         key: 'open-file',
         label: '打开文件',
         showDivider: false,
         color: 'default',
-        className: ''
+        className: '',
       } as MenuItem,
       {
         key: 'exec-log',
         label: '执行日志',
         showDivider: true,
         color: 'default',
-        className: ''
+        className: '',
       } as MenuItem,
       {
         key: 'delete',
         label: '删除',
         showDivider: false,
         color: 'danger',
-        className: 'text-danger'
-      } as MenuItem
+        className: 'text-danger',
+      } as MenuItem,
     ]
     if (info.ext === 'yaml') {
       list.splice(3, 1)
@@ -137,12 +128,12 @@ const OverrideItem: React.FC<Props> = (props) => {
 
   return (
     <div
-      className="grid col-span-1"
+      className='grid col-span-1'
       style={{
         position: 'relative',
         transform: CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 'calc(infinity)' : undefined
+        zIndex: isDragging ? 'calc(infinity)' : undefined,
       }}
     >
       {openFileEditor && (
@@ -153,18 +144,14 @@ const OverrideItem: React.FC<Props> = (props) => {
         />
       )}
       {openInfoEditor && (
-        <EditInfoModal
-          item={info}
-          onClose={() => setOpenInfoEditor(false)}
-          updateOverrideItem={updateOverrideItem}
-        />
+        <EditInfoModal item={info} onClose={() => setOpenInfoEditor(false)} updateOverrideItem={updateOverrideItem} />
       )}
       {confirmOpen && (
         <ConfirmModal
           onChange={setConfirmOpen}
-          title="确认删除覆写？"
-          confirmText="确认删除"
-          cancelText="取消"
+          title='确认删除覆写？'
+          confirmText='确认删除'
+          cancelText='取消'
           onConfirm={() => {
             removeOverrideItem(info.id)
             mutateOverrideConfig()
@@ -173,7 +160,7 @@ const OverrideItem: React.FC<Props> = (props) => {
       )}
       {openLog && <ExecLogModal id={info.id} onClose={() => setOpenLog(false)} />}
       <Card
-        as="div"
+        as='div'
         fullWidth
         isPressable
         onPress={() => {
@@ -181,22 +168,22 @@ const OverrideItem: React.FC<Props> = (props) => {
           setOpenFileEditor(true)
         }}
       >
-        <div ref={setNodeRef} {...attributes} {...listeners} className="h-full w-full">
+        <div ref={setNodeRef} {...attributes} {...listeners} className='h-full w-full'>
           <CardBody>
-            <div className="flex justify-between h-[32px]">
+            <div className='flex justify-between h-[32px]'>
               <h3
                 title={info?.name}
                 className={`text-ellipsis whitespace-nowrap overflow-hidden text-md font-bold leading-[32px] text-foreground`}
               >
                 {info?.name}
               </h3>
-              <div className="flex" onClick={(e) => e.stopPropagation()}>
+              <div className='flex' onClick={e => e.stopPropagation()}>
                 {info.type === 'remote' && (
                   <Button
                     isIconOnly
-                    size="sm"
-                    variant="light"
-                    color="default"
+                    size='sm'
+                    variant='light'
+                    color='default'
                     disabled={updating}
                     onPress={async () => {
                       setUpdating(true)
@@ -210,21 +197,18 @@ const OverrideItem: React.FC<Props> = (props) => {
                       }
                     }}
                   >
-                    <IoMdRefresh
-                      color="default"
-                      className={`text-[24px] ${updating ? 'animate-spin' : ''}`}
-                    />
+                    <IoMdRefresh color='default' className={`text-[24px] ${updating ? 'animate-spin' : ''}`} />
                   </Button>
                 )}
 
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light" color="default">
-                      <IoMdMore color="default" className={`text-[24px]`} />
+                    <Button isIconOnly size='sm' variant='light' color='default'>
+                      <IoMdMore color='default' className={`text-[24px]`} />
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu onAction={onMenuAction}>
-                    {menuItems.map((item) => (
+                    {menuItems.map(item => (
                       <DropdownItem
                         showDivider={item.showDivider}
                         key={item.key}
@@ -238,14 +222,14 @@ const OverrideItem: React.FC<Props> = (props) => {
                 </Dropdown>
               </div>
             </div>
-            <div className="flex justify-between">
+            <div className='flex justify-between'>
               <div className={`mt-2 flex justify-start`}>
                 {info.global && (
-                  <Chip size="sm" variant="dot" color="primary" className="mr-2">
+                  <Chip size='sm' variant='dot' color='primary' className='mr-2'>
                     全局
                   </Chip>
                 )}
-                <Chip size="sm" variant="bordered">
+                <Chip size='sm' variant='bordered'>
                   {info.ext === 'yaml' ? 'YAML' : 'JavaScript'}
                 </Chip>
               </div>

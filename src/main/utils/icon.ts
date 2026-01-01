@@ -1,13 +1,15 @@
+import { exec } from 'node:child_process'
+import crypto from 'node:crypto'
+import fs, { existsSync } from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+
 import axios from 'axios'
-import { getControledMihomoConfig } from '../config'
-import fs, { existsSync } from 'fs'
-import path from 'path'
-import { getIcon } from 'file-icon-info'
-import { windowsDefaultIcon, darwinDefaultIcon, otherDevicesIcon } from './defaultIcon'
 import { app } from 'electron'
-import os from 'os'
-import crypto from 'crypto'
-import { exec } from 'child_process'
+import { getIcon } from 'file-icon-info'
+
+import { getControledMihomoConfig } from '../config'
+import { darwinDefaultIcon, otherDevicesIcon, windowsDefaultIcon } from './defaultIcon'
 
 export function isIOSApp(appPath: string): boolean {
   const appDir = appPath.endsWith('.app')
@@ -22,7 +24,7 @@ export function isIOSApp(appPath: string): boolean {
 function hasIOSAppIcon(appPath: string): boolean {
   try {
     const items = fs.readdirSync(appPath)
-    return items.some((item) => {
+    return items.some(item => {
       const lower = item.toLowerCase()
       const ext = path.extname(item).toLowerCase()
       return lower.startsWith('appicon') && (ext === '.png' || ext === '.jpg' || ext === '.jpeg')
@@ -40,7 +42,7 @@ function hasMacOSAppIcon(appPath: string): boolean {
 
   try {
     const items = fs.readdirSync(resourcesDir)
-    return items.some((item) => path.extname(item).toLowerCase() === '.icns')
+    return items.some(item => path.extname(item).toLowerCase() === '.icns')
   } catch {
     return false
   }
@@ -90,7 +92,7 @@ async function findDesktopFile(appPath: string): Promise<string | null> {
       if (!existsSync(dir)) continue
 
       const files = fs.readdirSync(dir)
-      const desktopFiles = files.filter((file) => file.endsWith('.desktop'))
+      const desktopFiles = files.filter(file => file.endsWith('.desktop'))
 
       for (const file of desktopFiles) {
         const fullPath = path.join(dir, file)
@@ -119,12 +121,12 @@ async function findDesktopFile(appPath: string): Promise<string | null> {
           if (nameRegex.test(content) || genericNameRegex.test(content)) {
             return fullPath
           }
-        } catch (err) {
+        } catch (_err) {
           continue
         }
       }
     }
-  } catch (err) {
+  } catch (_err) {
     // ignore
   }
 
@@ -148,7 +150,7 @@ function resolveIconPath(iconName: string): string | null {
     '/usr/share/icons/hicolor',
     '/usr/share/pixmaps',
     '/usr/share/icons/Adwaita',
-    `${process.env.HOME}/.local/share/icons`
+    `${process.env.HOME}/.local/share/icons`,
   ]
 
   for (const dir of iconDirs) {
@@ -167,7 +169,7 @@ function resolveIconPath(iconName: string): string | null {
     }
   }
 
-  return searchPaths.find((iconPath) => existsSync(iconPath)) || null
+  return searchPaths.find(iconPath => existsSync(iconPath)) || null
 }
 
 export async function getIconDataURL(appPath: string): Promise<string> {
@@ -213,7 +215,7 @@ export async function getIconDataURL(appPath: string): Promise<string> {
         }
 
         const iconBuffer = await new Promise<Buffer>((resolve, reject) => {
-          getIcon(targetPath, (b64d) => {
+          getIcon(targetPath, b64d => {
             try {
               resolve(Buffer.from(b64d, 'base64'))
             } catch (err) {
@@ -265,13 +267,13 @@ export async function getImageDataURL(url: string): Promise<string> {
   const { 'mixed-port': port = 7890 } = await getControledMihomoConfig()
   const res = await axios.get(url, {
     responseType: 'arraybuffer',
-    ...(port != 0 && {
+    ...(port !== 0 && {
       proxy: {
         protocol: 'http',
         host: '127.0.0.1',
-        port
-      }
-    })
+        port,
+      },
+    }),
   })
   const mimeType = res.headers['content-type']
   const dataURL = `data:${mimeType};base64,${Buffer.from(res.data).toString('base64')}`

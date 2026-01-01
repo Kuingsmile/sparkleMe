@@ -1,11 +1,12 @@
+import { Button, Input } from '@heroui/react'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+import debounce from '@renderer/utils/debounce'
+import { listWebdavBackups, webdavBackup } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
+
 import SettingCard from '../base/base-setting-card'
 import SettingItem from '../base/base-setting-item'
-import { Button, Input } from '@heroui/react'
-import { listWebdavBackups, webdavBackup } from '@renderer/utils/ipc'
 import WebdavRestoreModal from './webdav-restore-modal'
-import debounce from '@renderer/utils/debounce'
-import { useAppConfig } from '@renderer/hooks/use-app-config'
 
 const WebdavConfig: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
@@ -45,66 +46,58 @@ const WebdavConfig: React.FC = () => {
   }
   return (
     <>
-      {restoreOpen && (
-        <WebdavRestoreModal filenames={filenames} onClose={() => setRestoreOpen(false)} />
-      )}
-      <SettingCard title="WebDAV 备份">
-        <SettingItem title="WebDAV 地址" divider>
+      {restoreOpen && <WebdavRestoreModal filenames={filenames} onClose={() => setRestoreOpen(false)} />}
+      <SettingCard title='WebDAV 备份'>
+        <SettingItem title='WebDAV 地址' divider>
           <Input
-            size="sm"
-            className="w-[60%]"
+            size='sm'
+            className='w-[60%]'
             value={webdav.webdavUrl}
-            onValueChange={(v) => {
+            onValueChange={v => {
               setWebdav({ ...webdav, webdavUrl: v })
               setWebdavDebounce({ ...webdav, webdavUrl: v })
             }}
           />
         </SettingItem>
-        <SettingItem title="WebDAV 备份目录" divider>
+        <SettingItem title='WebDAV 备份目录' divider>
           <Input
-            size="sm"
-            className="w-[60%]"
+            size='sm'
+            className='w-[60%]'
             value={webdav.webdavDir}
-            onValueChange={(v) => {
+            onValueChange={v => {
               setWebdav({ ...webdav, webdavDir: v })
               setWebdavDebounce({ ...webdav, webdavDir: v })
             }}
           />
         </SettingItem>
-        <SettingItem title="WebDAV 用户名" divider>
+        <SettingItem title='WebDAV 用户名' divider>
           <Input
-            size="sm"
-            className="w-[60%]"
+            size='sm'
+            className='w-[60%]'
             value={webdav.webdavUsername}
-            onValueChange={(v) => {
+            onValueChange={v => {
               setWebdav({ ...webdav, webdavUsername: v })
               setWebdavDebounce({ ...webdav, webdavUsername: v })
             }}
           />
         </SettingItem>
-        <SettingItem title="WebDAV 密码" divider>
+        <SettingItem title='WebDAV 密码' divider>
           <Input
-            size="sm"
-            className="w-[60%]"
-            type="password"
+            size='sm'
+            className='w-[60%]'
+            type='password'
             value={webdav.webdavPassword}
-            onValueChange={(v) => {
+            onValueChange={v => {
               setWebdav({ ...webdav, webdavPassword: v })
               setWebdavDebounce({ ...webdav, webdavPassword: v })
             }}
           />
         </SettingItem>
-        <div className="flex justify0between">
-          <Button isLoading={backuping} fullWidth size="sm" className="mr-1" onPress={handleBackup}>
+        <div className='flex justify0between'>
+          <Button isLoading={backuping} fullWidth size='sm' className='mr-1' onPress={handleBackup}>
             备份
           </Button>
-          <Button
-            isLoading={restoring}
-            fullWidth
-            size="sm"
-            className="ml-1"
-            onPress={handleRestore}
-          >
+          <Button isLoading={restoring} fullWidth size='sm' className='ml-1' onPress={handleRestore}>
             恢复
           </Button>
         </div>

@@ -44,7 +44,7 @@ type TunStack = 'gvisor' | 'mixed' | 'system'
 type FindProcessMode = 'off' | 'strict' | 'always'
 type DnsMode = 'normal' | 'fake-ip' | 'redir-host'
 type FilterMode = 'blacklist' | 'whitelist'
-type NetworkInterfaceInfo = os.NetworkInterfaceInfo
+type NetworkInterfaceInfo = import('os').NetworkInterfaceInfo
 type Fingerprints =
   | ''
   | 'random'

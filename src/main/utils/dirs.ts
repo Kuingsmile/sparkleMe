@@ -1,13 +1,16 @@
+import { execSync } from 'node:child_process'
+import { existsSync, mkdirSync, readdirSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { is } from '@electron-toolkit/utils'
-import { existsSync, mkdirSync, readdirSync } from 'fs'
 import { app } from 'electron'
-import path from 'path'
-import { execSync } from 'child_process'
+
 import { getAppConfigSync } from '../config/app'
 import { checkCorePermissionSync } from '../core/manager'
 
 export const homeDir = app.getPath('home')
-
+const dirname = path.dirname(fileURLToPath(import.meta.url))
 export function isPortable(): boolean {
   return existsSync(path.join(exeDir(), 'PORTABLE'))
 }
@@ -42,7 +45,7 @@ export function exePath(): string {
 
 export function resourcesDir(): string {
   if (is.dev) {
-    return path.join(__dirname, '../../extra')
+    return path.join(dirname, '../../extra')
   } else {
     if (app.getAppPath().endsWith('asar')) {
       return process.resourcesPath
@@ -185,7 +188,7 @@ function hasCommand(command: string): boolean {
     const whichCmd = isWin ? 'where' : 'which'
     execSync(`${whichCmd} ${command}`, { encoding: 'utf8', stdio: 'pipe' })
     return true
-  } catch (error) {
+  } catch (_error) {
     return false
   }
 }
@@ -202,14 +205,14 @@ export function findSystemMihomo(): string[] {
       const command = isWin ? 'where' : 'which'
       const result = execSync(`${command} ${name}`, { encoding: 'utf8' }).trim()
       if (result) {
-        const paths = result.split('\n').filter((p) => p && existsSync(p))
+        const paths = result.split('\n').filter(p => p && existsSync(p))
         for (const p of paths) {
           if (!foundPaths.includes(p)) {
             foundPaths.push(p)
           }
         }
       }
-    } catch (error) {
+    } catch (_error) {
       // ignore
     }
   }
@@ -220,7 +223,7 @@ export function findSystemMihomo(): string[] {
       '/usr/bin',
       '/usr/local/bin',
       path.join(homeDir, '.local/bin'),
-      path.join(homeDir, 'bin')
+      path.join(homeDir, 'bin'),
     ]
 
     for (const dir of commonDirs) {
@@ -235,7 +238,7 @@ export function findSystemMihomo(): string[] {
               }
             }
           }
-        } catch (error) {
+        } catch (_error) {
           // ignore
         }
       }
@@ -248,7 +251,7 @@ export function findSystemMihomo(): string[] {
       for (const name of searchNames) {
         try {
           const result = execSync(`brew --prefix ${name} 2>/dev/null`, {
-            encoding: 'utf8'
+            encoding: 'utf8',
           }).trim()
           if (result) {
             const binPath = path.join(result, 'bin', name)
@@ -256,7 +259,7 @@ export function findSystemMihomo(): string[] {
               foundPaths.push(binPath)
             }
           }
-        } catch (error) {
+        } catch (_error) {
           // ignore
         }
       }
@@ -269,17 +272,17 @@ export function findSystemMihomo(): string[] {
       for (const name of searchNames) {
         try {
           const result = execSync(`dpkg -L ${name} 2>/dev/null | grep bin/${name}$`, {
-            encoding: 'utf8'
+            encoding: 'utf8',
           }).trim()
           if (result) {
-            const paths = result.split('\n').filter((p) => p && existsSync(p))
+            const paths = result.split('\n').filter(p => p && existsSync(p))
             for (const p of paths) {
               if (!foundPaths.includes(p)) {
                 foundPaths.push(p)
               }
             }
           }
-        } catch (error) {
+        } catch (_error) {
           // ignore
         }
       }
@@ -290,17 +293,17 @@ export function findSystemMihomo(): string[] {
       for (const name of searchNames) {
         try {
           const result = execSync(`rpm -ql ${name} 2>/dev/null | grep bin/${name}$`, {
-            encoding: 'utf8'
+            encoding: 'utf8',
           }).trim()
           if (result) {
-            const paths = result.split('\n').filter((p) => p && existsSync(p))
+            const paths = result.split('\n').filter(p => p && existsSync(p))
             for (const p of paths) {
               if (!foundPaths.includes(p)) {
                 foundPaths.push(p)
               }
             }
           }
-        } catch (error) {
+        } catch (_error) {
           // ignore
         }
       }
@@ -311,20 +314,20 @@ export function findSystemMihomo(): string[] {
       for (const name of searchNames) {
         try {
           const result = execSync(`pacman -Ql ${name} 2>/dev/null | grep bin/${name}$`, {
-            encoding: 'utf8'
+            encoding: 'utf8',
           }).trim()
           if (result) {
             const paths = result
               .split('\n')
-              .map((line) => line.split(' ')[1])
-              .filter((p) => p && existsSync(p))
+              .map(line => line.split(' ')[1])
+              .filter(p => p && existsSync(p))
             for (const p of paths) {
               if (!foundPaths.includes(p)) {
                 foundPaths.push(p)
               }
             }
           }
-        } catch (error) {
+        } catch (_error) {
           // ignore
         }
       }
@@ -340,7 +343,7 @@ export function findSystemMihomo(): string[] {
           if (result && existsSync(result) && !foundPaths.includes(result)) {
             foundPaths.push(result)
           }
-        } catch (error) {
+        } catch (_error) {
           // ignore
         }
       }

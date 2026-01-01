@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { subStorePort } from '../resolve/server'
+
 import { getAppConfig } from '../config'
+import { subStorePort } from '../resolve/server'
 
 export async function subStoreSubs(): Promise<SubStoreSub[]> {
   const { useCustomSubStore = false, customSubStoreUrl = '' } = await getAppConfig()

@@ -1,9 +1,10 @@
+import { Radio, RadioGroup } from '@heroui/react'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 import React from 'react'
+
 import SettingCard from '../base/base-setting-card'
 import SettingItem from '../base/base-setting-item'
-import { RadioGroup, Radio } from '@heroui/react'
-import { useAppConfig } from '@renderer/hooks/use-app-config'
-const titleMap = {
+const titleMap: Record<string, string> = {
   sysproxyCardStatus: '系统代理',
   tunCardStatus: '虚拟网卡',
   profileCardStatus: '订阅管理',
@@ -16,7 +17,7 @@ const titleMap = {
   dnsCardStatus: 'DNS',
   sniffCardStatus: '域名嗅探',
   logCardStatus: '日志',
-  substoreCardStatus: 'Sub-Store'
+  substoreCardStatus: 'Sub-Store',
 }
 const SiderConfig: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
@@ -33,10 +34,10 @@ const SiderConfig: React.FC = () => {
     dnsCardStatus = 'col-span-1',
     sniffCardStatus = 'col-span-1',
     logCardStatus = 'col-span-1',
-    substoreCardStatus = 'col-span-1'
+    substoreCardStatus = 'col-span-1',
   } = appConfig || {}
 
-  const cardStatus = {
+  const cardStatus: Record<string, string> = {
     sysproxyCardStatus,
     tunCardStatus,
     profileCardStatus,
@@ -49,24 +50,24 @@ const SiderConfig: React.FC = () => {
     dnsCardStatus,
     sniffCardStatus,
     logCardStatus,
-    substoreCardStatus
+    substoreCardStatus,
   }
 
   return (
-    <SettingCard title="侧边栏设置">
+    <SettingCard title='侧边栏设置'>
       {Object.keys(cardStatus).map((key, index, array) => {
         return (
           <SettingItem title={titleMap[key]} key={key} divider={index !== array.length - 1}>
             <RadioGroup
-              orientation="horizontal"
+              orientation='horizontal'
               value={cardStatus[key]}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 patchAppConfig({ [key]: v as CardStatus })
               }}
             >
-              <Radio value="col-span-2">大</Radio>
-              <Radio value="col-span-1">小</Radio>
-              <Radio value="hidden">隐藏</Radio>
+              <Radio value='col-span-2'>大</Radio>
+              <Radio value='col-span-1'>小</Radio>
+              <Radio value='hidden'>隐藏</Radio>
             </RadioGroup>
           </SettingItem>
         )

@@ -1,3 +1,15 @@
+import { existsSync } from 'node:fs'
+import { cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises'
+import path from 'node:path'
+
+import { app } from 'electron'
+
+import { getAppConfig, getControledMihomoConfig, patchAppConfig, patchControledMihomoConfig } from '../config'
+import { startNetworkDetection } from '../core/manager'
+import { startPacServer, startSubStoreBackendServer, startSubStoreFrontendServer } from '../resolve/server'
+import { initKeyManager } from '../service/manager'
+import { startSSIDCheck } from '../sys/ssid'
+import { triggerSysProxy } from '../sys/sysproxy'
 import {
   appConfigPath,
   controledMihomoConfigPath,
@@ -12,55 +24,28 @@ import {
   profilesDir,
   resourcesFilesDir,
   subStoreDir,
-  themesDir
+  themesDir,
 } from './dirs'
 import {
   defaultConfig,
   defaultControledMihomoConfig,
   defaultOverrideConfig,
   defaultProfile,
-  defaultProfileConfig
+  defaultProfileConfig,
 } from './template'
 import { stringifyYaml } from './yaml'
-import { mkdir, writeFile, cp, rm, readdir } from 'fs/promises'
-import { existsSync } from 'fs'
-import path from 'path'
-import {
-  startPacServer,
-  startSubStoreBackendServer,
-  startSubStoreFrontendServer
-} from '../resolve/server'
-import { triggerSysProxy } from '../sys/sysproxy'
-import {
-  getAppConfig,
-  getControledMihomoConfig,
-  patchAppConfig,
-  patchControledMihomoConfig
-} from '../config'
-import { app } from 'electron'
-import { startSSIDCheck } from '../sys/ssid'
-import { startNetworkDetection } from '../core/manager'
-import { initKeyManager } from '../service/manager'
 
 async function initDirs(): Promise<void> {
   if (!existsSync(dataDir())) {
     await mkdir(dataDir())
   }
-  const dirs = [
-    themesDir(),
-    profilesDir(),
-    overrideDir(),
-    mihomoWorkDir(),
-    logDir(),
-    mihomoTestDir(),
-    subStoreDir()
-  ]
+  const dirs = [themesDir(), profilesDir(), overrideDir(), mihomoWorkDir(), logDir(), mihomoTestDir(), subStoreDir()]
   await Promise.all(
-    dirs.map(async (dir) => {
+    dirs.map(async dir => {
       if (!existsSync(dir)) {
         await mkdir(dir, { recursive: true })
       }
-    })
+    }),
   )
 }
 
@@ -80,9 +65,7 @@ async function initConfig(): Promise<void> {
     configTasks.push(writeFile(profilePath('default'), stringifyYaml(defaultProfile)))
   }
   if (!existsSync(controledMihomoConfigPath())) {
-    configTasks.push(
-      writeFile(controledMihomoConfigPath(), stringifyYaml(defaultControledMihomoConfig))
-    )
+    configTasks.push(writeFile(controledMihomoConfigPath(), stringifyYaml(defaultControledMihomoConfig)))
   }
 
   if (configTasks.length > 0) {
@@ -109,7 +92,7 @@ async function initFiles(): Promise<void> {
     copy('geosite.dat'),
     copy('ASN.mmdb'),
     copy('sub-store.bundle.js'),
-    copy('sub-store-frontend')
+    copy('sub-store-frontend'),
   ])
 }
 
@@ -148,12 +131,8 @@ async function migration(): Promise<void> {
   const mihomoConfigPatch: Partial<MihomoConfig> = {}
 
   for (const key in defaultControledMihomoConfig) {
-    if (
-      !(key in mihomoConfig) &&
-      defaultControledMihomoConfig[key as keyof MihomoConfig] !== undefined
-    ) {
-      ;(mihomoConfigPatch as Record<string, unknown>)[key] =
-        defaultControledMihomoConfig[key as keyof MihomoConfig]
+    if (!(key in mihomoConfig) && defaultControledMihomoConfig[key as keyof MihomoConfig] !== undefined) {
+      ;(mihomoConfigPatch as Record<string, unknown>)[key] = defaultControledMihomoConfig[key as keyof MihomoConfig]
     }
   }
 
@@ -210,16 +189,12 @@ export async function init(): Promise<void> {
     initKeyManager(),
     cleanup().catch(() => {
       // ignore
-    })
+    }),
   ])
 
   const { sysProxy, onlyActiveDevice = false, networkDetection = false } = appConfig
 
-  const initTasks: Promise<void>[] = [
-    startSubStoreFrontendServer(),
-    startSubStoreBackendServer(),
-    startSSIDCheck()
-  ]
+  const initTasks: Promise<void>[] = [startSubStoreFrontendServer(), startSubStoreBackendServer(), startSSIDCheck()]
 
   if (networkDetection) {
     initTasks.push(startNetworkDetection())
@@ -235,7 +210,7 @@ export async function init(): Promise<void> {
       } catch {
         // ignore
       }
-    })()
+    })(),
   )
 
   await Promise.all(initTasks)

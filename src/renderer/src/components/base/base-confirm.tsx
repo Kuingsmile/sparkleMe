@@ -1,6 +1,6 @@
-import React from 'react'
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react'
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import React from 'react'
 
 export interface ConfirmButton {
   key: string
@@ -21,7 +21,7 @@ interface Props {
   className?: string
 }
 
-const ConfirmModal: React.FC<Props> = (props) => {
+const ConfirmModal: React.FC<Props> = props => {
   const {
     onChange,
     title = '请确认',
@@ -30,16 +30,16 @@ const ConfirmModal: React.FC<Props> = (props) => {
     cancelText = '取消',
     onConfirm,
     buttons,
-    className
+    className,
   } = props
   const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
 
   const renderButtons = () => {
     if (buttons && buttons.length > 0) {
-      return buttons.map((button) => (
+      return buttons.map(button => (
         <Button
           key={button.key}
-          size="sm"
+          size='sm'
           color={button.color || 'primary'}
           variant={button.variant || 'solid'}
           onPress={async () => {
@@ -54,12 +54,12 @@ const ConfirmModal: React.FC<Props> = (props) => {
 
     return (
       <>
-        <Button size="sm" variant="light" onPress={() => onChange(false)}>
+        <Button size='sm' variant='light' onPress={() => onChange(false)}>
           {cancelText}
         </Button>
         <Button
-          size="sm"
-          color="danger"
+          size='sm'
+          color='danger'
           onPress={async () => {
             if (onConfirm) {
               await onConfirm()
@@ -79,20 +79,20 @@ const ConfirmModal: React.FC<Props> = (props) => {
       disableAnimation={disableAnimation}
       hideCloseButton
       isOpen={true}
-      size="5xl"
+      size='5xl'
       onOpenChange={onChange}
-      scrollBehavior="inside"
+      scrollBehavior='inside'
       classNames={{
         base: 'max-w-none w-full',
-        backdrop: 'top-[48px]'
+        backdrop: 'top-[48px]',
       }}
     >
       <ModalContent className={['w-[400px]', className].filter(Boolean).join(' ')}>
         <ModalHeader>{title}</ModalHeader>
         <ModalBody>
-          <div className="leading-relaxed">{description}</div>
+          <div className='leading-relaxed'>{description}</div>
         </ModalBody>
-        <ModalFooter className="space-x-2">{renderButtons()}</ModalFooter>
+        <ModalFooter className='space-x-2'>{renderButtons()}</ModalFooter>
       </ModalContent>
     </Modal>
   )

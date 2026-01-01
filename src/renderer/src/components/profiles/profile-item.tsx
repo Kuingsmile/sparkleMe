@@ -1,3 +1,5 @@
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import {
   Button,
   Card,
@@ -9,19 +11,18 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Progress,
-  Tooltip
+  Tooltip,
 } from '@heroui/react'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { calcPercent, calcTraffic } from '@renderer/utils/calc'
-import { IoMdMore, IoMdRefresh } from 'react-icons/io'
+import { openFile } from '@renderer/utils/ipc'
 import dayjs from 'dayjs'
 import React, { Key, useEffect, useMemo, useState } from 'react'
+import { IoMdMore, IoMdRefresh } from 'react-icons/io'
+
+import ConfirmModal from '../base/base-confirm'
 import EditFileModal from './edit-file-modal'
 import EditInfoModal from './edit-info-modal'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { openFile } from '@renderer/utils/ipc'
-import { useAppConfig } from '@renderer/hooks/use-app-config'
-import ConfirmModal from '../base/base-confirm'
 
 interface Props {
   info: ProfileItem
@@ -41,7 +42,7 @@ interface MenuItem {
   color: 'default' | 'danger'
   className: string
 }
-const ProfileItem: React.FC<Props> = (props) => {
+const ProfileItem: React.FC<Props> = props => {
   const {
     info,
     addProfileItem,
@@ -50,7 +51,7 @@ const ProfileItem: React.FC<Props> = (props) => {
     updateProfileItem,
     onClick,
     isCurrent,
-    switching
+    switching,
   } = props
   const extra = info?.extra
   const usage = (extra?.upload ?? 0) + (extra?.download ?? 0)
@@ -67,9 +68,9 @@ const ProfileItem: React.FC<Props> = (props) => {
     setNodeRef,
     transform: tf,
     transition,
-    isDragging
+    isDragging,
   } = useSortable({
-    id: info.id
+    id: info.id,
   })
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
   const [disableSelect, setDisableSelect] = useState(false)
@@ -82,29 +83,29 @@ const ProfileItem: React.FC<Props> = (props) => {
         label: '编辑信息',
         showDivider: false,
         color: 'default',
-        className: ''
+        className: '',
       } as MenuItem,
       {
         key: 'edit-file',
         label: '编辑文件',
         showDivider: false,
         color: 'default',
-        className: ''
+        className: '',
       } as MenuItem,
       {
         key: 'open-file',
         label: '打开文件',
         showDivider: true,
         color: 'default',
-        className: ''
+        className: '',
       } as MenuItem,
       {
         key: 'delete',
         label: '删除',
         showDivider: false,
         color: 'danger',
-        className: 'text-danger'
-      } as MenuItem
+        className: 'text-danger',
+      } as MenuItem,
     ]
     if (info.home) {
       list.unshift({
@@ -112,7 +113,7 @@ const ProfileItem: React.FC<Props> = (props) => {
         label: '主页',
         showDivider: false,
         color: 'default',
-        className: ''
+        className: '',
       } as MenuItem)
     }
     return list
@@ -158,20 +159,16 @@ const ProfileItem: React.FC<Props> = (props) => {
 
   return (
     <div
-      className="grid col-span-1"
+      className='grid col-span-1'
       style={{
         position: 'relative',
         transform: CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 'calc(infinity)' : undefined
+        zIndex: isDragging ? 'calc(infinity)' : undefined,
       }}
     >
       {openFileEditor && (
-        <EditFileModal
-          id={info.id}
-          isRemote={info.type === 'remote'}
-          onClose={() => setOpenFileEditor(false)}
-        />
+        <EditFileModal id={info.id} isRemote={info.type === 'remote'} onClose={() => setOpenFileEditor(false)} />
       )}
       {openInfoEditor && (
         <EditInfoModal
@@ -184,9 +181,9 @@ const ProfileItem: React.FC<Props> = (props) => {
       {confirmOpen && (
         <ConfirmModal
           onChange={setConfirmOpen}
-          title="确认删除配置？"
-          confirmText="确认删除"
-          cancelText="取消"
+          title='确认删除配置？'
+          confirmText='确认删除'
+          cancelText='取消'
           onConfirm={() => {
             removeProfileItem(info.id)
             mutateProfileConfig()
@@ -194,7 +191,7 @@ const ProfileItem: React.FC<Props> = (props) => {
         />
       )}
       <Card
-        as="div"
+        as='div'
         fullWidth
         isPressable
         onPress={() => {
@@ -206,23 +203,23 @@ const ProfileItem: React.FC<Props> = (props) => {
         }}
         className={`${isCurrent ? 'bg-primary' : ''} ${selecting ? 'blur-sm' : ''}`}
       >
-        <div ref={setNodeRef} {...attributes} {...listeners} className="w-full h-full">
-          <CardBody className="pb-1">
-            <div className="flex justify-between h-[32px]">
+        <div ref={setNodeRef} {...attributes} {...listeners} className='w-full h-full'>
+          <CardBody className='pb-1'>
+            <div className='flex justify-between h-[32px]'>
               <h3
                 title={info?.name}
                 className={`text-ellipsis whitespace-nowrap overflow-hidden text-md font-bold leading-[32px] ${isCurrent ? 'text-primary-foreground' : 'text-foreground'}`}
               >
                 {info?.name}
               </h3>
-              <div className="flex" onClick={(e) => e.stopPropagation()}>
+              <div className='flex' onClick={e => e.stopPropagation()}>
                 {info.type === 'remote' && (
-                  <Tooltip placement="left" content={dayjs(info.updated).fromNow()}>
+                  <Tooltip placement='left' content={dayjs(info.updated).fromNow()}>
                     <Button
                       isIconOnly
-                      size="sm"
-                      variant="light"
-                      color="default"
+                      size='sm'
+                      variant='light'
+                      color='default'
                       disabled={updating}
                       onPress={async () => {
                         setUpdating(true)
@@ -231,7 +228,7 @@ const ProfileItem: React.FC<Props> = (props) => {
                       }}
                     >
                       <IoMdRefresh
-                        color="default"
+                        color='default'
                         className={`${isCurrent ? 'text-primary-foreground' : 'text-foreground'} text-[24px] ${updating ? 'animate-spin' : ''}`}
                       />
                     </Button>
@@ -240,15 +237,15 @@ const ProfileItem: React.FC<Props> = (props) => {
 
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light" color="default">
+                    <Button isIconOnly size='sm' variant='light' color='default'>
                       <IoMdMore
-                        color="default"
+                        color='default'
                         className={`text-[24px] ${isCurrent ? 'text-primary-foreground' : 'text-foreground'}`}
                       />
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu onAction={onMenuAction}>
-                    {menuItems.map((item) => (
+                    {menuItems.map(item => (
                       <DropdownItem
                         showDivider={item.showDivider}
                         key={item.key}
@@ -263,14 +260,12 @@ const ProfileItem: React.FC<Props> = (props) => {
               </div>
             </div>
             {info.type === 'remote' && extra && (
-              <div
-                className={`mt-2 flex justify-between ${isCurrent ? 'text-primary-foreground' : 'text-foreground'}`}
-              >
+              <div className={`mt-2 flex justify-between ${isCurrent ? 'text-primary-foreground' : 'text-foreground'}`}>
                 <small>{`${calcTraffic(usage)}/${calcTraffic(total)}`}</small>
                 {profileDisplayDate === 'expire' ? (
                   <Button
-                    size="sm"
-                    variant="light"
+                    size='sm'
+                    variant='light'
                     className={`h-[20px] p-1 m-0 ${isCurrent ? 'text-primary-foreground' : 'text-foreground'}`}
                     onPress={async () => {
                       await patchAppConfig({ profileDisplayDate: 'update' })
@@ -280,8 +275,8 @@ const ProfileItem: React.FC<Props> = (props) => {
                   </Button>
                 ) : (
                   <Button
-                    size="sm"
-                    variant="light"
+                    size='sm'
+                    variant='light'
                     className={`h-[20px] p-1 m-0 ${isCurrent ? 'text-primary-foreground' : 'text-foreground'}`}
                     onPress={async () => {
                       await patchAppConfig({ profileDisplayDate: 'expire' })
@@ -293,14 +288,14 @@ const ProfileItem: React.FC<Props> = (props) => {
               </div>
             )}
           </CardBody>
-          <CardFooter className="pt-0">
+          <CardFooter className='pt-0'>
             {info.type === 'remote' && !extra && (
               <div
                 className={`w-full mt-2 flex justify-between ${isCurrent ? 'text-primary-foreground' : 'text-foreground'}`}
               >
                 <Chip
-                  size="sm"
-                  variant="bordered"
+                  size='sm'
+                  variant='bordered'
                   className={`${isCurrent ? 'text-primary-foreground border-primary-foreground' : 'border-primary text-primary'}`}
                 >
                   远程
@@ -309,12 +304,10 @@ const ProfileItem: React.FC<Props> = (props) => {
               </div>
             )}
             {info.type === 'local' && (
-              <div
-                className={`mt-2 flex justify-between ${isCurrent ? 'text-primary-foreground' : 'text-foreground'}`}
-              >
+              <div className={`mt-2 flex justify-between ${isCurrent ? 'text-primary-foreground' : 'text-foreground'}`}>
                 <Chip
-                  size="sm"
-                  variant="bordered"
+                  size='sm'
+                  variant='bordered'
                   className={`${isCurrent ? 'text-primary-foreground border-primary-foreground' : 'border-primary text-primary'}`}
                 >
                   本地
@@ -323,9 +316,9 @@ const ProfileItem: React.FC<Props> = (props) => {
             )}
             {extra && (
               <Progress
-                className="w-full"
+                className='w-full'
                 classNames={{
-                  indicator: isCurrent ? 'bg-primary-foreground' : 'bg-foreground'
+                  indicator: isCurrent ? 'bg-primary-foreground' : 'bg-foreground',
                 }}
                 value={calcPercent(extra?.upload, extra?.download, extra?.total)}
               />

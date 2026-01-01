@@ -1,15 +1,15 @@
+import { Button, Input, Switch } from '@heroui/react'
+import InterfaceModal from '@renderer/components/mihomo/interface-modal'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
+import { platform } from '@renderer/utils/init'
+import { restartCore, startSubStoreBackendServer, triggerSysProxy } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
+import { FaNetworkWired } from 'react-icons/fa'
+
+import EditableList from '../base/base-list-editor'
 import SettingCard from '../base/base-setting-card'
 import SettingItem from '../base/base-setting-item'
-import EditableList from '../base/base-list-editor'
-
-import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import { restartCore, startSubStoreBackendServer, triggerSysProxy } from '@renderer/utils/ipc'
-import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { platform } from '@renderer/utils/init'
-import { Button, Input, Switch } from '@heroui/react'
-import { FaNetworkWired } from 'react-icons/fa'
-import InterfaceModal from '@renderer/components/mihomo/interface-modal'
 
 const PortSetting: React.FC = () => {
   const { appConfig } = useAppConfig()
@@ -25,7 +25,7 @@ const PortSetting: React.FC = () => {
     'socks-port': socksPort = 0,
     port: httpPort = 0,
     'redir-port': redirPort = 0,
-    'tproxy-port': tproxyPort = 0
+    'tproxy-port': tproxyPort = 0,
   } = controledMihomoConfig || {}
 
   const [mixedPortInput, setMixedPortInput] = useState(mixedPort)
@@ -45,13 +45,7 @@ const PortSetting: React.FC = () => {
   }
   const formatAuth = (user: string, pass?: string): string => `${user}:${pass || ''}`
   const hasPortConflict = (): boolean => {
-    const ports = [
-      mixedPortInput,
-      socksPortInput,
-      httpPortInput,
-      redirPortInput,
-      tproxyPortInput
-    ].filter((p) => p !== 0)
+    const ports = [mixedPortInput, socksPortInput, httpPortInput, redirPortInput, tproxyPortInput].filter(p => p !== 0)
     return new Set(ports).size !== ports.length
   }
 
@@ -63,14 +57,14 @@ const PortSetting: React.FC = () => {
   return (
     <>
       {lanOpen && <InterfaceModal onClose={() => setLanOpen(false)} />}
-      <SettingCard title="端口设置">
-        <SettingItem title="混合端口" divider>
-          <div className="flex">
+      <SettingCard title='端口设置'>
+        <SettingItem title='混合端口' divider>
+          <div className='flex'>
             {mixedPortInput !== mixedPort && (
               <Button
-                size="sm"
-                color="primary"
-                className="mr-2"
+                size='sm'
+                color='primary'
+                className='mr-2'
                 isDisabled={hasPortConflict()}
                 onPress={async () => {
                   await onChangeNeedRestart({ 'mixed-port': mixedPortInput })
@@ -84,25 +78,25 @@ const PortSetting: React.FC = () => {
               </Button>
             )}
             <Input
-              size="sm"
-              type="number"
-              className="w-[100px]"
+              size='sm'
+              type='number'
+              className='w-[100px]'
               value={mixedPortInput.toString()}
               max={65535}
               min={0}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 setMixedPortInput(parseInt(v) || 0)
               }}
             />
           </div>
         </SettingItem>
-        <SettingItem title="Socks 端口" divider>
-          <div className="flex">
+        <SettingItem title='Socks 端口' divider>
+          <div className='flex'>
             {socksPortInput !== socksPort && (
               <Button
-                size="sm"
-                color="primary"
-                className="mr-2"
+                size='sm'
+                color='primary'
+                className='mr-2'
                 isDisabled={hasPortConflict()}
                 onPress={() => {
                   onChangeNeedRestart({ 'socks-port': socksPortInput })
@@ -113,25 +107,25 @@ const PortSetting: React.FC = () => {
             )}
 
             <Input
-              size="sm"
-              type="number"
-              className="w-[100px]"
+              size='sm'
+              type='number'
+              className='w-[100px]'
               value={socksPortInput.toString()}
               max={65535}
               min={0}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 setSocksPortInput(parseInt(v) || 0)
               }}
             />
           </div>
         </SettingItem>
-        <SettingItem title="Http 端口" divider>
-          <div className="flex">
+        <SettingItem title='Http 端口' divider>
+          <div className='flex'>
             {httpPortInput !== httpPort && (
               <Button
-                size="sm"
-                color="primary"
-                className="mr-2"
+                size='sm'
+                color='primary'
+                className='mr-2'
                 isDisabled={hasPortConflict()}
                 onPress={() => {
                   onChangeNeedRestart({ port: httpPortInput })
@@ -142,26 +136,26 @@ const PortSetting: React.FC = () => {
             )}
 
             <Input
-              size="sm"
-              type="number"
-              className="w-[100px]"
+              size='sm'
+              type='number'
+              className='w-[100px]'
               value={httpPortInput.toString()}
               max={65535}
               min={0}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 setHttpPortInput(parseInt(v) || 0)
               }}
             />
           </div>
         </SettingItem>
         {platform !== 'win32' && (
-          <SettingItem title="Redir 端口" divider>
-            <div className="flex">
+          <SettingItem title='Redir 端口' divider>
+            <div className='flex'>
               {redirPortInput !== redirPort && (
                 <Button
-                  size="sm"
-                  color="primary"
-                  className="mr-2"
+                  size='sm'
+                  color='primary'
+                  className='mr-2'
                   isDisabled={hasPortConflict()}
                   onPress={() => {
                     onChangeNeedRestart({ 'redir-port': redirPortInput })
@@ -172,13 +166,13 @@ const PortSetting: React.FC = () => {
               )}
 
               <Input
-                size="sm"
-                type="number"
-                className="w-[100px]"
+                size='sm'
+                type='number'
+                className='w-[100px]'
                 value={redirPortInput.toString()}
                 max={65535}
                 min={0}
-                onValueChange={(v) => {
+                onValueChange={v => {
                   setRedirPortInput(parseInt(v) || 0)
                 }}
               />
@@ -186,13 +180,13 @@ const PortSetting: React.FC = () => {
           </SettingItem>
         )}
         {platform === 'linux' && (
-          <SettingItem title="TProxy 端口" divider>
-            <div className="flex">
+          <SettingItem title='TProxy 端口' divider>
+            <div className='flex'>
               {tproxyPortInput !== tproxyPort && (
                 <Button
-                  size="sm"
-                  color="primary"
-                  className="mr-2"
+                  size='sm'
+                  color='primary'
+                  className='mr-2'
                   isDisabled={hasPortConflict()}
                   onPress={() => {
                     onChangeNeedRestart({ 'tproxy-port': tproxyPortInput })
@@ -203,13 +197,13 @@ const PortSetting: React.FC = () => {
               )}
 
               <Input
-                size="sm"
-                type="number"
-                className="w-[100px]"
+                size='sm'
+                type='number'
+                className='w-[100px]'
                 value={tproxyPortInput.toString()}
                 max={65535}
                 min={0}
-                onValueChange={(v) => {
+                onValueChange={v => {
                   setTproxyPortInput(parseInt(v) || 0)
                 }}
               />
@@ -217,36 +211,36 @@ const PortSetting: React.FC = () => {
           </SettingItem>
         )}
         <SettingItem
-          title="允许局域网连接"
+          title='允许局域网连接'
           actions={
             <Button
-              size="sm"
+              size='sm'
               isIconOnly
-              variant="light"
+              variant='light'
               onPress={() => {
                 setLanOpen(true)
               }}
             >
-              <FaNetworkWired className="text-lg" />
+              <FaNetworkWired className='text-lg' />
             </Button>
           }
           divider
         >
           <Switch
-            size="sm"
+            size='sm'
             isSelected={allowLan}
-            onValueChange={(v) => {
+            onValueChange={v => {
               onChangeNeedRestart({ 'allow-lan': v })
             }}
           />
         </SettingItem>
         {allowLan && (
           <>
-            <SettingItem title="允许连接的 IP 段">
+            <SettingItem title='允许连接的 IP 段'>
               {lanAllowedIpsInput.join('') !== lanAllowedIps.join('') && (
                 <Button
-                  size="sm"
-                  color="primary"
+                  size='sm'
+                  color='primary'
                   onPress={() => {
                     onChangeNeedRestart({ 'lan-allowed-ips': lanAllowedIpsInput })
                   }}
@@ -257,14 +251,14 @@ const PortSetting: React.FC = () => {
             </SettingItem>
             <EditableList
               items={lanAllowedIpsInput}
-              onChange={(items) => setLanAllowedIpsInput(items as string[])}
-              placeholder="IP 段"
+              onChange={items => setLanAllowedIpsInput(items as string[])}
+              placeholder='IP 段'
             />
-            <SettingItem title="禁止连接的 IP 段">
+            <SettingItem title='禁止连接的 IP 段'>
               {lanDisallowedIpsInput.join('') !== lanDisallowedIps.join('') && (
                 <Button
-                  size="sm"
-                  color="primary"
+                  size='sm'
+                  color='primary'
                   onPress={() => {
                     onChangeNeedRestart({ 'lan-disallowed-ips': lanDisallowedIpsInput })
                   }}
@@ -275,16 +269,16 @@ const PortSetting: React.FC = () => {
             </SettingItem>
             <EditableList
               items={lanDisallowedIpsInput}
-              onChange={(items) => setLanDisallowedIpsInput(items as string[])}
-              placeholder="IP 段"
+              onChange={items => setLanDisallowedIpsInput(items as string[])}
+              placeholder='IP 段'
             />
           </>
         )}
-        <SettingItem title="用户验证">
+        <SettingItem title='用户验证'>
           {authenticationInput.join() !== authentication.join() && (
             <Button
-              size="sm"
-              color="primary"
+              size='sm'
+              color='primary'
               onPress={() => onChangeNeedRestart({ authentication: authenticationInput })}
             >
               确认
@@ -293,17 +287,17 @@ const PortSetting: React.FC = () => {
         </SettingItem>
         <EditableList
           items={authenticationInput}
-          onChange={(items) => setAuthenticationInput(items as string[])}
-          placeholder="用户名"
-          part2Placeholder="密码"
+          onChange={items => setAuthenticationInput(items as string[])}
+          placeholder='用户名'
+          part2Placeholder='密码'
           parse={parseAuth}
           format={formatAuth}
         />
-        <SettingItem title="允许跳过验证的 IP 段">
+        <SettingItem title='允许跳过验证的 IP 段'>
           {skipAuthPrefixesInput.join('') !== skipAuthPrefixes.join('') && (
             <Button
-              size="sm"
-              color="primary"
+              size='sm'
+              color='primary'
               onPress={() => {
                 onChangeNeedRestart({ 'skip-auth-prefixes': skipAuthPrefixesInput })
               }}
@@ -314,8 +308,8 @@ const PortSetting: React.FC = () => {
         </SettingItem>
         <EditableList
           items={skipAuthPrefixesInput}
-          onChange={(items) => setSkipAuthPrefixesInput(items as string[])}
-          placeholder="IP 段"
+          onChange={items => setSkipAuthPrefixesInput(items as string[])}
+          placeholder='IP 段'
           disableFirst
           divider={false}
         />

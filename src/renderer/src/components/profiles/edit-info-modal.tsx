@@ -1,27 +1,28 @@
 import {
-  cn,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Button,
-  Input,
-  Switch,
+  cn,
   Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
   DropdownItem,
-  Tooltip
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Switch,
+  Tooltip,
 } from '@heroui/react'
-import React, { useState } from 'react'
-import SettingItem from '../base/base-setting-item'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useOverrideConfig } from '@renderer/hooks/use-override-config'
 import { restartCore } from '@renderer/utils/ipc'
-import { MdDeleteForever } from 'react-icons/md'
+import React, { useState } from 'react'
 import { FaPlus } from 'react-icons/fa6'
-import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { IoIosHelpCircle } from 'react-icons/io'
+import { MdDeleteForever } from 'react-icons/md'
+
+import SettingItem from '../base/base-setting-item'
 
 interface Props {
   item: ProfileItem
@@ -30,7 +31,7 @@ interface Props {
   onClose: () => void
 }
 
-const EditInfoModal: React.FC<Props> = (props) => {
+const EditInfoModal: React.FC<Props> = props => {
   const { item, isCurrent, updateProfileItem, onClose } = props
   const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const { overrideConfig } = useOverrideConfig()
@@ -43,9 +44,8 @@ const EditInfoModal: React.FC<Props> = (props) => {
       const itemToSave = {
         ...values,
         override: values.override?.filter(
-          (i) =>
-            overrideItems.find((t) => t.id === i) && !overrideItems.find((t) => t.id === i)?.global
-        )
+          i => overrideItems.find(t => t.id === i) && !overrideItems.find(t => t.id === i)?.global,
+        ),
       }
 
       await updateProfileItem(itemToSave)
@@ -62,107 +62,107 @@ const EditInfoModal: React.FC<Props> = (props) => {
     <Modal
       backdrop={disableAnimation ? 'transparent' : 'blur'}
       disableAnimation={disableAnimation}
-      size="5xl"
+      size='5xl'
       classNames={{
         backdrop: 'top-[48px]',
-        base: 'w-[600px] md:w-[600px] lg:w-[800px] xl:w-[1024px]'
+        base: 'w-[600px] md:w-[600px] lg:w-[800px] xl:w-[1024px]',
       }}
       hideCloseButton
       isOpen={true}
       onOpenChange={onClose}
-      scrollBehavior="inside"
+      scrollBehavior='inside'
     >
       <ModalContent>
-        <ModalHeader className="flex app-drag">{item.id ? '编辑信息' : '导入远程配置'}</ModalHeader>
+        <ModalHeader className='flex app-drag'>{item.id ? '编辑信息' : '导入远程配置'}</ModalHeader>
         <ModalBody>
-          <SettingItem title="名称">
+          <SettingItem title='名称'>
             <Input
-              size="sm"
+              size='sm'
               className={cn(inputWidth)}
               value={values.name}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 setValues({ ...values, name: v })
               }}
             />
           </SettingItem>
           {values.type === 'remote' && (
             <>
-              <SettingItem title="订阅地址">
+              <SettingItem title='订阅地址'>
                 <Input
-                  size="sm"
+                  size='sm'
                   className={cn(inputWidth)}
                   value={values.url}
-                  onValueChange={(v) => {
+                  onValueChange={v => {
                     setValues({ ...values, url: v })
                   }}
                 />
               </SettingItem>
-              <SettingItem title="证书指纹">
+              <SettingItem title='证书指纹'>
                 <Input
-                  size="sm"
+                  size='sm'
                   className={cn(inputWidth)}
                   value={values.fingerprint ?? ''}
-                  onValueChange={(v) => {
+                  onValueChange={v => {
                     setValues({ ...values, fingerprint: v.trim() || undefined })
                   }}
                 />
               </SettingItem>
-              <SettingItem title="指定 UA">
+              <SettingItem title='指定 UA'>
                 <Input
-                  size="sm"
+                  size='sm'
                   className={cn(inputWidth)}
                   value={values.ua ?? ''}
-                  onValueChange={(v) => {
+                  onValueChange={v => {
                     setValues({ ...values, ua: v.trim() || undefined })
                   }}
                 />
               </SettingItem>
-              <SettingItem title="验证订阅格式">
+              <SettingItem title='验证订阅格式'>
                 <Switch
-                  size="sm"
+                  size='sm'
                   isSelected={values.verify ?? false}
-                  onValueChange={(v) => {
+                  onValueChange={v => {
                     setValues({ ...values, verify: v })
                   }}
                 />
               </SettingItem>
-              <SettingItem title="使用代理更新">
+              <SettingItem title='使用代理更新'>
                 <Switch
-                  size="sm"
+                  size='sm'
                   isSelected={values.useProxy ?? false}
-                  onValueChange={(v) => {
+                  onValueChange={v => {
                     setValues({ ...values, useProxy: v })
                   }}
                 />
               </SettingItem>
-              <SettingItem title="自动更新">
+              <SettingItem title='自动更新'>
                 <Switch
-                  size="sm"
+                  size='sm'
                   isSelected={values.autoUpdate ?? false}
-                  onValueChange={(v) => {
+                  onValueChange={v => {
                     setValues({ ...values, autoUpdate: v })
                   }}
                 />
               </SettingItem>
               {values.autoUpdate && (
                 <SettingItem
-                  title="更新间隔（分钟）"
+                  title='更新间隔（分钟）'
                   actions={
                     values.locked && (
-                      <Tooltip content="当前更新间隔由远程管理">
-                        <Button isIconOnly size="sm" variant="light">
-                          <IoIosHelpCircle className="text-lg" />
+                      <Tooltip content='当前更新间隔由远程管理'>
+                        <Button isIconOnly size='sm' variant='light'>
+                          <IoIosHelpCircle className='text-lg' />
                         </Button>
                       </Tooltip>
                     )
                   }
                 >
                   <Input
-                    size="sm"
-                    type="number"
+                    size='sm'
+                    type='number'
                     className={cn(inputWidth)}
                     value={values.interval?.toString() ?? ''}
-                    onValueChange={(v) => {
+                    onValueChange={v => {
                       setValues({ ...values, interval: parseInt(v) })
                     }}
                     disabled={values.locked}
@@ -171,62 +171,62 @@ const EditInfoModal: React.FC<Props> = (props) => {
               )}
             </>
           )}
-          <SettingItem title="覆写">
+          <SettingItem title='覆写'>
             <div>
               {overrideItems
-                .filter((i) => i.global)
-                .map((i) => {
+                .filter(i => i.global)
+                .map(i => {
                   return (
-                    <div className="flex mb-2" key={i.id}>
-                      <Button disabled fullWidth variant="flat" size="sm">
+                    <div className='flex mb-2' key={i.id}>
+                      <Button disabled fullWidth variant='flat' size='sm'>
                         {i.name} (全局)
                       </Button>
                     </div>
                   )
                 })}
-              {values.override?.map((i) => {
-                if (!overrideItems.find((t) => t.id === i)) return null
-                if (overrideItems.find((t) => t.id === i)?.global) return null
+              {values.override?.map(i => {
+                if (!overrideItems.find(t => t.id === i)) return null
+                if (overrideItems.find(t => t.id === i)?.global) return null
                 return (
-                  <div className="flex mb-2" key={i}>
-                    <Button disabled fullWidth variant="flat" size="sm">
-                      {overrideItems.find((t) => t.id === i)?.name}
+                  <div className='flex mb-2' key={i}>
+                    <Button disabled fullWidth variant='flat' size='sm'>
+                      {overrideItems.find(t => t.id === i)?.name}
                     </Button>
                     <Button
-                      color="warning"
-                      variant="flat"
-                      className="ml-2"
-                      size="sm"
+                      color='warning'
+                      variant='flat'
+                      className='ml-2'
+                      size='sm'
                       onPress={() => {
                         setValues({
                           ...values,
-                          override: values.override?.filter((t) => t !== i)
+                          override: values.override?.filter(t => t !== i),
                         })
                       }}
                     >
-                      <MdDeleteForever className="text-lg" />
+                      <MdDeleteForever className='text-lg' />
                     </Button>
                   </div>
                 )
               })}
               <Dropdown>
                 <DropdownTrigger>
-                  <Button fullWidth size="sm" variant="flat" color="default">
+                  <Button fullWidth size='sm' variant='flat' color='default'>
                     <FaPlus />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu
-                  emptyContent="没有可用的覆写"
-                  onAction={(key) => {
+                  emptyContent='没有可用的覆写'
+                  onAction={key => {
                     setValues({
                       ...values,
-                      override: Array.from(values.override || []).concat(key.toString())
+                      override: Array.from(values.override || []).concat(key.toString()),
                     })
                   }}
                 >
                   {overrideItems
-                    .filter((i) => !values.override?.includes(i.id) && !i.global)
-                    .map((i) => (
+                    .filter(i => !values.override?.includes(i.id) && !i.global)
+                    .map(i => (
                       <DropdownItem key={i.id}>{i.name}</DropdownItem>
                     ))}
                 </DropdownMenu>
@@ -235,10 +235,10 @@ const EditInfoModal: React.FC<Props> = (props) => {
           </SettingItem>
         </ModalBody>
         <ModalFooter>
-          <Button size="sm" variant="light" onPress={onClose}>
+          <Button size='sm' variant='light' onPress={onClose}>
             取消
           </Button>
-          <Button size="sm" color="primary" onPress={onSave}>
+          <Button size='sm' color='primary' onPress={onSave}>
             {item.id ? '保存' : '导入'}
           </Button>
         </ModalFooter>

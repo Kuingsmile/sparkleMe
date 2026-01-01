@@ -1,12 +1,13 @@
 import axios, { AxiosInstance } from 'axios'
-import { getAppConfig, getControledMihomoConfig } from '../config'
-import { mainWindow } from '..'
 import WebSocket from 'ws'
+
+import { mainWindow } from '..'
+import { getAppConfig, getControledMihomoConfig } from '../config'
+import { floatingWindow } from '../resolve/floatingWindow'
 import { tray } from '../resolve/tray'
 import { calcTraffic } from '../utils/calc'
-import { getRuntimeConfig } from './factory'
-import { floatingWindow } from '../resolve/floatingWindow'
 import { mihomoIpcPath } from '../utils/dirs'
+import { getRuntimeConfig } from './factory'
 
 let axiosIns: AxiosInstance = null!
 let mihomoTrafficWs: WebSocket | null = null
@@ -30,19 +31,19 @@ export const getAxios = async (force: boolean = false): Promise<AxiosInstance> =
   axiosIns = axios.create({
     baseURL: `http://localhost`,
     socketPath: currentSocketPath,
-    timeout: 15000
+    timeout: 15000,
   })
 
   axiosIns.interceptors.response.use(
-    (response) => {
+    response => {
       return response.data
     },
-    (error) => {
+    error => {
       if (error.response && error.response.data) {
         return Promise.reject(error.response.data)
       }
       return Promise.reject(error)
-    }
+    },
   )
   return axiosIns
 }
@@ -77,12 +78,11 @@ export const mihomoCloseAllConnections = async (name?: string): Promise<void> =>
   if (name) {
     const connectionsInfo = await mihomoGetConnections()
     const targetConnections =
-      connectionsInfo?.connections?.filter((conn) => conn.chains && conn.chains.includes(name)) ||
-      []
+      connectionsInfo?.connections?.filter(conn => conn.chains && conn.chains.includes(name)) || []
     for (const conn of targetConnections) {
       try {
         await mihomoCloseConnection(conn.id)
-      } catch (error) {
+      } catch (_e) {
         // ignore
       }
     }
@@ -112,19 +112,19 @@ export const mihomoGroups = async (): Promise<ControllerMixedGroup[]> => {
     if (proxies.proxies[name] && 'all' in proxies.proxies[name] && !proxies.proxies[name].hidden) {
       const newGroup = proxies.proxies[name]
       newGroup.testUrl = url
-      const newAll = newGroup.all.map((name) => proxies.proxies[name])
+      const newAll = newGroup.all.map(name => proxies.proxies[name])
       groups.push({ ...newGroup, all: newAll })
     }
   })
-  if (!groups.find((group) => group.name === 'GLOBAL')) {
+  if (!groups.find(group => group.name === 'GLOBAL')) {
     const newGlobal = proxies.proxies['GLOBAL'] as ControllerGroupDetail
     if (!newGlobal.hidden) {
-      const newAll = newGlobal.all.map((name) => proxies.proxies[name])
+      const newAll = newGlobal.all.map(name => proxies.proxies[name])
       groups.push({ ...newGlobal, all: newAll })
     }
   }
   if (mode === 'global') {
-    const global = groups.findIndex((group) => group.name === 'GLOBAL')
+    const global = groups.findIndex(group => group.name === 'GLOBAL')
     groups.unshift(groups.splice(global, 1)[0])
   }
   return groups
@@ -150,10 +150,7 @@ export const mihomoUpdateRuleProviders = async (name: string): Promise<void> => 
   return await instance.put(`/providers/rules/${encodeURIComponent(name)}`)
 }
 
-export const mihomoChangeProxy = async (
-  group: string,
-  proxy: string
-): Promise<ControllerProxiesDetail> => {
+export const mihomoChangeProxy = async (group: string, proxy: string): Promise<ControllerProxiesDetail> => {
   const instance = await getAxios()
   return await instance.put(`/proxies/${encodeURIComponent(group)}`, { name: proxy })
 }
@@ -163,33 +160,27 @@ export const mihomoUnfixedProxy = async (group: string): Promise<ControllerProxi
   return await instance.delete(`/proxies/${encodeURIComponent(group)}`)
 }
 
-export const mihomoProxyDelay = async (
-  proxy: string,
-  url?: string
-): Promise<ControllerProxiesDelay> => {
+export const mihomoProxyDelay = async (proxy: string, url?: string): Promise<ControllerProxiesDelay> => {
   const appConfig = await getAppConfig()
   const { delayTestUrl, delayTestTimeout } = appConfig
   const instance = await getAxios()
   return await instance.get(`/proxies/${encodeURIComponent(proxy)}/delay`, {
     params: {
       url: url || delayTestUrl || 'https://www.gstatic.com/generate_204',
-      timeout: delayTestTimeout || 5000
-    }
+      timeout: delayTestTimeout || 5000,
+    },
   })
 }
 
-export const mihomoGroupDelay = async (
-  group: string,
-  url?: string
-): Promise<ControllerGroupDelay> => {
+export const mihomoGroupDelay = async (group: string, url?: string): Promise<ControllerGroupDelay> => {
   const appConfig = await getAppConfig()
   const { delayTestUrl, delayTestTimeout } = appConfig
   const instance = await getAxios()
   return await instance.get(`/group/${encodeURIComponent(group)}/delay`, {
     params: {
       url: url || delayTestUrl || 'https://www.gstatic.com/generate_204',
-      timeout: delayTestTimeout || 5000
-    }
+      timeout: delayTestTimeout || 5000,
+    },
   })
 }
 
@@ -234,10 +225,7 @@ const mihomoTraffic = async (): Promise<void> => {
       mainWindow?.webContents.send('mihomoTraffic', json)
       if (process.platform !== 'linux') {
         tray?.setToolTip(
-          '↑' +
-            `${calcTraffic(json.up)}/s`.padStart(9) +
-            '\n↓' +
-            `${calcTraffic(json.down)}/s`.padStart(9)
+          '↑' + `${calcTraffic(json.up)}/s`.padStart(9) + '\n↓' + `${calcTraffic(json.down)}/s`.padStart(9),
         )
       }
       floatingWindow?.webContents.send('mihomoTraffic', json)
@@ -368,9 +356,7 @@ export const restartMihomoConnections = async (): Promise<void> => {
 
 const mihomoConnections = async (): Promise<void> => {
   const { connectionInterval = 500 } = await getAppConfig()
-  mihomoConnectionsWs = new WebSocket(
-    `ws+unix:${mihomoIpcPath()}:/connections?interval=${connectionInterval}`
-  )
+  mihomoConnectionsWs = new WebSocket(`ws+unix:${mihomoIpcPath()}:/connections?interval=${connectionInterval}`)
 
   mihomoConnectionsWs.onmessage = (e): void => {
     const data = e.data as string

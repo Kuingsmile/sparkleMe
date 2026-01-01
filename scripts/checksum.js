@@ -1,5 +1,5 @@
-import { readFileSync, readdirSync, writeFileSync } from 'fs'
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 const files = readdirSync('dist')
 
 for (const file of files) {

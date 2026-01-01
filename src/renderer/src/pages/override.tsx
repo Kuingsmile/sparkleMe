@@ -1,30 +1,15 @@
-import {
-  Button,
-  Divider,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Input
-} from '@heroui/react'
+import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { SortableContext } from '@dnd-kit/sortable'
+import { Button, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input } from '@heroui/react'
 import BasePage from '@renderer/components/base/base-page'
+import EditInfoModal from '@renderer/components/override/edit-info-modal'
+import OverrideItem from '@renderer/components/override/override-item'
+import { useOverrideConfig } from '@renderer/hooks/use-override-config'
 import { getFilePath, readTextFile } from '@renderer/utils/ipc'
 import { useEffect, useRef, useState } from 'react'
-import { MdContentPaste } from 'react-icons/md'
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent
-} from '@dnd-kit/core'
-import { SortableContext } from '@dnd-kit/sortable'
-import { useOverrideConfig } from '@renderer/hooks/use-override-config'
-import OverrideItem from '@renderer/components/override/override-item'
-import EditInfoModal from '@renderer/components/override/edit-info-modal'
 import { FaPlus } from 'react-icons/fa6'
 import { HiOutlineDocumentText } from 'react-icons/hi'
+import { MdContentPaste } from 'react-icons/md'
 import { RiArchiveLine } from 'react-icons/ri'
 
 const emptyItems: OverrideItem[] = []
@@ -36,7 +21,7 @@ const Override: React.FC = () => {
     addOverrideItem,
     updateOverrideItem,
     removeOverrideItem,
-    mutateOverrideConfig
+    mutateOverrideConfig,
   } = useOverrideConfig()
   const { items } = overrideConfig || {}
   const itemsArray = items ?? emptyItems
@@ -49,9 +34,9 @@ const Override: React.FC = () => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 2
-      }
-    })
+        distance: 2,
+      },
+    }),
   )
   const isProcessingDrop = useRef(false)
   const handleImport = async (): Promise<void> => {
@@ -63,7 +48,7 @@ const Override: React.FC = () => {
         name: name ? decodeURIComponent(name) : undefined,
         type: 'remote',
         url,
-        ext: urlObj.pathname.endsWith('.js') ? 'js' : 'yaml'
+        ext: urlObj.pathname.endsWith('.js') ? 'js' : 'yaml',
       })
     } finally {
       setImporting(false)
@@ -76,8 +61,8 @@ const Override: React.FC = () => {
     if (over) {
       if (active.id !== over.id) {
         const newOrder = sortedItems.slice()
-        const activeIndex = newOrder.findIndex((item) => item.id === active.id)
-        const overIndex = newOrder.findIndex((item) => item.id === over.id)
+        const activeIndex = newOrder.findIndex(item => item.id === active.id)
+        const overIndex = newOrder.findIndex(item => item.id === over.id)
         newOrder.splice(activeIndex, 1)
         newOrder.splice(overIndex, 0, itemsArray[activeIndex])
         setSortedItems(newOrder)
@@ -87,17 +72,17 @@ const Override: React.FC = () => {
   }
 
   useEffect(() => {
-    pageRef.current?.addEventListener('dragover', (e) => {
+    pageRef.current?.addEventListener('dragover', e => {
       e.preventDefault()
       e.stopPropagation()
       setFileOver(true)
     })
-    pageRef.current?.addEventListener('dragleave', (e) => {
+    pageRef.current?.addEventListener('dragleave', e => {
       e.preventDefault()
       e.stopPropagation()
       setFileOver(false)
     })
-    pageRef.current?.addEventListener('drop', async (event) => {
+    pageRef.current?.addEventListener('drop', async event => {
       event.preventDefault()
       event.stopPropagation()
       if (isProcessingDrop.current) return
@@ -120,7 +105,7 @@ const Override: React.FC = () => {
               name: file.name,
               type: 'local',
               file: content,
-              ext: file.name.endsWith('.js') ? 'js' : 'yaml'
+              ext: file.name.endsWith('.js') ? 'js' : 'yaml',
             })
           } catch (e) {
             alert('文件导入失败' + e)
@@ -146,61 +131,61 @@ const Override: React.FC = () => {
   return (
     <BasePage
       ref={pageRef}
-      title="覆写"
+      title='覆写'
       header={
         <>
           <Button
-            size="sm"
-            variant="light"
-            title="使用文档"
+            size='sm'
+            variant='light'
+            title='使用文档'
             isIconOnly
-            className="app-nodrag"
+            className='app-nodrag'
             onPress={() => {
               open('https://mihomo.party/docs/guide/override')
             }}
           >
-            <HiOutlineDocumentText className="text-lg" />
+            <HiOutlineDocumentText className='text-lg' />
           </Button>
           <Button
-            className="app-nodrag"
-            title="常用覆写仓库"
+            className='app-nodrag'
+            title='常用覆写仓库'
             isIconOnly
-            variant="light"
-            size="sm"
+            variant='light'
+            size='sm'
             onPress={() => {
               open('https://github.com/mihomo-party-org/override-hub')
             }}
           >
-            <RiArchiveLine className="text-lg" />
+            <RiArchiveLine className='text-lg' />
           </Button>
         </>
       }
     >
-      <div className="sticky top-0 z-40 bg-background">
-        <div className="flex p-2">
+      <div className='sticky top-0 z-40 bg-background'>
+        <div className='flex p-2'>
           <Input
-            size="sm"
+            size='sm'
             value={url}
             onValueChange={setUrl}
             endContent={
               <Button
-                size="sm"
+                size='sm'
                 isIconOnly
-                variant="light"
+                variant='light'
                 onPress={() => {
-                  navigator.clipboard.readText().then((text) => {
+                  navigator.clipboard.readText().then(text => {
                     setUrl(text)
                   })
                 }}
               >
-                <MdContentPaste className="text-lg" />
+                <MdContentPaste className='text-lg' />
               </Button>
             }
           />
           <Button
-            size="sm"
-            color="primary"
-            className="ml-2"
+            size='sm'
+            color='primary'
+            className='ml-2'
             isDisabled={url === ''}
             isLoading={importing}
             onPress={handleImport}
@@ -209,12 +194,12 @@ const Override: React.FC = () => {
           </Button>
           <Dropdown>
             <DropdownTrigger>
-              <Button className="ml-2" size="sm" isIconOnly color="primary">
+              <Button className='ml-2' size='sm' isIconOnly color='primary'>
                 <FaPlus />
               </Button>
             </DropdownTrigger>
             <DropdownMenu
-              onAction={async (key) => {
+              onAction={async key => {
                 if (key === 'open') {
                   try {
                     const files = await getFilePath(['js', 'yaml'])
@@ -225,7 +210,7 @@ const Override: React.FC = () => {
                         name: fileName,
                         type: 'local',
                         file: content,
-                        ext: fileName?.endsWith('.js') ? 'js' : 'yaml'
+                        ext: fileName?.endsWith('.js') ? 'js' : 'yaml',
                       })
                     }
                   } catch (e) {
@@ -236,14 +221,14 @@ const Override: React.FC = () => {
                     name: '新建 YAML',
                     type: 'local',
                     file: '# https://mihomo.party/docs/guide/override/yaml',
-                    ext: 'yaml'
+                    ext: 'yaml',
                   })
                 } else if (key === 'new-js') {
                   await addOverrideItem({
                     name: '新建 JS',
                     type: 'local',
                     file: '// https://mihomo.party/docs/guide/override/javascript\nfunction main(config) {\n  return config\n}',
-                    ext: 'js'
+                    ext: 'js',
                   })
                 } else if (key === 'import') {
                   const newRemoteOverride: OverrideItem = {
@@ -252,17 +237,17 @@ const Override: React.FC = () => {
                     type: 'remote',
                     url: '',
                     ext: 'yaml',
-                    updated: Date.now()
+                    updated: Date.now(),
                   }
                   setEditingItem(newRemoteOverride)
                   setShowEditModal(true)
                 }
               }}
             >
-              <DropdownItem key="open">打开本地覆写</DropdownItem>
-              <DropdownItem key="import">导入远程覆写</DropdownItem>
-              <DropdownItem key="new-yaml">新建 YAML</DropdownItem>
-              <DropdownItem key="new-js">新建 JavaScript</DropdownItem>
+              <DropdownItem key='open'>打开本地覆写</DropdownItem>
+              <DropdownItem key='import'>导入远程覆写</DropdownItem>
+              <DropdownItem key='new-yaml'>新建 YAML</DropdownItem>
+              <DropdownItem key='new-js'>新建 JavaScript</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </div>
@@ -273,11 +258,11 @@ const Override: React.FC = () => {
           className={`${fileOver ? 'blur-sm' : ''} grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 m-2`}
         >
           <SortableContext
-            items={sortedItems.map((item) => {
+            items={sortedItems.map(item => {
               return item.id
             })}
           >
-            {sortedItems.map((item) => (
+            {sortedItems.map(item => (
               <OverrideItem
                 key={item.id}
                 addOverrideItem={addOverrideItem}

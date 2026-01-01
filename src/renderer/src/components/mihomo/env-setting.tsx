@@ -1,21 +1,16 @@
-import React, { useState } from 'react'
-import SettingCard from '../base/base-setting-card'
-import SettingItem from '../base/base-setting-item'
 import { Button, Switch } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { restartCore } from '@renderer/utils/ipc'
-import EditableList from '../base/base-list-editor'
 import { platform } from '@renderer/utils/init'
+import { restartCore } from '@renderer/utils/ipc'
+import React, { useState } from 'react'
+
+import EditableList from '../base/base-list-editor'
+import SettingCard from '../base/base-setting-card'
+import SettingItem from '../base/base-setting-item'
 
 const EnvSetting: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
-  const {
-    disableLoopbackDetector,
-    disableEmbedCA,
-    disableSystemCA,
-    disableNftables,
-    safePaths = []
-  } = appConfig || {}
+  const { disableLoopbackDetector, disableEmbedCA, disableSystemCA, disableNftables, safePaths = [] } = appConfig || {}
   const handleConfigChangeWithRestart = async (key: string, value: unknown): Promise<void> => {
     try {
       await patchAppConfig({ [key]: value })
@@ -29,50 +24,50 @@ const EnvSetting: React.FC = () => {
   const [safePathsInput, setSafePathsInput] = useState(safePaths)
 
   return (
-    <SettingCard title="环境变量">
-      <SettingItem title="禁用系统 CA" divider>
+    <SettingCard title='环境变量'>
+      <SettingItem title='禁用系统 CA' divider>
         <Switch
-          size="sm"
+          size='sm'
           isSelected={disableSystemCA}
-          onValueChange={(v) => {
+          onValueChange={v => {
             handleConfigChangeWithRestart('disableSystemCA', v)
           }}
         />
       </SettingItem>
-      <SettingItem title="禁用内置 CA" divider>
+      <SettingItem title='禁用内置 CA' divider>
         <Switch
-          size="sm"
+          size='sm'
           isSelected={disableEmbedCA}
-          onValueChange={(v) => {
+          onValueChange={v => {
             handleConfigChangeWithRestart('disableEmbedCA', v)
           }}
         />
       </SettingItem>
-      <SettingItem title="禁用回环检测" divider>
+      <SettingItem title='禁用回环检测' divider>
         <Switch
-          size="sm"
+          size='sm'
           isSelected={disableLoopbackDetector}
-          onValueChange={(v) => {
+          onValueChange={v => {
             handleConfigChangeWithRestart('disableLoopbackDetector', v)
           }}
         />
       </SettingItem>
-      {platform == 'linux' && (
-        <SettingItem title="禁用 nftables" divider>
+      {platform === 'linux' && (
+        <SettingItem title='禁用 nftables' divider>
           <Switch
-            size="sm"
+            size='sm'
             isSelected={disableNftables}
-            onValueChange={(v) => {
+            onValueChange={v => {
               handleConfigChangeWithRestart('disableNftables', v)
             }}
           />
         </SettingItem>
       )}
-      <SettingItem title="可信路径">
-        {safePathsInput.join('') != safePaths.join('') && (
+      <SettingItem title='可信路径'>
+        {safePathsInput.join('') !== safePaths.join('') && (
           <Button
-            size="sm"
-            color="primary"
+            size='sm'
+            color='primary'
             onPress={() => {
               handleConfigChangeWithRestart('safePaths', safePathsInput)
             }}
@@ -83,7 +78,7 @@ const EnvSetting: React.FC = () => {
       </SettingItem>
       <EditableList
         items={safePathsInput}
-        onChange={(items) => setSafePathsInput(items as string[])}
+        onChange={items => setSafePathsInput(items as string[])}
         divider={false}
       />{' '}
     </SettingCard>

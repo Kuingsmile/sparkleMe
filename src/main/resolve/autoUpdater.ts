@@ -1,36 +1,38 @@
+import { exec, spawn } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { existsSync } from 'node:fs'
+import { copyFile, readFile, rm, writeFile } from 'node:fs/promises'
+import path from 'node:path'
+import { promisify } from 'node:util'
+
 import axios, { AxiosRequestConfig, CancelTokenSource } from 'axios'
-import { parseYaml } from '../utils/yaml'
 import { app, shell } from 'electron'
+
+import { mainWindow, setNotQuitDialog } from '..'
 import { getAppConfig, getControledMihomoConfig } from '../config'
-import { dataDir, exeDir, exePath, isPortable, resourcesFilesDir } from '../utils/dirs'
-import { copyFile, rm, writeFile, readFile } from 'fs/promises'
-import path from 'path'
-import { existsSync } from 'fs'
-import { exec, spawn } from 'child_process'
-import { promisify } from 'util'
-import { createHash } from 'crypto'
-import { setNotQuitDialog, mainWindow } from '..'
 import { disableSysProxy } from '../sys/sysproxy'
+import { dataDir, exeDir, exePath, isPortable, resourcesFilesDir } from '../utils/dirs'
+import { parseYaml } from '../utils/yaml'
 
 let downloadCancelToken: CancelTokenSource | null = null
 
 export async function checkUpdate(): Promise<AppVersion | undefined> {
   const { 'mixed-port': mixedPort = 7890 } = await getControledMihomoConfig()
   const { updateChannel = 'stable' } = await getAppConfig()
-  let url = 'https://github.com/xishang0128/sparkle/releases/latest/download/latest.yml'
-  if (updateChannel == 'beta') {
-    url = 'https://github.com/xishang0128/sparkle/releases/download/pre-release/latest.yml'
+  let url = 'https://github.com/Kuingsmile/sparkleMe/releases/latest/download/latest.yml'
+  if (updateChannel === 'beta') {
+    url = 'https://github.com/Kuingsmile/sparkleMe/releases/download/pre-release/latest.yml'
   }
   const res = await axios.get(url, {
     headers: { 'Content-Type': 'application/octet-stream' },
-    ...(mixedPort != 0 && {
+    ...(mixedPort !== 0 && {
       proxy: {
         protocol: 'http',
         host: '127.0.0.1',
-        port: mixedPort
-      }
+        port: mixedPort,
+      },
     }),
-    responseType: 'text'
+    responseType: 'text',
   })
   const latest = parseYaml<AppVersion>(res.data)
   const currentVersion = app.getVersion()
@@ -47,13 +49,13 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
   if (version.includes('beta')) {
     releaseTag = 'pre-release'
   }
-  const baseUrl = `https://github.com/xishang0128/sparkle/releases/download/${releaseTag}/`
+  const baseUrl = `https://github.com/Kuingsmile/sparkleMe/releases/download/${releaseTag}/`
   const fileMap = {
     'win32-x64': `sparkle-windows-${version}-x64-setup.exe`,
     'win32-arm64': `sparkle-windows-${version}-arm64-setup.exe`,
     'darwin-x64': `sparkle-macos-${version}-x64.pkg`,
-    'darwin-arm64': `sparkle-macos-${version}-arm64.pkg`
-  }
+    'darwin-arm64': `sparkle-macos-${version}-arm64.pkg`,
+  } as Record<string, string>
   let file = fileMap[`${process.platform}-${process.arch}`]
   if (isPortable()) {
     file = file.replace('-setup.exe', '-portable.7z')
@@ -63,28 +65,28 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
   }
   downloadCancelToken = axios.CancelToken.source()
 
-  const apiUrl = `https://api.github.com/repos/xishang0128/sparkle/releases/tags/${releaseTag}`
+  const apiUrl = `https://api.github.com/repos/Kuingsmile/sparkleMe/releases/tags/${releaseTag}`
   const apiRequestConfig: AxiosRequestConfig = {
     headers: { Accept: 'application/vnd.github.v3+json' },
-    ...(mixedPort != 0 && {
+    ...(mixedPort !== 0 && {
       proxy: {
         protocol: 'http',
         host: '127.0.0.1',
-        port: mixedPort
-      }
+        port: mixedPort,
+      },
     }),
-    cancelToken: downloadCancelToken.token
+    cancelToken: downloadCancelToken.token,
   }
 
   try {
     mainWindow?.webContents.send('update-status', {
       downloading: true,
-      progress: 0
+      progress: 0,
     })
 
     const releaseRes = await axios.get(apiUrl, apiRequestConfig)
-    const assets: Array<{ name: string; digest?: string }> = releaseRes.data.assets || []
-    const matchedAsset = assets.find((a) => a.name === file)
+    const assets: { name: string; digest?: string }[] = releaseRes.data.assets || []
+    const matchedAsset = assets.find(a => a.name === file)
     if (!matchedAsset || !matchedAsset.digest) {
       throw new Error(`无法从 GitHub Release 中找到 "${file}" 对应的 SHA-256 信息`)
     }
@@ -93,26 +95,24 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
     if (!existsSync(path.join(dataDir(), file))) {
       const res = await axios.get(`${baseUrl}${file}`, {
         responseType: 'arraybuffer',
-        ...(mixedPort != 0 && {
+        ...(mixedPort !== 0 && {
           proxy: {
             protocol: 'http',
             host: '127.0.0.1',
-            port: mixedPort
-          }
+            port: mixedPort,
+          },
         }),
         headers: {
-          'Content-Type': 'application/octet-stream'
+          'Content-Type': 'application/octet-stream',
         },
         cancelToken: downloadCancelToken.token,
-        onDownloadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / (progressEvent.total || 1)
-          )
+        onDownloadProgress: progressEvent => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1))
           mainWindow?.webContents.send('update-status', {
             downloading: true,
-            progress: percentCompleted
+            progress: percentCompleted,
           })
-        }
+        },
       })
       await writeFile(path.join(dataDir(), file), res.data)
     }
@@ -128,14 +128,14 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
 
     mainWindow?.webContents.send('update-status', {
       downloading: false,
-      progress: 100
+      progress: 100,
     })
 
     disableSysProxy(false)
     if (file.endsWith('.exe')) {
       spawn(path.join(dataDir(), file), ['/S', '--force-run'], {
         detached: true,
-        stdio: 'ignore'
+        stdio: 'ignore',
       }).unref()
     }
     if (file.endsWith('.7z')) {
@@ -144,12 +144,12 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
         'cmd',
         [
           '/C',
-          `"timeout /t 2 /nobreak >nul && "${path.join(dataDir(), '7za.exe')}" x -o"${exeDir()}" -y "${path.join(dataDir(), file)}" & start "" "${exePath()}""`
+          `"timeout /t 2 /nobreak >nul && "${path.join(dataDir(), '7za.exe')}" x -o"${exeDir()}" -y "${path.join(dataDir(), file)}" & start "" "${exePath()}""`,
         ],
         {
           shell: true,
-          detached: true
-        }
+          detached: true,
+        },
       ).unref()
       setNotQuitDialog()
       app.quit()
@@ -173,14 +173,14 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
       mainWindow?.webContents.send('update-status', {
         downloading: false,
         progress: 0,
-        error: '下载已取消'
+        error: '下载已取消',
       })
       return
     } else {
       mainWindow?.webContents.send('update-status', {
         downloading: false,
         progress: 0,
-        error: e instanceof Error ? e.message : '下载失败'
+        error: e instanceof Error ? e.message : '下载失败',
       })
     }
     throw e

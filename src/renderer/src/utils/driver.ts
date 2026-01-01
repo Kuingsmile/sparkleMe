@@ -1,6 +1,6 @@
 import type { NavigateFunction } from 'react-router-dom'
 
-type Driver = {
+interface Driver {
   drive: () => void
   destroy: () => void
   moveNext: () => void
@@ -37,18 +37,17 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
           description:
             '这是一份交互式使用教程，如果您已经完全熟悉本软件的操作，可以直接点击右上角关闭按钮，后续您可以随时从设置中打开本教程',
           side: 'over',
-          align: 'center'
-        }
+          align: 'center',
+        },
       },
       {
         element: '.side',
         popover: {
           title: '导航栏',
-          description:
-            '左侧是应用的导航栏，兼顾仪表盘功能，在这里可以切换不同页面，也可以概览常用的状态信息',
+          description: '左侧是应用的导航栏，兼顾仪表盘功能，在这里可以切换不同页面，也可以概览常用的状态信息',
           side: 'right',
-          align: 'center'
-        }
+          align: 'center',
+        },
       },
       {
         element: '.sysproxy-card',
@@ -56,8 +55,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
           title: '卡片',
           description: '点击导航栏卡片可以跳转到对应页面，拖动导航栏卡片可以自由排列卡片顺序',
           side: 'right',
-          align: 'start'
-        }
+          align: 'start',
+        },
       },
       {
         element: '.main',
@@ -65,15 +64,14 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
           title: '主要区域',
           description: '右侧是应用的主要区域，展示了导航栏所选页面的内容',
           side: 'left',
-          align: 'center'
-        }
+          align: 'center',
+        },
       },
       {
         element: '.profile-card',
         popover: {
           title: '订阅管理',
-          description:
-            '订阅管理卡片展示当前运行的订阅配置信息，点击进入订阅管理页面可以在这里管理订阅配置',
+          description: '订阅管理卡片展示当前运行的订阅配置信息，点击进入订阅管理页面可以在这里管理订阅配置',
           side: 'right',
           align: 'start',
           onNextClick: async (): Promise<void> => {
@@ -81,8 +79,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
             setTimeout(() => {
               driverInstance?.moveNext()
             }, 0)
-          }
-        }
+          },
+        },
       },
       {
         element: '.profiles-sticky',
@@ -91,8 +89,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
           description:
             'Sparkle 支持多种订阅导入方式，在此输入订阅链接，点击导入即可导入您的订阅配置，如果您的订阅需要代理才能更新，请勾选"代理"再点击导入，当然这需要已经有一个可以正常使用的订阅才可以',
           side: 'bottom',
-          align: 'start'
-        }
+          align: 'start',
+        },
       },
       {
         element: '.substore-import',
@@ -101,8 +99,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
           description:
             'Sparkle 深度集成了 Sub-Store，您可以点击该按钮进入 Sub-Store 或直接导入您通过 Sub-Store 管理的订阅，Sparkle 默认使用内置的 Sub-Store 后端，如果您有自建的 Sub-Store 后端，可以在设置页面中配置，如果您不使用 Sub-Store 也可以在设置页面中关闭',
           side: 'bottom',
-          align: 'start'
-        }
+          align: 'start',
+        },
       },
       {
         element: '.new-profile',
@@ -110,8 +108,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
           title: '本地订阅',
           description: '点击"+"可以选择本地文件进行导入或者直接新建空白配置进行编辑',
           side: 'bottom',
-          align: 'start'
-        }
+          align: 'start',
+        },
       },
       {
         element: '.sysproxy-card',
@@ -126,8 +124,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
             setTimeout(() => {
               driverInstance?.moveNext()
             }, 0)
-          }
-        }
+          },
+        },
       },
       {
         element: '.sysproxy-settings',
@@ -136,8 +134,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
           description:
             '在此您可以进行系统代理相关设置，选择代理模式，如果某些 Windows 应用不遵循系统代理，还可以使用"UWP 工具"解除本地回环限制，对于"手动代理模式"和"PAC 代理模式"的区别，请自行百度',
           side: 'top',
-          align: 'start'
-        }
+          align: 'start',
+        },
       },
       {
         element: '.tun-card',
@@ -152,8 +150,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
             setTimeout(() => {
               driverInstance?.moveNext()
             }, 0)
-          }
-        }
+          },
+        },
       },
       {
         element: '.tun-settings',
@@ -162,8 +160,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
           description:
             '这里可以更改虚拟网卡相关设置，Sparkle 理论上已经完全解决权限问题，如果您的虚拟网卡仍然不可用，可以尝试重设防火墙（Windows）或手动授权内核（MacOS/Linux）后重启内核',
           side: 'bottom',
-          align: 'start'
-        }
+          align: 'start',
+        },
       },
       {
         element: '.override-card',
@@ -172,8 +170,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
           description:
             'Sparkle 提供强大的覆写功能，可以对您导入的订阅配置进行个性化修改，如添加规则、自定义代理组等，您可以直接导入别人写好的覆写文件，也可以自己动手编写，<b>编辑好覆写文件一定要记得在需要覆写的订阅上启用</b>，覆写文件的语法请参考 <a href="https://mihomo.party/docs/guide/override" target="_blank">官方文档</a>',
           side: 'right',
-          align: 'center'
-        }
+          align: 'center',
+        },
       },
       {
         element: '.dns-card',
@@ -188,8 +186,8 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
             setTimeout(() => {
               driverInstance?.moveNext()
             }, 0)
-          }
-        }
+          },
+        },
       },
       {
         element: 'none',
@@ -203,10 +201,10 @@ export async function createDriver(navigate: NavigateFunction): Promise<Driver> 
             setTimeout(() => {
               driverInstance?.destroy()
             }, 0)
-          }
-        }
-      }
-    ]
+          },
+        },
+      },
+    ],
   })
 
   return driverInstance

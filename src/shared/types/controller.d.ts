@@ -169,9 +169,9 @@ interface ControllerGroupDetail {
   fixed?: string
 }
 
-// 自定义 group 内容
+// 自定义 group 内容 ControllerProxyDetail?
 interface ControllerMixedGroup extends ControllerGroupDetail {
-  all: (ControllerProxyDetail | ControllerGroupDetail)[]
+  all: (any | ControllerGroupDetail)[]
 }
 
 // ${api}/proxies/:name/delay
@@ -181,9 +181,7 @@ interface ControllerProxiesDelay {
 }
 
 // ${api}/group/:name/delay
-interface ControllerGroupDelay {
-  [key: string]: number
-}
+type ControllerGroupDelay = Record<string, number>
 
 interface ControllerTraffic {
   up: number

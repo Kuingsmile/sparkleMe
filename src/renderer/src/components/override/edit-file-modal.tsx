@@ -1,17 +1,10 @@
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Switch
-} from '@heroui/react'
-import React, { useEffect, useState } from 'react'
-import { BaseEditor } from '../base/base-editor-lazy'
-import { getOverride, restartCore, setOverride } from '@renderer/utils/ipc'
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { getOverride, restartCore, setOverride } from '@renderer/utils/ipc'
+import React, { useEffect, useState } from 'react'
+
 import ConfirmModal from '../base/base-confirm'
+import { BaseEditor } from '../base/base-editor-lazy'
 
 interface Props {
   id: string
@@ -19,7 +12,7 @@ interface Props {
   onClose: () => void
 }
 
-const EditFileModal: React.FC<Props> = (props) => {
+const EditFileModal: React.FC<Props> = props => {
   const { id, language, onClose } = props
   const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [currData, setCurrData] = useState('')
@@ -54,53 +47,51 @@ const EditFileModal: React.FC<Props> = (props) => {
       disableAnimation={disableAnimation}
       classNames={{
         base: 'max-w-none w-full',
-        backdrop: 'top-[48px]'
+        backdrop: 'top-[48px]',
       }}
-      size="5xl"
+      size='5xl'
       hideCloseButton
       isOpen={true}
       onOpenChange={handleClose}
-      scrollBehavior="inside"
+      scrollBehavior='inside'
     >
       {isConfirmOpen && (
         <ConfirmModal
-          title="确认取消"
-          description="您有未保存的修改，确定要取消吗？"
-          confirmText="放弃修改"
-          cancelText="继续编辑"
+          title='确认取消'
+          description='您有未保存的修改，确定要取消吗？'
+          confirmText='放弃修改'
+          cancelText='继续编辑'
           onChange={setIsConfirmOpen}
           onConfirm={onClose}
         />
       )}
-      <ModalContent className="h-full w-[calc(100%-100px)]">
-        <ModalHeader className="flex pb-0 app-drag">
-          编辑覆写{language === 'javascript' ? '脚本' : '配置'}
-        </ModalHeader>
-        <ModalBody className="h-full">
+      <ModalContent className='h-full w-[calc(100%-100px)]'>
+        <ModalHeader className='flex pb-0 app-drag'>编辑覆写{language === 'javascript' ? '脚本' : '配置'}</ModalHeader>
+        <ModalBody className='h-full'>
           <BaseEditor
             language={language}
             value={currData}
             originalValue={isDiff ? originalData : undefined}
-            onChange={(value) => setCurrData(value)}
+            onChange={value => setCurrData(value)}
             diffRenderSideBySide={sideBySide}
           />
         </ModalBody>
-        <ModalFooter className="pt-0 flex justify-between">
-          <div className="flex items-center space-x-2">
-            <Switch size="sm" isSelected={isDiff} onValueChange={setIsDiff}>
+        <ModalFooter className='pt-0 flex justify-between'>
+          <div className='flex items-center space-x-2'>
+            <Switch size='sm' isSelected={isDiff} onValueChange={setIsDiff}>
               显示修改
             </Switch>
-            <Switch size="sm" isSelected={sideBySide} onValueChange={setSideBySide}>
+            <Switch size='sm' isSelected={sideBySide} onValueChange={setSideBySide}>
               侧边显示
             </Switch>
           </div>
-          <div className="flex gap-2">
-            <Button size="sm" variant="light" onPress={handleClose}>
+          <div className='flex gap-2'>
+            <Button size='sm' variant='light' onPress={handleClose}>
               取消
             </Button>
             <Button
-              size="sm"
-              color="primary"
+              size='sm'
+              color='primary'
               onPress={async () => {
                 try {
                   await setOverride(id, language === 'javascript' ? 'js' : 'yaml', currData)

@@ -1,13 +1,16 @@
-import * as isIp from 'is-ip'
 import isCidr from 'is-cidr'
+import * as isIp from 'is-ip'
 
-export type ValidationResult = { ok: boolean; error?: string }
+export interface ValidationResult {
+  ok: boolean
+  error?: string
+}
 
 export const isIPv4 = (ip: string): ValidationResult => {
   if (!ip) return { ok: false, error: 'IP 地址不能为空' }
   try {
     return isIp.isIPv4(ip) ? { ok: true } : { ok: false, error: '无效的 IPv4 地址' }
-  } catch (e) {
+  } catch (_e) {
     return { ok: false, error: '解析 IP 地址时出错' }
   }
 }
@@ -16,7 +19,7 @@ export const isIPv6 = (ip: string): ValidationResult => {
   if (!ip) return { ok: false, error: 'IP 地址不能为空' }
   try {
     return isIp.isIPv6(ip) ? { ok: true } : { ok: false, error: '无效的 IPv6 地址' }
-  } catch (e) {
+  } catch (_e) {
     return { ok: false, error: '解析 IP 地址时出错' }
   }
 }
@@ -29,7 +32,7 @@ export const isValidIPv4Cidr = (s: string | undefined): ValidationResult => {
     if (r === 4) return { ok: true }
     if (r === 6) return { ok: false, error: '这是 IPv6 CIDR，而不是 IPv4 CIDR' }
     return { ok: false, error: '不是有效的 CIDR 格式（示例：198.18.0.1/16）' }
-  } catch (e) {
+  } catch (_e) {
     return { ok: false, error: '解析 CIDR 时出错' }
   }
 }
@@ -42,7 +45,7 @@ export const isValidIPv6Cidr = (s: string | undefined): ValidationResult => {
     if (r === 6) return { ok: true }
     if (r === 4) return { ok: false, error: '这是 IPv4 CIDR，而不是 IPv6 CIDR' }
     return { ok: false, error: '不是有效的 CIDR 格式（示例：fc00::/18）' }
-  } catch (e) {
+  } catch (_e) {
     return { ok: false, error: '解析 CIDR 时出错' }
   }
 }
@@ -101,7 +104,7 @@ export const isValidDomainWildcard = (s: string | undefined): ValidationResult =
 
   if (v.includes('*')) {
     const labels = v.split('.')
-    if (labels.every((lab) => lab === '*' || /^[a-zA-Z0-9-]+$/.test(lab))) return { ok: true }
+    if (labels.every(lab => lab === '*' || /^[a-zA-Z0-9-]+$/.test(lab))) return { ok: true }
     return { ok: false, error: '通配符位置或标签不合法' }
   }
 
@@ -113,7 +116,7 @@ export const isValidPortRange = (s: string | undefined): boolean => {
   if (!s || s.trim() === '') return false
   const parts = s
     .split(/[,/]/)
-    .map((p) => p.trim())
+    .map(p => p.trim())
     .filter(Boolean)
   if (parts.length === 0) return false
   for (const p of parts) {
@@ -149,7 +152,7 @@ export const isValidDnsServer = (s: string | undefined, ipOnly = false): Validat
 
     const params = paramsPart
       .split('&')
-      .map((p) => p.trim())
+      .map(p => p.trim())
       .filter(Boolean)
     for (const param of params) {
       if (param.includes('=')) {
@@ -163,7 +166,7 @@ export const isValidDnsServer = (s: string | undefined, ipOnly = false): Validat
         if (!allowedParams.includes(key)) {
           return {
             ok: false,
-            error: `不支持的参数 "${key}"，允许的参数：${allowedParams.join(', ')}`
+            error: `不支持的参数 "${key}"，允许的参数：${allowedParams.join(', ')}`,
           }
         }
         if (boolParams.includes(key) && value !== 'true' && value !== 'false') {
@@ -179,7 +182,7 @@ export const isValidDnsServer = (s: string | undefined, ipOnly = false): Validat
         if (!/^[a-zA-Z0-9\u4e00-\u9fa5\s-_]+$/.test(param)) {
           return {
             ok: false,
-            error: `参数 "${param}" 不合法，如有需要请关闭软件 DNS 覆盖使用`
+            error: `参数 "${param}" 不合法，如有需要请关闭软件 DNS 覆盖使用`,
           }
         }
       }
@@ -200,14 +203,7 @@ export const isValidDnsServer = (s: string | undefined, ipOnly = false): Validat
 
   if (lower.startsWith('rcode://')) {
     const code = lower.slice('rcode://'.length)
-    const allowed = new Set([
-      'success',
-      'format_error',
-      'server_failure',
-      'name_error',
-      'not_implemented',
-      'refused'
-    ])
+    const allowed = new Set(['success', 'format_error', 'server_failure', 'name_error', 'not_implemented', 'refused'])
     return allowed.has(code) ? { ok: true } : { ok: false, error: '无效的 rcode 值' }
   }
 
@@ -230,7 +226,7 @@ export const isValidDnsServer = (s: string | undefined, ipOnly = false): Validat
         return { ok: false, error: '主机必须是 IP 地址，不支持域名' }
       }
       return { ok: true }
-    } catch (e) {
+    } catch (_e) {
       return { ok: false, error: '无效的 URL 格式' }
     }
   }
@@ -246,10 +242,7 @@ export const isValidDnsServer = (s: string | undefined, ipOnly = false): Validat
     const hpIdx = hostPort.lastIndexOf(':')
     let host = hostPort
     let portStr: string | undefined
-    if (
-      hpIdx !== -1 &&
-      !(hostPort.startsWith('[') && hostPort.includes(']') && hpIdx > hostPort.indexOf(']'))
-    ) {
+    if (hpIdx !== -1 && !(hostPort.startsWith('[') && hostPort.includes(']') && hpIdx > hostPort.indexOf(']'))) {
       host = hostPort.slice(0, hpIdx)
       portStr = hostPort.slice(hpIdx + 1)
     }
@@ -295,9 +288,7 @@ export const isValidDnsServer = (s: string | undefined, ipOnly = false): Validat
     if (ipOnly) {
       return { ok: false, error: '主机必须是 IP 地址，不支持域名' }
     }
-    return /^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$/.test(host)
-      ? { ok: true }
-      : { ok: false, error: '无效的主机名' }
+    return /^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$/.test(host) ? { ok: true } : { ok: false, error: '无效的主机名' }
   }
 
   if (serverPart.startsWith('[') && serverPart.endsWith(']')) {

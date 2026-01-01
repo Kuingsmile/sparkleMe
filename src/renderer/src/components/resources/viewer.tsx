@@ -1,9 +1,10 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react'
-import React, { useEffect, useState } from 'react'
-import { BaseEditor } from '../base/base-editor-lazy'
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { getFileStr, setFileStr } from '@renderer/utils/ipc'
 import yaml from 'js-yaml'
-import { useAppConfig } from '@renderer/hooks/use-app-config'
+import React, { useEffect, useState } from 'react'
+
+import { BaseEditor } from '../base/base-editor-lazy'
 type Language = 'yaml' | 'javascript' | 'css' | 'json' | 'text'
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
   privderType: string
   format?: string
 }
-const Viewer: React.FC<Props> = (props) => {
+const Viewer: React.FC<Props> = props => {
   const { type, path, title, format, privderType, onClose } = props
   const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [currData, setCurrData] = useState('')
@@ -31,20 +32,20 @@ const Viewer: React.FC<Props> = (props) => {
     try {
       const parsedYaml = yaml.load(fileContent)
       if (parsedYaml && typeof parsedYaml === 'object') {
-        const yamlObj = parsedYaml as Record<string, unknown>
+        const yamlObj = parsedYaml as Record<string, any>
         const payload = yamlObj[privderType]?.[title]?.payload
         if (payload) {
           if (privderType === 'proxy-providers') {
             setCurrData(
               yaml.dump({
-                proxies: payload
-              })
+                proxies: payload,
+              }),
             )
           } else {
             setCurrData(
               yaml.dump({
-                rules: payload
-              })
+                rules: payload,
+              }),
             )
           }
         } else {
@@ -58,7 +59,7 @@ const Viewer: React.FC<Props> = (props) => {
       } else {
         setCurrData(fileContent)
       }
-    } catch (error) {
+    } catch (_error) {
       setCurrData(fileContent)
     }
   }
@@ -73,32 +74,32 @@ const Viewer: React.FC<Props> = (props) => {
       disableAnimation={disableAnimation}
       classNames={{
         base: 'max-w-none w-full',
-        backdrop: 'top-[48px]'
+        backdrop: 'top-[48px]',
       }}
-      size="5xl"
+      size='5xl'
       hideCloseButton
       isOpen={true}
       onOpenChange={onClose}
-      scrollBehavior="inside"
+      scrollBehavior='inside'
     >
-      <ModalContent className="h-full w-[calc(100%-100px)]">
-        <ModalHeader className="flex pb-0 app-drag">{title}</ModalHeader>
-        <ModalBody className="h-full">
+      <ModalContent className='h-full w-[calc(100%-100px)]'>
+        <ModalHeader className='flex pb-0 app-drag'>{title}</ModalHeader>
+        <ModalBody className='h-full'>
           <BaseEditor
             language={language}
             value={currData}
-            readOnly={type != 'File'}
-            onChange={(value) => setCurrData(value)}
+            readOnly={type !== 'File'}
+            onChange={value => setCurrData(value)}
           />
         </ModalBody>
-        <ModalFooter className="pt-0">
-          <Button size="sm" variant="light" onPress={onClose}>
+        <ModalFooter className='pt-0'>
+          <Button size='sm' variant='light' onPress={onClose}>
             关闭
           </Button>
-          {type == 'File' && (
+          {type === 'File' && (
             <Button
-              size="sm"
-              color="primary"
+              size='sm'
+              color='primary'
               onPress={async () => {
                 await setFileStr(path, currData)
                 onClose()

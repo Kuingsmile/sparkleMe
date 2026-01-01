@@ -1,27 +1,28 @@
-import { resolve } from 'path'
-import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
+import { resolve } from 'node:path'
+
+import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { defineConfig } from 'electron-vite'
 // https://github.com/vdesjs/vite-plugin-monaco-editor/issues/21#issuecomment-1827562674
 import monacoEditorPluginModule from 'vite-plugin-monaco-editor'
-import tailwindcss from '@tailwindcss/vite'
 
-const isObjectWithDefaultFunction = (
-  module: unknown
-): module is { default: typeof monacoEditorPluginModule } =>
-  module != null &&
-  typeof module === 'object' &&
-  'default' in module &&
-  typeof module.default === 'function'
+const isObjectWithDefaultFunction = (module: unknown): module is { default: typeof monacoEditorPluginModule } =>
+  module !== null && typeof module === 'object' && 'default' in module && typeof module.default === 'function'
+
 const monacoEditorPlugin = isObjectWithDefaultFunction(monacoEditorPluginModule)
   ? monacoEditorPluginModule.default
   : monacoEditorPluginModule
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    build: {
+      externalizeDeps: true,
+    },
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    build: {
+      externalizeDeps: true,
+    },
   },
   renderer: {
     build: {
@@ -29,14 +30,14 @@ export default defineConfig({
         input: {
           index: resolve('src/renderer/index.html'),
           floating: resolve('src/renderer/floating.html'),
-          traymenu: resolve('src/renderer/traymenu.html')
-        }
-      }
+          traymenu: resolve('src/renderer/traymenu.html'),
+        },
+      },
     },
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src')
-      }
+        '@renderer': resolve('src/renderer/src'),
+      },
     },
     plugins: [
       react(),
@@ -47,10 +48,10 @@ export default defineConfig({
         customWorkers: [
           {
             label: 'yaml',
-            entry: 'monaco-yaml/yaml.worker'
-          }
-        ]
-      })
-    ]
-  }
+            entry: 'monaco-yaml/yaml.worker',
+          },
+        ],
+      }),
+    ],
+  },
 })

@@ -1,22 +1,25 @@
-@import 'tailwindcss';
+@import url('tailwindcss');
+
 @plugin './hero.mjs';
+
 @source '../../../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: 'twemoji';
+  font-family: twemoji;
   src: url('./twemoji.ttf');
 }
 
 .driver-popover {
-  background-color: hsl(var(--heroui-content2)) !important;
   border-radius: 8px !important;
   color: hsl(var(--heroui-foreground)) !important;
+  background-color: hsl(var(--heroui-content2)) !important;
 }
 
 .driver-popover a {
-  color: hsl(var(--heroui-primary)) !important;
   text-decoration: underline !important;
+  color: hsl(var(--heroui-primary)) !important;
 }
 
 .driver-popover-close-btn {
@@ -28,23 +31,23 @@
 }
 
 .driver-popover-prev-btn {
-  color: white !important;
-  text-shadow: none !important;
   border: none !important;
-  padding: 8px !important;
   border-radius: 5px !important;
+  padding: 8px !important;
   font-size: 12px !important;
+  color: white !important;
   background-color: hsl(var(--heroui-primary)) !important;
+  text-shadow: none !important;
 }
 
 .driver-popover-next-btn {
-  color: white !important;
-  text-shadow: none !important;
   border: none !important;
-  padding: 8px !important;
   border-radius: 5px !important;
+  padding: 8px !important;
   font-size: 12px !important;
+  color: white !important;
   background-color: hsl(var(--heroui-primary)) !important;
+  text-shadow: none !important;
 }
 
 .driver-popover-arrow-side-bottom {
@@ -66,6 +69,7 @@
 .app-nodrag {
   -webkit-app-region: none;
 }
+
 .app-drag {
   -webkit-app-region: drag;
 }
@@ -94,7 +98,7 @@
     'Helvetica Neue',
     sans-serif,
     'Apple Color Emoji',
-    'twemoji';
+    twemoji;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -113,8 +117,8 @@
 /* Light mode */
 @media (prefers-color-scheme: light) {
   *::-webkit-scrollbar-thumb {
-    background: #c0c1c58f;
     border-radius: 5px;
+    background: #c0c1c58f;
   }
 
   *::-webkit-scrollbar-thumb:hover {
@@ -125,8 +129,8 @@
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
   *::-webkit-scrollbar-thumb {
-    background: #c0c1c550;
     border-radius: 5px;
+    background: #c0c1c550;
   }
 
   *::-webkit-scrollbar-thumb:hover {

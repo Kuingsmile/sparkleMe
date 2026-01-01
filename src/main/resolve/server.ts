@@ -1,16 +1,18 @@
-import { getAppConfig, getControledMihomoConfig } from '../config'
-import { Worker } from 'worker_threads'
-import { mihomoWorkDir, subStoreDir, substoreLogPath } from '../utils/dirs'
-import subStoreIcon from '../../../resources/subStoreIcon.png?asset'
-import { createWriteStream, existsSync, mkdirSync } from 'fs'
-import { writeFile, rm, cp } from 'fs/promises'
-import http from 'http'
-import net from 'net'
-import path from 'path'
+import { createWriteStream, existsSync, mkdirSync } from 'node:fs'
+import { cp, rm, writeFile } from 'node:fs/promises'
+import http from 'node:http'
+import net from 'node:net'
+import path from 'node:path'
+import { Worker } from 'node:worker_threads'
+
+import AdmZip from 'adm-zip'
+import axios from 'axios'
 import { nativeImage } from 'electron'
 import express from 'express'
-import axios from 'axios'
-import AdmZip from 'adm-zip'
+
+import subStoreIcon from '../../../resources/subStoreIcon.png?asset'
+import { getAppConfig, getControledMihomoConfig } from '../config'
+import { mihomoWorkDir, subStoreDir, substoreLogPath } from '../utils/dirs'
 
 export let pacPort: number
 export let subStorePort: number
@@ -27,7 +29,7 @@ function FindProxyForURL(url, host) {
 export function findAvailablePort(startPort: number): Promise<number> {
   return new Promise((resolve, reject) => {
     const server = net.createServer()
-    server.on('error', (err) => {
+    server.on('error', err => {
       if (startPort <= 65535) {
         resolve(findAvailablePort(startPort + 1))
       } else {
@@ -99,7 +101,7 @@ export async function startSubStoreBackendServer(): Promise<void> {
     subStoreHost = '127.0.0.1',
     subStoreBackendSyncCron = '',
     subStoreBackendDownloadCron = '',
-    subStoreBackendUploadCron = ''
+    subStoreBackendUploadCron = '',
   } = await getAppConfig()
   const { 'mixed-port': port = 7890 } = await getControledMihomoConfig()
   if (!useSubStore) return
@@ -120,7 +122,7 @@ export async function startSubStoreBackendServer(): Promise<void> {
       SUB_STORE_BACKEND_DOWNLOAD_CRON: subStoreBackendDownloadCron,
       SUB_STORE_BACKEND_UPLOAD_CRON: subStoreBackendUploadCron,
       SUB_STORE_MMDB_COUNTRY_PATH: path.join(mihomoWorkDir(), 'country.mmdb'),
-      SUB_STORE_MMDB_ASN_PATH: path.join(mihomoWorkDir(), 'ASN.mmdb')
+      SUB_STORE_MMDB_ASN_PATH: path.join(mihomoWorkDir(), 'ASN.mmdb'),
     }
     subStoreBackendWorker = new Worker(path.join(mihomoWorkDir(), 'sub-store.bundle.js'), {
       env: useProxyInSubStore
@@ -128,9 +130,9 @@ export async function startSubStoreBackendServer(): Promise<void> {
             ...env,
             HTTP_PROXY: `http://127.0.0.1:${port}`,
             HTTPS_PROXY: `http://127.0.0.1:${port}`,
-            ALL_PROXY: `http://127.0.0.1:${port}`
+            ALL_PROXY: `http://127.0.0.1:${port}`,
           }
-        : env
+        : env,
     })
     subStoreBackendWorker.stdout.pipe(stdout)
     subStoreBackendWorker.stderr.pipe(stderr)
@@ -156,14 +158,14 @@ export async function downloadSubStore(): Promise<void> {
       {
         responseType: 'arraybuffer',
         headers: { 'Content-Type': 'application/octet-stream' },
-        ...(mixedPort != 0 && {
+        ...(mixedPort !== 0 && {
           proxy: {
             protocol: 'http',
             host: '127.0.0.1',
-            port: mixedPort
-          }
-        })
-      }
+            port: mixedPort,
+          },
+        }),
+      },
     )
     await writeFile(backendPath, Buffer.from(backendRes.data))
 
@@ -173,14 +175,14 @@ export async function downloadSubStore(): Promise<void> {
       {
         responseType: 'arraybuffer',
         headers: { 'Content-Type': 'application/octet-stream' },
-        ...(mixedPort != 0 && {
+        ...(mixedPort !== 0 && {
           proxy: {
             protocol: 'http',
             host: '127.0.0.1',
-            port: mixedPort
-          }
-        })
-      }
+            port: mixedPort,
+          },
+        }),
+      },
     )
 
     // 创建临时目录

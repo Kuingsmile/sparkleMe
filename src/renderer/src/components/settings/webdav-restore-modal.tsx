@@ -1,4 +1,4 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react'
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { relaunchApp, webdavDelete, webdavRestore } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
@@ -7,7 +7,7 @@ interface Props {
   filenames: string[]
   onClose: () => void
 }
-const WebdavRestoreModal: React.FC<Props> = (props) => {
+const WebdavRestoreModal: React.FC<Props> = props => {
   const { filenames: names, onClose } = props
   const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [filenames, setFilenames] = useState<string[]>(names)
@@ -21,21 +21,21 @@ const WebdavRestoreModal: React.FC<Props> = (props) => {
       hideCloseButton
       isOpen={true}
       onOpenChange={onClose}
-      scrollBehavior="inside"
+      scrollBehavior='inside'
     >
       <ModalContent>
-        <ModalHeader className="flex app-drag">恢复备份</ModalHeader>
+        <ModalHeader className='flex app-drag'>恢复备份</ModalHeader>
         <ModalBody>
           {filenames.length === 0 ? (
-            <div className="flex justify-center">还没有备份</div>
+            <div className='flex justify-center'>还没有备份</div>
           ) : (
-            filenames.map((filename) => (
-              <div className="flex" key={filename}>
+            filenames.map(filename => (
+              <div className='flex' key={filename}>
                 <Button
-                  size="sm"
+                  size='sm'
                   fullWidth
                   isLoading={restoring}
-                  variant="flat"
+                  variant='flat'
                   onPress={async () => {
                     setRestoring(true)
                     try {
@@ -51,27 +51,27 @@ const WebdavRestoreModal: React.FC<Props> = (props) => {
                   {filename}
                 </Button>
                 <Button
-                  size="sm"
-                  color="warning"
-                  variant="flat"
-                  className="ml-2"
+                  size='sm'
+                  color='warning'
+                  variant='flat'
+                  className='ml-2'
                   onPress={async () => {
                     try {
                       await webdavDelete(filename)
-                      setFilenames(filenames.filter((name) => name !== filename))
+                      setFilenames(filenames.filter(name => name !== filename))
                     } catch (e) {
                       alert(`删除失败：${e}`)
                     }
                   }}
                 >
-                  <MdDeleteForever className="text-lg" />
+                  <MdDeleteForever className='text-lg' />
                 </Button>
               </div>
             ))
           )}
         </ModalBody>
         <ModalFooter>
-          <Button size="sm" variant="light" onPress={onClose}>
+          <Button size='sm' variant='light' onPress={onClose}>
             关闭
           </Button>
         </ModalFooter>

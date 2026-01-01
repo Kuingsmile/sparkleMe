@@ -1,22 +1,22 @@
-import BasePage from '@renderer/components/base/base-page'
-import { mihomoCloseAllConnections, mihomoCloseConnection } from '@renderer/utils/ipc'
-import React, { Key, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Badge, Button, Divider, Input, Select, SelectItem, Tab, Tabs } from '@heroui/react'
-import { calcTraffic } from '@renderer/utils/calc'
-import ConnectionItem from '@renderer/components/connections/connection-item'
-import { Virtuoso } from 'react-virtuoso'
-import dayjs from 'dayjs'
+import BasePage from '@renderer/components/base/base-page'
 import ConnectionDetailModal from '@renderer/components/connections/connection-detail-modal'
+import ConnectionItem from '@renderer/components/connections/connection-item'
 import ConnectionSettingModal from '@renderer/components/connections/connection-setting-modal'
-import { CgClose, CgTrash } from 'react-icons/cg'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { includesIgnoreCase } from '@renderer/utils/includes'
-import { getIconDataURL, getAppName } from '@renderer/utils/ipc'
-import { HiSortAscending, HiSortDescending } from 'react-icons/hi'
-import { cropAndPadTransparent } from '@renderer/utils/image'
-import { platform } from '@renderer/utils/init'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
+import { calcTraffic } from '@renderer/utils/calc'
+import { cropAndPadTransparent } from '@renderer/utils/image'
+import { includesIgnoreCase } from '@renderer/utils/includes'
+import { platform } from '@renderer/utils/init'
+import { mihomoCloseAllConnections, mihomoCloseConnection } from '@renderer/utils/ipc'
+import { getAppName, getIconDataURL } from '@renderer/utils/ipc'
+import dayjs from 'dayjs'
+import React, { Key, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { CgClose, CgTrash } from 'react-icons/cg'
+import { HiSortAscending, HiSortDescending } from 'react-icons/hi'
 import { MdTune } from 'react-icons/md'
+import { Virtuoso } from 'react-virtuoso'
 
 let cachedConnections: ControllerConnectionDetail[] = []
 
@@ -29,11 +29,10 @@ const Connections: React.FC = () => {
     connectionDirection = 'asc',
     connectionOrderBy = 'time',
     displayIcon = true,
-    displayAppName = true
+    displayAppName = true,
   } = appConfig || {}
   const [connectionsInfo, setConnectionsInfo] = useState<ControllerConnections>()
-  const [allConnections, setAllConnections] =
-    useState<ControllerConnectionDetail[]>(cachedConnections)
+  const [allConnections, setAllConnections] = useState<ControllerConnectionDetail[]>(cachedConnections)
   const [activeConnections, setActiveConnections] = useState<ControllerConnectionDetail[]>([])
   const [closedConnections, setClosedConnections] = useState<ControllerConnectionDetail[]>([])
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
@@ -60,7 +59,7 @@ const Connections: React.FC = () => {
 
     let filtered = connections
     if (filter !== '') {
-      filtered = connections.filter((connection) => {
+      filtered = connections.filter(connection => {
         const searchableFields = [
           connection.metadata.process,
           connection.metadata.host,
@@ -68,7 +67,7 @@ const Connections: React.FC = () => {
           connection.metadata.sourceIP,
           connection.chains?.[0],
           connection.rule,
-          connection.rulePayload
+          connection.rulePayload,
         ]
           .filter(Boolean)
           .join(' ')
@@ -119,10 +118,10 @@ const Connections: React.FC = () => {
   const trashAllClosedConnection = useCallback((): void => {
     if (closedConnections.length === 0) return
 
-    const trashIds = closedConnections.map((conn) => conn.id)
-    setDeletedIds((prev) => new Set([...prev, ...trashIds]))
-    setAllConnections((allConns) => {
-      const updatedConnections = allConns.filter((conn) => !trashIds.includes(conn.id))
+    const trashIds = closedConnections.map(conn => conn.id)
+    setDeletedIds(prev => new Set([...prev, ...trashIds]))
+    setAllConnections(allConns => {
+      const updatedConnections = allConns.filter(conn => !trashIds.includes(conn.id))
       cachedConnections = updatedConnections
       return updatedConnections
     })
@@ -130,13 +129,13 @@ const Connections: React.FC = () => {
   }, [closedConnections])
 
   const trashClosedConnection = useCallback((id: string): void => {
-    setDeletedIds((prev) => new Set([...prev, id]))
-    setAllConnections((allConns) => {
-      const updatedConnections = allConns.filter((conn) => conn.id !== id)
+    setDeletedIds(prev => new Set([...prev, id]))
+    setAllConnections(allConns => {
+      const updatedConnections = allConns.filter(conn => conn.id !== id)
       cachedConnections = updatedConnections
       return updatedConnections
     })
-    setClosedConnections((closedConns) => closedConns.filter((conn) => conn.id !== id))
+    setClosedConnections(closedConns => closedConns.filter(conn => conn.id !== id))
   }, [])
 
   const closeAllConnections = useCallback((): void => {
@@ -147,7 +146,7 @@ const Connections: React.FC = () => {
     (id: string): void => {
       tab === 'active' ? mihomoCloseConnection(id) : trashClosedConnection(id)
     },
-    [tab, trashClosedConnection]
+    [tab, trashClosedConnection],
   )
 
   useEffect(() => {
@@ -156,10 +155,10 @@ const Connections: React.FC = () => {
 
       if (!info.connections) return
 
-      const prevActiveMap = new Map(activeConnections.map((conn) => [conn.id, conn]))
-      const existingConnectionIds = new Set(allConnections.map((conn) => conn.id))
+      const prevActiveMap = new Map(activeConnections.map(conn => [conn.id, conn]))
+      const existingConnectionIds = new Set(allConnections.map(conn => conn.id))
 
-      const activeConns = info.connections.map((conn) => {
+      const activeConns = info.connections.map(conn => {
         const preConn = prevActiveMap.get(conn.id)
         const downloadSpeed = preConn ? conn.download - preConn.download : 0
         const uploadSpeed = preConn ? conn.upload - preConn.upload : 0
@@ -173,24 +172,22 @@ const Connections: React.FC = () => {
           metadata,
           isActive: true,
           downloadSpeed,
-          uploadSpeed
+          uploadSpeed,
         }
       })
 
-      const newConnections = activeConns.filter(
-        (conn) => !existingConnectionIds.has(conn.id) && !deletedIds.has(conn.id)
-      )
+      const newConnections = activeConns.filter(conn => !existingConnectionIds.has(conn.id) && !deletedIds.has(conn.id))
 
       if (newConnections.length > 0) {
         const updatedAllConnections = [...allConnections, ...newConnections]
 
-        const activeConnIds = new Set(activeConns.map((conn) => conn.id))
-        const allConns = updatedAllConnections.map((conn) => {
-          const activeConn = activeConns.find((ac) => ac.id === conn.id)
+        const activeConnIds = new Set(activeConns.map(conn => conn.id))
+        const allConns = updatedAllConnections.map(conn => {
+          const activeConn = activeConns.find(ac => ac.id === conn.id)
           return activeConn || { ...conn, isActive: false, downloadSpeed: 0, uploadSpeed: 0 }
         })
 
-        const closedConns = allConns.filter((conn) => !activeConnIds.has(conn.id))
+        const closedConns = allConns.filter(conn => !activeConnIds.has(conn.id))
 
         setActiveConnections(activeConns)
         setClosedConnections(closedConns)
@@ -198,13 +195,13 @@ const Connections: React.FC = () => {
         setAllConnections(finalAllConnections)
         cachedConnections = finalAllConnections
       } else {
-        const activeConnIds = new Set(activeConns.map((conn) => conn.id))
-        const allConns = allConnections.map((conn) => {
-          const activeConn = activeConns.find((ac) => ac.id === conn.id)
+        const activeConnIds = new Set(activeConns.map(conn => conn.id))
+        const allConns = allConnections.map(conn => {
+          const activeConn = activeConns.find(ac => ac.id === conn.id)
           return activeConn || { ...conn, isActive: false, downloadSpeed: 0, uploadSpeed: 0 }
         })
 
-        const closedConns = allConns.filter((conn) => !activeConnIds.has(conn.id))
+        const closedConns = allConns.filter(conn => !activeConnIds.has(conn.id))
 
         setActiveConnections(activeConns)
         setClosedConnections(closedConns)
@@ -224,16 +221,16 @@ const Connections: React.FC = () => {
     if (processingAppNames.current.size >= 3 || appNameRequestQueue.current.size === 0) return
 
     const pathsToProcess = Array.from(appNameRequestQueue.current).slice(0, 3)
-    pathsToProcess.forEach((path) => appNameRequestQueue.current.delete(path))
+    pathsToProcess.forEach(path => appNameRequestQueue.current.delete(path))
 
-    const promises = pathsToProcess.map(async (path) => {
+    const promises = pathsToProcess.map(async path => {
       if (processingAppNames.current.has(path)) return
       processingAppNames.current.add(path)
 
       try {
         const appName = await getAppName(path)
         if (appName) {
-          setAppNameCache((prev) => ({ ...prev, [path]: appName }))
+          setAppNameCache(prev => ({ ...prev, [path]: appName }))
         }
       } catch {
         // ignore
@@ -253,9 +250,9 @@ const Connections: React.FC = () => {
     if (processingIcons.current.size >= 5 || iconRequestQueue.current.size === 0) return
 
     const pathsToProcess = Array.from(iconRequestQueue.current).slice(0, 5)
-    pathsToProcess.forEach((path) => iconRequestQueue.current.delete(path))
+    pathsToProcess.forEach(path => iconRequestQueue.current.delete(path))
 
-    const promises = pathsToProcess.map(async (path) => {
+    const promises = pathsToProcess.map(async path => {
       if (processingIcons.current.has(path)) return
       processingIcons.current.add(path)
 
@@ -263,12 +260,10 @@ const Connections: React.FC = () => {
         const rawBase64 = await getIconDataURL(path)
         if (!rawBase64) return
 
-        const fullDataURL = rawBase64.startsWith('data:')
-          ? rawBase64
-          : `data:image/png;base64,${rawBase64}`
+        const fullDataURL = rawBase64.startsWith('data:') ? rawBase64 : `data:image/png;base64,${rawBase64}`
 
         let processedDataURL = fullDataURL
-        if (platform != 'darwin') {
+        if (platform !== 'darwin') {
           processedDataURL = await cropAndPadTransparent(fullDataURL)
         }
 
@@ -278,11 +273,11 @@ const Connections: React.FC = () => {
           // ignore
         }
 
-        setIconMap((prev) => ({ ...prev, [path]: processedDataURL }))
+        setIconMap(prev => ({ ...prev, [path]: processedDataURL }))
 
         const firstConnection = filteredConnections[0]
         if (firstConnection?.metadata.processPath === path) {
-          setFirstItemRefreshTrigger((prev) => prev + 1)
+          setFirstItemRefreshTrigger(prev => prev + 1)
         }
       } catch {
         // ignore
@@ -305,7 +300,7 @@ const Connections: React.FC = () => {
     const otherPaths = new Set<string>()
 
     const visibleConnections = filteredConnections.slice(0, 20)
-    visibleConnections.forEach((c) => {
+    visibleConnections.forEach(c => {
       const path = c.metadata.processPath || ''
       visiblePaths.add(path)
     })
@@ -327,9 +322,9 @@ const Connections: React.FC = () => {
 
       const fromStorage = localStorage.getItem(path)
       if (fromStorage) {
-        setIconMap((prev) => ({ ...prev, [path]: fromStorage }))
+        setIconMap(prev => ({ ...prev, [path]: fromStorage }))
         if (isVisible && filteredConnections[0]?.metadata.processPath === path) {
-          setFirstItemRefreshTrigger((prev) => prev + 1)
+          setFirstItemRefreshTrigger(prev => prev + 1)
         }
         return
       }
@@ -342,14 +337,14 @@ const Connections: React.FC = () => {
       appNameRequestQueue.current.add(path)
     }
 
-    visiblePaths.forEach((path) => {
+    visiblePaths.forEach(path => {
       loadIcon(path, true)
       if (displayAppName) loadAppName(path)
     })
 
     if (otherPaths.size > 0) {
       const loadOtherPaths = () => {
-        otherPaths.forEach((path) => {
+        otherPaths.forEach(path => {
           loadIcon(path, false)
           if (displayAppName) loadAppName(path)
         })
@@ -379,7 +374,7 @@ const Connections: React.FC = () => {
     filteredConnections,
     processIconQueue,
     processAppNameQueue,
-    displayAppName
+    displayAppName,
   ])
 
   const handleTabChange = useCallback((key: Key) => {
@@ -395,15 +390,15 @@ const Connections: React.FC = () => {
           | 'download'
           | 'uploadSpeed'
           | 'downloadSpeed'
-          | 'process'
+          | 'process',
       })
     },
-    [patchAppConfig]
+    [patchAppConfig],
   )
 
   const handleDirectionToggle = useCallback(async () => {
     await patchAppConfig({
-      connectionDirection: connectionDirection === 'asc' ? 'desc' : 'asc'
+      connectionDirection: connectionDirection === 'asc' ? 'desc' : 'asc',
     })
   }, [connectionDirection, patchAppConfig])
 
@@ -413,9 +408,7 @@ const Connections: React.FC = () => {
       const iconUrl = (displayIcon && findProcessMode !== 'off' && iconMap[path]) || ''
       const itemKey = i === 0 ? `${connection.id}-${firstItemRefreshTrigger}` : connection.id
       const displayName =
-        displayAppName && connection.metadata.processPath
-          ? appNameCache[connection.metadata.processPath]
-          : undefined
+        displayAppName && connection.metadata.processPath ? appNameCache[connection.metadata.processPath] : undefined
 
       return (
         <ConnectionItem
@@ -440,64 +433,56 @@ const Connections: React.FC = () => {
       closeConnection,
       appNameCache,
       findProcessMode,
-      displayAppName
-    ]
+      displayAppName,
+    ],
   )
 
   return (
     <BasePage
-      title="连接"
+      title='连接'
       header={
         <>
-          <div className="flex">
-            <div className="flex items-center">
-              <span className="mx-1 text-gray-400">
-                ↑ {calcTraffic(connectionsInfo?.uploadTotal ?? 0)}{' '}
-              </span>
-              <span className="mx-1 text-gray-400">
-                ↓ {calcTraffic(connectionsInfo?.downloadTotal ?? 0)}{' '}
-              </span>
+          <div className='flex'>
+            <div className='flex items-center'>
+              <span className='mx-1 text-gray-400'>↑ {calcTraffic(connectionsInfo?.uploadTotal ?? 0)} </span>
+              <span className='mx-1 text-gray-400'>↓ {calcTraffic(connectionsInfo?.downloadTotal ?? 0)} </span>
             </div>
             <Badge
-              className="mt-2"
-              color="primary"
-              variant="flat"
+              className='mt-2'
+              color='primary'
+              variant='flat'
               showOutline={false}
               content={filteredConnections.length}
             >
               <Button
-                className="app-nodrag ml-1"
+                className='app-nodrag ml-1'
                 title={tab === 'active' ? '关闭全部连接' : '清空已关闭连接'}
                 isIconOnly
-                size="sm"
-                variant="light"
+                size='sm'
+                variant='light'
                 onPress={() => {
                   if (filter === '') {
                     closeAllConnections()
                   } else {
-                    filteredConnections.forEach((conn) => {
+                    filteredConnections.forEach(conn => {
                       closeConnection(conn.id)
                     })
                   }
                 }}
               >
-                {tab === 'active' ? (
-                  <CgClose className="text-lg" />
-                ) : (
-                  <CgTrash className="text-lg" />
-                )}
+                {tab === 'active' ? <CgClose className='text-lg' /> : <CgTrash className='text-lg' />}
               </Button>
             </Badge>
           </div>
           <Button
-            size="sm"
+            size='sm'
             isIconOnly
-            className="app-nodrag"
-            variant="light"
-            title="连接设置"
+            className='app-nodrag'
+            variant='light'
+            title='连接设置'
             onPress={() => setIsSettingModalOpen(true)}
           >
-            <MdTune className="text-lg" />
+            <MdTune className='text-lg' />
           </Button>
         </>
       }
@@ -505,85 +490,76 @@ const Connections: React.FC = () => {
       {isDetailModalOpen && selected && (
         <ConnectionDetailModal onClose={() => setIsDetailModalOpen(false)} connection={selected} />
       )}
-      {isSettingModalOpen && (
-        <ConnectionSettingModal onClose={() => setIsSettingModalOpen(false)} />
-      )}
-      <div className="overflow-x-auto sticky top-0 z-40">
-        <div className="flex p-2 gap-2">
+      {isSettingModalOpen && <ConnectionSettingModal onClose={() => setIsSettingModalOpen(false)} />}
+      <div className='overflow-x-auto sticky top-0 z-40'>
+        <div className='flex p-2 gap-2'>
           <Tabs
-            size="sm"
+            size='sm'
             color={tab === 'active' ? 'primary' : 'danger'}
             selectedKey={tab}
-            variant="underlined"
-            className="w-fit h-[32px]"
+            variant='underlined'
+            className='w-fit h-[32px]'
             onSelectionChange={handleTabChange}
           >
             <Tab
-              key="active"
+              key='active'
               title={
                 <Badge
                   color={tab === 'active' ? 'primary' : 'default'}
-                  size="sm"
-                  shape="circle"
-                  variant="flat"
+                  size='sm'
+                  shape='circle'
+                  variant='flat'
                   content={activeConnections.length}
                   showOutline={false}
                 >
-                  <span className="p-1">活动中</span>
+                  <span className='p-1'>活动中</span>
                 </Badge>
               }
             />
             <Tab
-              key="closed"
+              key='closed'
               title={
                 <Badge
                   color={tab === 'closed' ? 'danger' : 'default'}
-                  size="sm"
-                  shape="circle"
-                  variant="flat"
+                  size='sm'
+                  shape='circle'
+                  variant='flat'
                   content={closedConnections.length}
                   showOutline={false}
                 >
-                  <span className="p-1">已关闭</span>
+                  <span className='p-1'>已关闭</span>
                 </Badge>
               }
             />
           </Tabs>
-          <Input
-            variant="flat"
-            size="sm"
-            value={filter}
-            placeholder="筛选过滤"
-            isClearable
-            onValueChange={setFilter}
-          />
+          <Input variant='flat' size='sm' value={filter} placeholder='筛选过滤' isClearable onValueChange={setFilter} />
 
           <Select
             classNames={{ trigger: 'data-[hover=true]:bg-default-200' }}
-            size="sm"
-            className="w-[180px] min-w-[120px]"
+            size='sm'
+            className='w-[180px] min-w-[120px]'
             selectedKeys={new Set([connectionOrderBy])}
             disallowEmptySelection={true}
             onSelectionChange={handleOrderByChange}
           >
-            <SelectItem key="upload">上传量</SelectItem>
-            <SelectItem key="download">下载量</SelectItem>
-            <SelectItem key="uploadSpeed">上传速度</SelectItem>
-            <SelectItem key="downloadSpeed">下载速度</SelectItem>
-            <SelectItem key="time">时间</SelectItem>
-            <SelectItem key="process">进程名称</SelectItem>
+            <SelectItem key='upload'>上传量</SelectItem>
+            <SelectItem key='download'>下载量</SelectItem>
+            <SelectItem key='uploadSpeed'>上传速度</SelectItem>
+            <SelectItem key='downloadSpeed'>下载速度</SelectItem>
+            <SelectItem key='time'>时间</SelectItem>
+            <SelectItem key='process'>进程名称</SelectItem>
           </Select>
-          <Button size="sm" isIconOnly className="bg-content2" onPress={handleDirectionToggle}>
+          <Button size='sm' isIconOnly className='bg-content2' onPress={handleDirectionToggle}>
             {connectionDirection === 'asc' ? (
-              <HiSortAscending className="text-lg" />
+              <HiSortAscending className='text-lg' />
             ) : (
-              <HiSortDescending className="text-lg" />
+              <HiSortDescending className='text-lg' />
             )}
           </Button>
         </div>
         <Divider />
       </div>
-      <div className="h-[calc(100vh-100px)] mt-px">
+      <div className='h-[calc(100vh-100px)] mt-px'>
         <Virtuoso data={filteredConnections} itemContent={renderConnectionItem} />
       </div>
     </BasePage>

@@ -1,8 +1,4 @@
-export async function cropAndPadTransparent(
-  base64: string,
-  finalSize = 256,
-  border = 24
-): Promise<string> {
+export async function cropAndPadTransparent(base64: string, finalSize = 256, border = 24): Promise<string> {
   const img = new Image()
   img.src = base64
   await new Promise((resolve, reject) => {
@@ -61,17 +57,7 @@ export async function cropAndPadTransparent(
   outCanvas.height = finalSize
   const outCtx = outCanvas.getContext('2d')!
   outCtx.clearRect(0, 0, finalSize, finalSize)
-  outCtx.drawImage(
-    canvas,
-    left,
-    top,
-    cropWidth,
-    cropHeight,
-    offsetX,
-    offsetY,
-    drawWidth,
-    drawHeight
-  )
+  outCtx.drawImage(canvas, left, top, cropWidth, cropHeight, offsetX, offsetY, drawWidth, drawHeight)
 
   return outCanvas.toDataURL('image/png')
 }

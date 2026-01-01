@@ -16,7 +16,7 @@ export function encryptString(plainText: string): string {
   try {
     const buffer = safeStorage.encryptString(plainText)
     return ENCRYPTED_PREFIX + buffer.toString('base64')
-  } catch (e) {
+  } catch (_e) {
     return plainText
   }
 }
@@ -36,7 +36,7 @@ export function decryptString(encryptedText: string): string {
     const base64Data = encryptedText.substring(ENCRYPTED_PREFIX.length)
     const buffer = Buffer.from(base64Data, 'base64')
     return safeStorage.decryptString(buffer)
-  } catch (e) {
+  } catch (_e) {
     return ''
   }
 }

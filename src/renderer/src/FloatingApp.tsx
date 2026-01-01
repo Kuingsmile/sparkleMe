@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
+
 import MihomoIcon from './components/base/mihomo-icon'
-import { calcTraffic } from './utils/calc'
-import { showContextMenu, triggerMainWindow } from './utils/ipc'
 import { useAppConfig } from './hooks/use-app-config'
 import { useControledMihomoConfig } from './hooks/use-controled-mihomo-config'
+import { calcTraffic } from './utils/calc'
+import { showContextMenu, triggerMainWindow } from './utils/ipc'
 
 const FloatingApp: React.FC = () => {
   const { appConfig } = useAppConfig()
@@ -33,7 +34,7 @@ const FloatingApp: React.FC = () => {
 
     let animationFrameId: number
     const animate = (): void => {
-      setRotation((prev) => {
+      setRotation(prev => {
         if (prev === 360) {
           return 0
         }
@@ -59,11 +60,11 @@ const FloatingApp: React.FC = () => {
   }, [])
 
   return (
-    <div className="app-drag h-screen w-screen overflow-hidden">
-      <div className="floating-bg border border-divider flex rounded-full bg-content1 h-[calc(100%-2px)] w-[calc(100%-2px)]">
-        <div className="flex justify-center items-center h-full aspect-square">
+    <div className='app-drag h-screen w-screen overflow-hidden'>
+      <div className='floating-bg border border-divider flex rounded-full bg-content1 h-[calc(100%-2px)] w-[calc(100%-2px)]'>
+        <div className='flex justify-center items-center h-full aspect-square'>
           <div
-            onContextMenu={(e) => {
+            onContextMenu={e => {
               e.preventDefault()
               showContextMenu()
             }}
@@ -74,21 +75,21 @@ const FloatingApp: React.FC = () => {
               spinFloatingIcon
                 ? {
                     transform: `rotate(${rotation}deg)`,
-                    transition: 'transform 0.1s linear'
+                    transition: 'transform 0.1s linear',
                   }
                 : {}
             }
             className={`app-nodrag cursor-pointer floating-thumb ${tunEnabled ? 'bg-secondary' : sysProxyEnabled ? 'bg-primary' : 'bg-default'} hover:opacity-hover rounded-full h-[calc(100%-4px)] aspect-square`}
           >
-            <MihomoIcon className="floating-icon text-primary-foreground h-full leading-full text-[22px] mx-auto" />
+            <MihomoIcon className='floating-icon text-primary-foreground h-full leading-full text-[22px] mx-auto' />
           </div>
         </div>
-        <div className="w-full overflow-hidden">
-          <div className="flex flex-col justify-center h-full w-full">
-            <h2 className="text-end floating-text whitespace-nowrap text-[12px] mr-2 font-bold">
+        <div className='w-full overflow-hidden'>
+          <div className='flex flex-col justify-center h-full w-full'>
+            <h2 className='text-end floating-text whitespace-nowrap text-[12px] mr-2 font-bold'>
               {calcTraffic(upload)}/s
             </h2>
-            <h2 className="text-end floating-text whitespace-nowrap text-[12px] mr-2 font-bold">
+            <h2 className='text-end floating-text whitespace-nowrap text-[12px] mr-2 font-bold'>
               {calcTraffic(download)}/s
             </h2>
           </div>

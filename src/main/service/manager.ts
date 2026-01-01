@@ -1,10 +1,11 @@
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
+
+import { getAppConfig, patchAppConfig } from '../config/app'
 import { servicePath } from '../utils/dirs'
 import { execWithElevation } from '../utils/elevation'
+import { getServiceAxios, initServiceAPI, ping, test } from './api'
 import { KeyManager } from './key'
-import { initServiceAPI, getServiceAxios, ping, test } from './api'
-import { getAppConfig, patchAppConfig } from '../config/app'
-import { execFile } from 'child_process'
-import { promisify } from 'util'
 
 let keyManager: KeyManager | null = null
 
@@ -31,7 +32,7 @@ export async function initKeyManager(): Promise<KeyManager> {
 
   const keyPair = keyManager.generateKeyPair()
   await patchAppConfig({
-    serviceAuthKey: `${keyPair.publicKey}:${keyPair.privateKey}`
+    serviceAuthKey: `${keyPair.publicKey}:${keyPair.privateKey}`,
   })
 
   initServiceAPI(keyManager)
@@ -94,7 +95,7 @@ export async function initService(): Promise<void> {
     await execWithElevation(execPath, ['service', 'init', '--public-key', publicKey])
 
     await patchAppConfig({
-      serviceAuthKey: `${keyPair.publicKey}:${keyPair.privateKey}`
+      serviceAuthKey: `${keyPair.publicKey}:${keyPair.privateKey}`,
     })
 
     keyManager = newKeyManager
@@ -105,7 +106,7 @@ export async function initService(): Promise<void> {
     throw new Error(`服务初始化失败：${error instanceof Error ? error.message : String(error)}`)
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 500))
+  await new Promise(resolve => setTimeout(resolve, 500))
 }
 
 export async function installService(): Promise<void> {
@@ -192,14 +193,14 @@ export async function serviceStatus(): Promise<
             return 'need-init'
           }
           return 'running'
-        } catch (e) {
+        } catch (_e) {
           return 'need-init'
         }
-      } catch (e) {
+      } catch (_e) {
         return 'stopped'
       }
     }
-  } catch (error) {
+  } catch (_error) {
     return 'unknown'
   }
 }

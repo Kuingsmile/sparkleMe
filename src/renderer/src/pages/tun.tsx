@@ -1,13 +1,13 @@
 import { Button, Input, Switch, Tab, Tabs } from '@heroui/react'
+import EditableList from '@renderer/components/base/base-list-editor'
 import BasePage from '@renderer/components/base/base-page'
 import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
-import EditableList from '@renderer/components/base/base-list-editor'
-import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import { restartCore, setupFirewall } from '@renderer/utils/ipc'
-import { platform } from '@renderer/utils/init'
-import React, { Key, useState } from 'react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
+import { platform } from '@renderer/utils/init'
+import { restartCore, setupFirewall } from '@renderer/utils/ipc'
+import React, { Key, useState } from 'react'
 
 const Tun: React.FC = () => {
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
@@ -25,7 +25,7 @@ const Tun: React.FC = () => {
     'route-exclude-address': routeExcludeAddress = [],
     'strict-route': strictRoute = false,
     'disable-icmp-forwarding': disableIcmpForwarding = false,
-    mtu = 1500
+    mtu = 1500,
   } = tun || {}
   const [changed, setChanged] = useState(false)
   const [values, originSetValues] = useState({
@@ -38,7 +38,7 @@ const Tun: React.FC = () => {
     strictRoute,
     routeExcludeAddress,
     disableIcmpForwarding,
-    mtu
+    mtu,
   })
   const setValues = (v: typeof values): void => {
     originSetValues(v)
@@ -54,13 +54,13 @@ const Tun: React.FC = () => {
   return (
     <>
       <BasePage
-        title="虚拟网卡设置"
+        title='虚拟网卡设置'
         header={
           changed && (
             <Button
-              size="sm"
-              className="app-nodrag"
-              color="primary"
+              size='sm'
+              className='app-nodrag'
+              color='primary'
               onPress={() =>
                 onSave({
                   tun: {
@@ -73,8 +73,8 @@ const Tun: React.FC = () => {
                     'strict-route': values.strictRoute,
                     'route-exclude-address': values.routeExcludeAddress,
                     'disable-icmp-forwarding': values.disableIcmpForwarding,
-                    mtu: values.mtu
-                  }
+                    mtu: values.mtu,
+                  },
                 })
               }
             >
@@ -83,12 +83,12 @@ const Tun: React.FC = () => {
           )
         }
       >
-        <SettingCard className="tun-settings">
+        <SettingCard className='tun-settings'>
           {platform === 'win32' && (
-            <SettingItem title="重设防火墙" divider>
+            <SettingItem title='重设防火墙' divider>
               <Button
-                size="sm"
-                color="primary"
+                size='sm'
+                color='primary'
                 isLoading={loading}
                 onPress={async () => {
                   setLoading(true)
@@ -108,121 +108,121 @@ const Tun: React.FC = () => {
             </SettingItem>
           )}
           {platform === 'darwin' && (
-            <SettingItem title="自动设置系统 DNS" divider>
+            <SettingItem title='自动设置系统 DNS' divider>
               <Tabs
-                size="sm"
-                color="primary"
+                size='sm'
+                color='primary'
                 selectedKey={autoSetDNSMode}
                 onSelectionChange={async (key: Key) => {
                   await patchAppConfig({ autoSetDNSMode: key as 'none' | 'exec' | 'service' })
                 }}
               >
-                <Tab key="none" title="不自动设置" />
-                <Tab key="exec" title="执行命令" />
-                <Tab key="service" title="服务模式" />
+                <Tab key='none' title='不自动设置' />
+                <Tab key='exec' title='执行命令' />
+                <Tab key='service' title='服务模式' />
               </Tabs>
             </SettingItem>
           )}
-          <SettingItem title="Tun 模式堆栈" divider>
+          <SettingItem title='Tun 模式堆栈' divider>
             <Tabs
-              size="sm"
-              color="primary"
+              size='sm'
+              color='primary'
               selectedKey={values.stack}
               onSelectionChange={(key: Key) => setValues({ ...values, stack: key as TunStack })}
             >
-              <Tab key="gvisor" title="gVisor" />
-              <Tab key="mixed" title="Mixed" />
-              <Tab key="system" title="System" />
+              <Tab key='gvisor' title='gVisor' />
+              <Tab key='mixed' title='Mixed' />
+              <Tab key='system' title='System' />
             </Tabs>
           </SettingItem>
           {platform !== 'darwin' && (
             <>
-              <SettingItem title="Tun 网卡名称" divider>
+              <SettingItem title='Tun 网卡名称' divider>
                 <Input
-                  size="sm"
-                  className="w-[100px]"
+                  size='sm'
+                  className='w-[100px]'
                   value={values.device}
-                  onValueChange={(v) => {
+                  onValueChange={v => {
                     setValues({ ...values, device: v })
                   }}
                 />
               </SettingItem>
-              <SettingItem title="严格路由" divider>
+              <SettingItem title='严格路由' divider>
                 <Switch
-                  size="sm"
+                  size='sm'
                   isSelected={values.strictRoute}
-                  onValueChange={(v) => {
+                  onValueChange={v => {
                     setValues({ ...values, strictRoute: v })
                   }}
                 />
               </SettingItem>
             </>
           )}
-          <SettingItem title="自动设置路由规则" divider>
+          <SettingItem title='自动设置路由规则' divider>
             <Switch
-              size="sm"
+              size='sm'
               isSelected={values.autoRoute}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 setValues({ ...values, autoRoute: v })
               }}
             />
           </SettingItem>
           {platform === 'linux' && (
-            <SettingItem title="自动设置TCP重定向" divider>
+            <SettingItem title='自动设置TCP重定向' divider>
               <Switch
-                size="sm"
+                size='sm'
                 isSelected={values.autoRedirect}
-                onValueChange={(v) => {
+                onValueChange={v => {
                   setValues({ ...values, autoRedirect: v })
                 }}
               />
             </SettingItem>
           )}
-          <SettingItem title="自动选择流量出口" divider>
+          <SettingItem title='自动选择流量出口' divider>
             <Switch
-              size="sm"
+              size='sm'
               isSelected={values.autoDetectInterface}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 setValues({ ...values, autoDetectInterface: v })
               }}
             />
           </SettingItem>
-          <SettingItem title="ICMP 转发" divider>
+          <SettingItem title='ICMP 转发' divider>
             <Switch
-              size="sm"
+              size='sm'
               isSelected={!values.disableIcmpForwarding}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 setValues({ ...values, disableIcmpForwarding: !v })
               }}
             />
           </SettingItem>
-          <SettingItem title="MTU" divider>
+          <SettingItem title='MTU' divider>
             <Input
-              size="sm"
-              type="number"
-              className="w-[100px]"
+              size='sm'
+              type='number'
+              className='w-[100px]'
               value={values.mtu.toString()}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 setValues({ ...values, mtu: parseInt(v) })
               }}
             />
           </SettingItem>
-          <SettingItem title="DNS 劫持，使用逗号分割多个值" divider>
+          <SettingItem title='DNS 劫持，使用逗号分割多个值' divider>
             <Input
-              size="sm"
-              className="w-[50%]"
+              size='sm'
+              className='w-[50%]'
               value={values.dnsHijack.join(',')}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 const arr = v !== '' ? v.split(',') : []
                 setValues({ ...values, dnsHijack: arr })
               }}
             />
           </SettingItem>
           <EditableList
-            title="排除自定义网段"
+            title='排除自定义网段'
             items={values.routeExcludeAddress}
-            placeholder="例: 172.20.0.0/16"
-            onChange={(list) => setValues({ ...values, routeExcludeAddress: list as string[] })}
+            placeholder='例: 172.20.0.0/16'
+            onChange={list => setValues({ ...values, routeExcludeAddress: list as string[] })}
             divider={false}
           />
         </SettingCard>

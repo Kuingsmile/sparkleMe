@@ -1,17 +1,18 @@
-import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
-import { FaCircleArrowDown, FaCircleArrowUp } from 'react-icons/fa6'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { calcTraffic } from '@renderer/utils/calc'
-import React, { useEffect, useState, useRef } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { IoLink } from 'react-icons/io5'
+import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { calcTraffic } from '@renderer/utils/calc'
 import { platform } from '@renderer/utils/init'
+import React, { useEffect, useRef, useState } from 'react'
+import { FaCircleArrowDown, FaCircleArrowUp } from 'react-icons/fa6'
+import { IoLink } from 'react-icons/io5'
+import { useLocation, useNavigate } from 'react-router-dom'
+
 import TrafficChart from './traffic-chart'
 
-let currentUpload: number | undefined = undefined
-let currentDownload: number | undefined = undefined
+let currentUpload: number | undefined
+let currentDownload: number | undefined
 let hasShowTraffic = false
 let drawing = false
 
@@ -19,14 +20,10 @@ interface Props {
   iconOnly?: boolean
 }
 
-const ConnCard: React.FC<Props> = (props) => {
+const ConnCard: React.FC<Props> = props => {
   const { iconOnly } = props
   const { appConfig } = useAppConfig()
-  const {
-    showTraffic = false,
-    connectionCardStatus = 'col-span-2',
-    disableAnimation = false
-  } = appConfig || {}
+  const { showTraffic = false, connectionCardStatus = 'col-span-2', disableAnimation = false } = appConfig || {}
   const showTrafficRef = useRef(showTraffic)
   showTrafficRef.current = showTraffic
 
@@ -42,14 +39,14 @@ const ConnCard: React.FC<Props> = (props) => {
     setNodeRef,
     transform: tf,
     transition,
-    isDragging
+    isDragging,
   } = useSortable({
-    id: 'connection'
+    id: 'connection',
   })
   const [trafficData, setTrafficData] = useState(() =>
     Array(10)
       .fill(0)
-      .map((v, i) => ({ traffic: v, index: i }))
+      .map((v, i) => ({ traffic: v, index: i })),
   )
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -65,7 +62,7 @@ const ConnCard: React.FC<Props> = (props) => {
       }
 
       updateTimeoutRef.current = setTimeout(() => {
-        setTrafficData((prev) => {
+        setTrafficData(prev => {
           const newData = [...prev]
           newData.shift()
           newData.push({ traffic: info.up + info.down, index: Date.now() })
@@ -105,9 +102,9 @@ const ConnCard: React.FC<Props> = (props) => {
   if (iconOnly) {
     return (
       <div className={`${connectionCardStatus} flex justify-center`}>
-        <Tooltip content="连接" placement="right">
+        <Tooltip content='连接' placement='right'>
           <Button
-            size="sm"
+            size='sm'
             isIconOnly
             color={match ? 'primary' : 'default'}
             variant={match ? 'solid' : 'light'}
@@ -115,7 +112,7 @@ const ConnCard: React.FC<Props> = (props) => {
               navigate('/connections')
             }}
           >
-            <IoLink className="text-[20px]" />
+            <IoLink className='text-[20px]' />
           </Button>
         </Tooltip>
       </div>
@@ -128,7 +125,7 @@ const ConnCard: React.FC<Props> = (props) => {
         position: 'relative',
         transform: CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 'calc(infinity)' : undefined
+        zIndex: isDragging ? 'calc(infinity)' : undefined,
       }}
       className={`${connectionCardStatus} conn-card`}
     >
@@ -141,34 +138,27 @@ const ConnCard: React.FC<Props> = (props) => {
             {...listeners}
             className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''} relative overflow-hidden`}
           >
-            <CardBody className="pb-1 pt-0 px-0 overflow-y-visible">
-              <div className="flex justify-between">
-                <Button
-                  isIconOnly
-                  className="bg-transparent pointer-events-none"
-                  variant="flat"
-                  color="default"
-                >
+            <CardBody className='pb-1 pt-0 px-0 overflow-y-visible'>
+              <div className='flex justify-between'>
+                <Button isIconOnly className='bg-transparent pointer-events-none' variant='flat' color='default'>
                   <IoLink
-                    color="default"
+                    color='default'
                     className={`${match ? 'text-primary-foreground' : 'text-foreground'} text-[24px]`}
                   />
                 </Button>
-                <div
-                  className={`p-2 w-full ${match ? 'text-primary-foreground' : 'text-foreground'} `}
-                >
-                  <div className="flex justify-between">
-                    <div className="w-full text-right mr-2">{calcTraffic(upload)}/s</div>
-                    <FaCircleArrowUp className="h-[24px] leading-[24px]" />
+                <div className={`p-2 w-full ${match ? 'text-primary-foreground' : 'text-foreground'} `}>
+                  <div className='flex justify-between'>
+                    <div className='w-full text-right mr-2'>{calcTraffic(upload)}/s</div>
+                    <FaCircleArrowUp className='h-[24px] leading-[24px]' />
                   </div>
-                  <div className="flex justify-between">
-                    <div className="w-full text-right mr-2">{calcTraffic(download)}/s</div>
-                    <FaCircleArrowDown className="h-[24px] leading-[24px]" />
+                  <div className='flex justify-between'>
+                    <div className='w-full text-right mr-2'>{calcTraffic(download)}/s</div>
+                    <FaCircleArrowDown className='h-[24px] leading-[24px]' />
                   </div>
                 </div>
               </div>
             </CardBody>
-            <CardFooter className="pt-1 relative z-10">
+            <CardFooter className='pt-1 relative z-10'>
               <div
                 className={`flex justify-between items-center w-full text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}
               >
@@ -186,27 +176,18 @@ const ConnCard: React.FC<Props> = (props) => {
           {...listeners}
           className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
         >
-          <CardBody className="pb-1 pt-0 px-0 overflow-y-visible">
-            <div className="flex justify-between">
-              <Button
-                isIconOnly
-                className="bg-transparent pointer-events-none"
-                variant="flat"
-                color="default"
-              >
+          <CardBody className='pb-1 pt-0 px-0 overflow-y-visible'>
+            <div className='flex justify-between'>
+              <Button isIconOnly className='bg-transparent pointer-events-none' variant='flat' color='default'>
                 <IoLink
-                  color="default"
+                  color='default'
                   className={`${match ? 'text-primary-foreground' : 'text-foreground'} text-[24px] font-bold`}
                 />
               </Button>
             </div>
           </CardBody>
-          <CardFooter className="pt-1">
-            <h3
-              className={`text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}
-            >
-              连接
-            </h3>
+          <CardFooter className='pt-1'>
+            <h3 className={`text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}>连接</h3>
           </CardFooter>
         </Card>
       )}

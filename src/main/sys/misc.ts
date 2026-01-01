@@ -1,8 +1,11 @@
-import { exec, execFile, execSync, spawn } from 'child_process'
+import { exec, execFile, execSync, spawn } from 'node:child_process'
+import { copyFileSync, writeFileSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
+import { promisify } from 'node:util'
+
 import { app, dialog, nativeTheme, shell } from 'electron'
-import { readFile } from 'fs/promises'
-import path from 'path'
-import { promisify } from 'util'
+
 import {
   dataDir,
   exePath,
@@ -11,15 +14,14 @@ import {
   profilePath,
   resourcesDir,
   resourcesFilesDir,
-  taskDir
+  taskDir,
 } from '../utils/dirs'
-import { copyFileSync, writeFileSync } from 'fs'
 
 export function getFilePath(ext: string[]): string[] | undefined {
   return dialog.showOpenDialogSync({
     title: '选择订阅文件',
     filters: [{ name: `${ext} file`, extensions: ext }],
-    properties: ['openFile']
+    properties: ['openFile'],
   })
 }
 
@@ -108,13 +110,8 @@ const elevateTaskXml = `<?xml version="1.0" encoding="UTF-16"?>
 export function createElevateTaskSync(): void {
   const taskFilePath = path.join(taskDir(), `sparkle-run.xml`)
   writeFileSync(taskFilePath, Buffer.from(`\ufeff${elevateTaskXml}`, 'utf-16le'))
-  copyFileSync(
-    path.join(resourcesFilesDir(), 'sparkle-run.exe'),
-    path.join(taskDir(), 'sparkle-run.exe')
-  )
-  execSync(
-    `%SystemRoot%\\System32\\schtasks.exe /create /tn "sparkle-run" /xml "${taskFilePath}" /f`
-  )
+  copyFileSync(path.join(resourcesFilesDir(), 'sparkle-run.exe'), path.join(taskDir(), 'sparkle-run.exe'))
+  execSync(`%SystemRoot%\\System32\\schtasks.exe /create /tn "sparkle-run" /xml "${taskFilePath}" /f`)
 }
 
 export async function deleteElevateTask(): Promise<void> {
@@ -136,17 +133,10 @@ export async function checkElevateTask(): Promise<boolean> {
 
 export function resetAppConfig(): void {
   if (process.platform === 'win32') {
-    spawn(
-      'cmd',
-      [
-        '/C',
-        `"timeout /t 2 /nobreak >nul && rmdir /s /q "${dataDir()}" && start "" "${exePath()}""`
-      ],
-      {
-        shell: true,
-        detached: true
-      }
-    ).unref()
+    spawn('cmd', ['/C', `"timeout /t 2 /nobreak >nul && rmdir /s /q "${dataDir()}" && start "" "${exePath()}""`], {
+      shell: true,
+      detached: true,
+    }).unref()
   } else {
     const script = `while kill -0 ${process.pid} 2>/dev/null; do
   sleep 0.1
@@ -158,7 +148,7 @@ exit
     spawn('sh', ['-c', `"${script}"`], {
       shell: true,
       detached: true,
-      stdio: 'ignore'
+      stdio: 'ignore',
     })
   }
   app.quit()

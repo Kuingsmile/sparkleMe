@@ -1,43 +1,39 @@
+import path, { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { is } from '@electron-toolkit/utils'
+import { app, BrowserWindow, clipboard, ipcMain, Menu, nativeImage, screen, shell, Tray } from 'electron'
+
+import icoIcon from '../../../resources/icon.ico?asset'
+import pngIcon from '../../../resources/icon.png?asset'
+import templateIcon from '../../../resources/iconTemplate.png?asset'
+import { mainWindow, setNotQuitDialog, showMainWindow, triggerMainWindow } from '..'
 import {
   changeCurrentProfile,
   getAppConfig,
   getControledMihomoConfig,
   getProfileConfig,
   patchAppConfig,
-  patchControledMihomoConfig
+  patchControledMihomoConfig,
 } from '../config'
-import icoIcon from '../../../resources/icon.ico?asset'
-import pngIcon from '../../../resources/icon.png?asset'
-import templateIcon from '../../../resources/iconTemplate.png?asset'
+import { quitWithoutCore, restartCore } from '../core/manager'
 import {
   mihomoChangeProxy,
   mihomoCloseAllConnections,
-  mihomoGroups,
   mihomoGroupDelay,
-  patchMihomoConfig
+  mihomoGroups,
+  patchMihomoConfig,
 } from '../core/mihomoApi'
-import { mainWindow, setNotQuitDialog, showMainWindow, triggerMainWindow } from '..'
-import {
-  app,
-  BrowserWindow,
-  clipboard,
-  ipcMain,
-  Menu,
-  nativeImage,
-  screen,
-  shell,
-  Tray
-} from 'electron'
-import { dataDir, logDir, mihomoCoreDir, mihomoWorkDir } from '../utils/dirs'
 import { triggerSysProxy } from '../sys/sysproxy'
-import { quitWithoutCore, restartCore } from '../core/manager'
+import { dataDir, logDir, mihomoCoreDir, mihomoWorkDir } from '../utils/dirs'
 import { floatingWindow, triggerFloatingWindow } from './floatingWindow'
-import { is } from '@electron-toolkit/utils'
-import { join } from 'path'
 import { applyTheme } from './theme'
 
 export let tray: Tray | null = null
 let customTrayWindow: BrowserWindow | null = null
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+const preloadPath = fileURLToPath(new URL('../preload/index.mjs', import.meta.url))
+console.log('tray preloadPath', preloadPath)
 
 function formatDelayText(delay: number): string {
   if (delay === 0) {
@@ -92,10 +88,10 @@ async function showCustomTray(): Promise<void> {
       focusable: true,
       hasShadow: true,
       webPreferences: {
-        preload: join(__dirname, '../preload/index.js'),
+        preload: preloadPath,
         spellcheck: false,
-        sandbox: false
-      }
+        sandbox: false,
+      },
     })
 
     customTrayWindow.on('blur', () => {
@@ -111,7 +107,7 @@ async function showCustomTray(): Promise<void> {
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       await customTrayWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/traymenu.html`)
     } else {
-      await customTrayWindow.loadFile(join(__dirname, '../renderer/traymenu.html'))
+      await customTrayWindow.loadFile(join(dirname, '../renderer/traymenu.html'))
     }
   }
 
@@ -146,17 +142,15 @@ export const buildContextMenu = async (): Promise<Menu> => {
     globalModeShortcut = '',
     directModeShortcut = '',
     quitWithoutCoreShortcut = '',
-    restartAppShortcut = ''
+    restartAppShortcut = '',
   } = await getAppConfig()
   let groupsMenu: Electron.MenuItemConstructorOptions[] = []
   if (proxyInTray && process.platform !== 'linux') {
     try {
       const groups = await mihomoGroups()
-      groupsMenu = groups.map((group) => {
-        const currentProxy = group.all.find((proxy) => proxy.name === group.now)
-        const delay = currentProxy?.history.length
-          ? currentProxy.history[currentProxy.history.length - 1].delay
-          : -1
+      groupsMenu = groups.map(group => {
+        const currentProxy = group.all.find(proxy => proxy.name === group.now)
+        const delay = currentProxy?.history.length ? currentProxy.history[currentProxy.history.length - 1].delay : -1
         const displayDelay = formatDelayText(delay)
 
         return {
@@ -173,16 +167,14 @@ export const buildContextMenu = async (): Promise<Menu> => {
                 try {
                   await mihomoGroupDelay(group.name, group.testUrl)
                   ipcMain.emit('updateTrayMenu')
-                } catch (e) {
+                } catch (_e) {
                   // ignore
                 }
-              }
+              },
             },
             { type: 'separator' },
-            ...group.all.map((proxy) => {
-              const proxyDelay = proxy.history.length
-                ? proxy.history[proxy.history.length - 1].delay
-                : -1
+            ...group.all.map(proxy => {
+              const proxyDelay = proxy.history.length ? proxy.history[proxy.history.length - 1].delay : -1
               const proxyDisplayDelay = formatDelayText(proxyDelay)
               return {
                 id: proxy.name,
@@ -195,14 +187,14 @@ export const buildContextMenu = async (): Promise<Menu> => {
                   if (autoCloseConnection) {
                     await mihomoCloseAllConnections()
                   }
-                }
+                },
               }
-            })
-          ]
+            }),
+          ],
         }
       })
       groupsMenu.unshift({ type: 'separator' })
-    } catch (e) {
+    } catch (_e) {
       // ignore
       // 避免出错时无法创建托盘菜单
     }
@@ -217,7 +209,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
       type: 'normal',
       click: (): void => {
         showMainWindow()
-      }
+      },
     },
     {
       id: 'show-floating',
@@ -226,7 +218,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
       type: 'normal',
       click: async (): Promise<void> => {
         await triggerFloatingWindow()
-      }
+      },
     },
     // { type: 'separator' },
     // {
@@ -251,12 +243,12 @@ export const buildContextMenu = async (): Promise<Menu> => {
           await patchAppConfig({ sysProxy: { enable } })
           mainWindow?.webContents.send('appConfigUpdated')
           floatingWindow?.webContents.send('appConfigUpdated')
-        } catch (e) {
+        } catch (_e) {
           // ignore
         } finally {
           ipcMain.emit('updateTrayMenu')
         }
-      }
+      },
     },
     {
       type: 'checkbox',
@@ -279,7 +271,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
         } finally {
           ipcMain.emit('updateTrayMenu')
         }
-      }
+      },
     },
     { type: 'separator' },
     {
@@ -298,7 +290,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
             mainWindow?.webContents.send('controledMihomoConfigUpdated')
             mainWindow?.webContents.send('groupsUpdated')
             ipcMain.emit('updateTrayMenu')
-          }
+          },
         },
         {
           id: 'global',
@@ -312,7 +304,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
             mainWindow?.webContents.send('controledMihomoConfigUpdated')
             mainWindow?.webContents.send('groupsUpdated')
             ipcMain.emit('updateTrayMenu')
-          }
+          },
         },
         {
           id: 'direct',
@@ -326,16 +318,16 @@ export const buildContextMenu = async (): Promise<Menu> => {
             mainWindow?.webContents.send('controledMihomoConfigUpdated')
             mainWindow?.webContents.send('groupsUpdated')
             ipcMain.emit('updateTrayMenu')
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     ...groupsMenu,
     { type: 'separator' },
     {
       type: 'submenu',
       label: '订阅配置',
-      submenu: items.map((item) => {
+      submenu: items.map(item => {
         return {
           type: 'radio',
           label: item.name,
@@ -345,9 +337,9 @@ export const buildContextMenu = async (): Promise<Menu> => {
             await changeCurrentProfile(item.id)
             mainWindow?.webContents.send('profileConfigUpdated')
             ipcMain.emit('updateTrayMenu')
-          }
+          },
         }
-      })
+      }),
     },
     { type: 'separator' },
     {
@@ -357,39 +349,39 @@ export const buildContextMenu = async (): Promise<Menu> => {
         {
           type: 'normal',
           label: '应用目录',
-          click: (): Promise<string> => shell.openPath(dataDir())
+          click: (): Promise<string> => shell.openPath(dataDir()),
         },
         {
           type: 'normal',
           label: '工作目录',
-          click: (): Promise<string> => shell.openPath(mihomoWorkDir())
+          click: (): Promise<string> => shell.openPath(mihomoWorkDir()),
         },
         {
           type: 'normal',
           label: '内核目录',
-          click: (): Promise<string> => shell.openPath(mihomoCoreDir())
+          click: (): Promise<string> => shell.openPath(mihomoCoreDir()),
         },
         {
           type: 'normal',
           label: '日志目录',
-          click: (): Promise<string> => shell.openPath(logDir())
-        }
-      ]
+          click: (): Promise<string> => shell.openPath(logDir()),
+        },
+      ],
     },
     envType.length > 1
       ? {
           type: 'submenu',
           label: '复制环境变量',
-          submenu: envType.map((type) => {
+          submenu: envType.map(type => {
             return {
               id: type,
               label: type,
               type: 'normal',
               click: async (): Promise<void> => {
                 await copyEnv(type)
-              }
+              },
             }
-          })
+          }),
         }
       : {
           id: 'copyenv',
@@ -397,7 +389,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
           type: 'normal',
           click: async (): Promise<void> => {
             await copyEnv(envType[0])
-          }
+          },
         },
     { type: 'separator' },
     {
@@ -408,7 +400,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
       click: (): void => {
         setNotQuitDialog()
         quitWithoutCore()
-      }
+      },
     },
     {
       id: 'restart',
@@ -419,7 +411,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
         setNotQuitDialog()
         app.relaunch()
         app.quit()
-      }
+      },
     },
     {
       id: 'quit',
@@ -429,8 +421,8 @@ export const buildContextMenu = async (): Promise<Menu> => {
       click: (): void => {
         setNotQuitDialog()
         app.quit()
-      }
-    }
+      },
+    },
   ] as Electron.MenuItemConstructorOptions[]
   return Menu.buildFromTemplate(contextMenu)
 }
@@ -505,25 +497,25 @@ export async function copyEnv(type: 'bash' | 'cmd' | 'powershell' | 'nushell'): 
   switch (type) {
     case 'bash': {
       clipboard.writeText(
-        `export https_proxy=http://${host || '127.0.0.1'}:${mixedPort} http_proxy=http://${host || '127.0.0.1'}:${mixedPort} all_proxy=http://${host || '127.0.0.1'}:${mixedPort} no_proxy=${bypass.join(',')}`
+        `export https_proxy=http://${host || '127.0.0.1'}:${mixedPort} http_proxy=http://${host || '127.0.0.1'}:${mixedPort} all_proxy=http://${host || '127.0.0.1'}:${mixedPort} no_proxy=${bypass.join(',')}`,
       )
       break
     }
     case 'cmd': {
       clipboard.writeText(
-        `set http_proxy=http://${host || '127.0.0.1'}:${mixedPort}\r\nset https_proxy=http://${host || '127.0.0.1'}:${mixedPort}\r\nset no_proxy=${bypass.join(',')}`
+        `set http_proxy=http://${host || '127.0.0.1'}:${mixedPort}\r\nset https_proxy=http://${host || '127.0.0.1'}:${mixedPort}\r\nset no_proxy=${bypass.join(',')}`,
       )
       break
     }
     case 'powershell': {
       clipboard.writeText(
-        `$env:HTTP_PROXY="http://${host || '127.0.0.1'}:${mixedPort}"; $env:HTTPS_PROXY="http://${host || '127.0.0.1'}:${mixedPort}"; $env:no_proxy="${bypass.join(',')}"`
+        `$env:HTTP_PROXY="http://${host || '127.0.0.1'}:${mixedPort}"; $env:HTTPS_PROXY="http://${host || '127.0.0.1'}:${mixedPort}"; $env:no_proxy="${bypass.join(',')}"`,
       )
       break
     }
     case 'nushell': {
       clipboard.writeText(
-        `load-env {http_proxy:"http://${host || '127.0.0.1'}:${mixedPort}", https_proxy:"http://${host || '127.0.0.1'}:${mixedPort}", no_proxy:"${bypass.join(',')}"}`
+        `load-env {http_proxy:"http://${host || '127.0.0.1'}:${mixedPort}", https_proxy:"http://${host || '127.0.0.1'}:${mixedPort}", no_proxy:"${bypass.join(',')}"}`,
       )
       break
     }

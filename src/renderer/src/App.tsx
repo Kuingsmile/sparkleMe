@@ -1,40 +1,34 @@
-import { useTheme } from 'next-themes'
-import { useEffect, useRef, useState } from 'react'
-import { NavigateFunction, useLocation, useNavigate, useRoutes } from 'react-router-dom'
-import OutboundModeSwitcher from '@renderer/components/sider/outbound-mode-switcher'
-import SysproxySwitcher from '@renderer/components/sider/sysproxy-switcher'
-import TunSwitcher from '@renderer/components/sider/tun-switcher'
-import { Button, Divider } from '@heroui/react'
-import { IoSettings } from 'react-icons/io5'
-import routes from '@renderer/routes'
-import {
-  DndContext,
-  closestCorners,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent
-} from '@dnd-kit/core'
+import { closestCorners, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext } from '@dnd-kit/sortable'
-import ProfileCard from '@renderer/components/sider/profile-card'
-import ProxyCard from '@renderer/components/sider/proxy-card'
-import RuleCard from '@renderer/components/sider/rule-card'
-import DNSCard from '@renderer/components/sider/dns-card'
-import SniffCard from '@renderer/components/sider/sniff-card'
-import OverrideCard from '@renderer/components/sider/override-card'
+import { Button, Divider } from '@heroui/react'
+import ConfirmModal from '@renderer/components/base/base-confirm'
 import ConnCard from '@renderer/components/sider/conn-card'
+import DNSCard from '@renderer/components/sider/dns-card'
 import LogCard from '@renderer/components/sider/log-card'
 import MihomoCoreCard from '@renderer/components/sider/mihomo-core-card'
+import OutboundModeSwitcher from '@renderer/components/sider/outbound-mode-switcher'
+import OverrideCard from '@renderer/components/sider/override-card'
+import ProfileCard from '@renderer/components/sider/profile-card'
+import ProxyCard from '@renderer/components/sider/proxy-card'
 import ResourceCard from '@renderer/components/sider/resource-card'
+import RuleCard from '@renderer/components/sider/rule-card'
+import SniffCard from '@renderer/components/sider/sniff-card'
+import SubStoreCard from '@renderer/components/sider/substore-card'
+import SysproxySwitcher from '@renderer/components/sider/sysproxy-switcher'
+import TunSwitcher from '@renderer/components/sider/tun-switcher'
 import UpdaterButton from '@renderer/components/updater/updater-button'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { applyTheme, checkUpdate, setNativeTheme, setTitleBarOverlay } from '@renderer/utils/ipc'
+import routes from '@renderer/routes'
 import { platform } from '@renderer/utils/init'
+import { applyTheme, checkUpdate, setNativeTheme, setTitleBarOverlay } from '@renderer/utils/ipc'
 import { TitleBarOverlayOptions } from 'electron'
-import SubStoreCard from '@renderer/components/sider/substore-card'
-import MihomoIcon from './components/base/mihomo-icon'
+import { useTheme } from 'next-themes'
+import { useEffect, useRef, useState } from 'react'
+import { IoSettings } from 'react-icons/io5'
+import { NavigateFunction, useLocation, useNavigate, useRoutes } from 'react-router-dom'
 import useSWR from 'swr'
-import ConfirmModal from '@renderer/components/base/base-confirm'
+
+import MihomoIcon from './components/base/mihomo-icon'
 
 let navigate: NavigateFunction
 
@@ -51,7 +45,7 @@ const defaultSiderOrder = [
   'resource',
   'override',
   'log',
-  'substore'
+  'substore',
 ]
 
 const App: React.FC = () => {
@@ -64,7 +58,7 @@ const App: React.FC = () => {
     siderOrder,
     autoCheckUpdate,
     updateChannel = 'stable',
-    disableAnimation = false
+    disableAnimation = false,
   } = appConfig || {}
   const siderOrderArray = siderOrder ?? defaultSiderOrder
   const narrowWidth = platform === 'darwin' ? 70 : 60
@@ -94,8 +88,8 @@ const App: React.FC = () => {
     autoCheckUpdate ? ['checkUpdate', updateChannel] : undefined,
     autoCheckUpdate ? checkUpdate : (): undefined => {},
     {
-      refreshInterval: 1000 * 60 * 10
-    }
+      refreshInterval: 1000 * 60 * 10,
+    },
   )
 
   useEffect(() => {
@@ -159,7 +153,7 @@ const App: React.FC = () => {
     navigate(navigateMap[active.id as string])
   }
 
-  const navigateMap = {
+  const navigateMap: Record<string, string> = {
     sysproxy: 'sysproxy',
     tun: 'tun',
     profile: 'profiles',
@@ -172,10 +166,10 @@ const App: React.FC = () => {
     rule: 'rules',
     resource: 'resources',
     override: 'override',
-    substore: 'substore'
+    substore: 'substore',
   }
 
-  const componentMap = {
+  const componentMap: Record<string, any> = {
     sysproxy: SysproxySwitcher,
     tun: TunSwitcher,
     profile: ProfileCard,
@@ -188,7 +182,7 @@ const App: React.FC = () => {
     rule: RuleCard,
     resource: ResourceCard,
     override: OverrideCard,
-    substore: SubStoreCard
+    substore: SubStoreCard,
   }
 
   const [showQuitConfirm, setShowQuitConfirm] = useState(false)
@@ -207,27 +201,18 @@ const App: React.FC = () => {
     const handleShowQuitConfirm = (): void => {
       setShowQuitConfirm(true)
     }
-    const handleShowProfileInstallConfirm = (
-      _event: unknown,
-      data: { url: string; name?: string | null }
-    ): void => {
+    const handleShowProfileInstallConfirm = (_event: unknown, data: { url: string; name?: string | null }): void => {
       setProfileInstallData(data)
       setShowProfileInstallConfirm(true)
     }
-    const handleShowOverrideInstallConfirm = (
-      _event: unknown,
-      data: { url: string; name?: string | null }
-    ): void => {
+    const handleShowOverrideInstallConfirm = (_event: unknown, data: { url: string; name?: string | null }): void => {
       setOverrideInstallData(data)
       setShowOverrideInstallConfirm(true)
     }
 
     window.electron.ipcRenderer.on('show-quit-confirm', handleShowQuitConfirm)
     window.electron.ipcRenderer.on('show-profile-install-confirm', handleShowProfileInstallConfirm)
-    window.electron.ipcRenderer.on(
-      'show-override-install-confirm',
-      handleShowOverrideInstallConfirm
-    )
+    window.electron.ipcRenderer.on('show-override-install-confirm', handleShowOverrideInstallConfirm)
 
     return (): void => {
       window.electron.ipcRenderer.removeAllListeners('show-quit-confirm')
@@ -253,7 +238,7 @@ const App: React.FC = () => {
 
   return (
     <div
-      onMouseMove={(e) => {
+      onMouseMove={e => {
         if (!resizing) return
         if (e.clientX <= 150) {
           setSiderWidthValue(narrowWidth)
@@ -269,19 +254,19 @@ const App: React.FC = () => {
     >
       {showQuitConfirm && (
         <ConfirmModal
-          title="确定要退出 Sparkle 吗？"
+          title='确定要退出 Sparkle 吗？'
           description={
             <div>
               <p></p>
-              <p className="text-sm text-gray-500 mt-2">退出后代理功能将停止工作</p>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className='text-sm text-gray-500 mt-2'>退出后代理功能将停止工作</p>
+              <p className='text-sm text-gray-400 mt-1'>
                 快按两次或长按 {platform === 'darwin' ? '⌘Q' : 'Ctrl+Q'} 可直接退出
               </p>
             </div>
           }
-          confirmText="退出"
-          cancelText="取消"
-          onChange={(open) => {
+          confirmText='退出'
+          cancelText='取消'
+          onChange={open => {
             if (!open) {
               handleQuitConfirm(false)
             }
@@ -291,46 +276,38 @@ const App: React.FC = () => {
       )}
       {showProfileInstallConfirm && profileInstallData && (
         <ConfirmModal
-          title="确定要导入订阅配置吗？"
+          title='确定要导入订阅配置吗？'
           description={
             <div>
-              <p className="text-sm text-gray-600 mb-2">
-                名称：{profileInstallData.name || '未命名'}
-              </p>
-              <p className="text-sm text-gray-600 mb-2">链接：{profileInstallData.url}</p>
-              <p className="text-sm text-orange-500 mt-2">
-                请确保订阅配置来源可信，恶意配置可能影响您的网络安全
-              </p>
+              <p className='text-sm text-gray-600 mb-2'>名称：{profileInstallData.name || '未命名'}</p>
+              <p className='text-sm text-gray-600 mb-2'>链接：{profileInstallData.url}</p>
+              <p className='text-sm text-orange-500 mt-2'>请确保订阅配置来源可信，恶意配置可能影响您的网络安全</p>
             </div>
           }
-          confirmText="导入"
-          cancelText="取消"
-          onChange={(open) => {
+          confirmText='导入'
+          cancelText='取消'
+          onChange={open => {
             if (!open) {
               handleProfileInstallConfirm(false)
             }
           }}
           onConfirm={() => handleProfileInstallConfirm(true)}
-          className="w-[500px]"
+          className='w-[500px]'
         />
       )}
       {showOverrideInstallConfirm && overrideInstallData && (
         <ConfirmModal
-          title="确定要导入覆写文件吗？"
+          title='确定要导入覆写文件吗？'
           description={
             <div>
-              <p className="text-sm text-gray-600 mb-2">
-                名称：{overrideInstallData.name || '未命名'}
-              </p>
-              <p className="text-sm text-gray-600 mb-2">链接：{overrideInstallData.url}</p>
-              <p className="text-sm text-orange-500 mt-2">
-                请确保覆写文件来源可信，恶意覆写文件可能影响您的网络安全
-              </p>
+              <p className='text-sm text-gray-600 mb-2'>名称：{overrideInstallData.name || '未命名'}</p>
+              <p className='text-sm text-gray-600 mb-2'>链接：{overrideInstallData.url}</p>
+              <p className='text-sm text-orange-500 mt-2'>请确保覆写文件来源可信，恶意覆写文件可能影响您的网络安全</p>
             </div>
           }
-          confirmText="导入"
-          cancelText="取消"
-          onChange={(open) => {
+          confirmText='导入'
+          cancelText='取消'
+          onChange={open => {
             if (!open) {
               handleOverrideInstallConfirm(false)
             }
@@ -339,16 +316,12 @@ const App: React.FC = () => {
         />
       )}
       {siderWidthValue === narrowWidth ? (
-        <div style={{ width: `${narrowWidth}px` }} className="side h-full">
-          <div className="app-drag flex justify-center items-center z-40 bg-transparent h-[45px]">
-            {platform !== 'darwin' && (
-              <MihomoIcon className="h-[32px] leading-[32px] text-lg mx-px" />
-            )}
+        <div style={{ width: `${narrowWidth}px` }} className='side h-full'>
+          <div className='app-drag flex justify-center items-center z-40 bg-transparent h-[45px]'>
+            {platform !== 'darwin' && <MihomoIcon className='h-[32px] leading-[32px] text-lg mx-px' />}
           </div>
-          <div
-            className={`${latest ? 'h-[calc(100%-275px)]' : 'h-[calc(100%-227px)]'} overflow-y-auto no-scrollbar`}
-          >
-            <div className="h-full w-full flex flex-col gap-2">
+          <div className={`${latest ? 'h-[calc(100%-275px)]' : 'h-[calc(100%-227px)]'} overflow-y-auto no-scrollbar`}>
+            <div className='h-full w-full flex flex-col gap-2'>
               {order.map((key: string) => {
                 const Component = componentMap[key]
                 if (!Component) return null
@@ -356,39 +329,34 @@ const App: React.FC = () => {
               })}
             </div>
           </div>
-          <div className="p-2 flex flex-col items-center space-y-2">
+          <div className='p-2 flex flex-col items-center space-y-2'>
             {latest && latest.version && <UpdaterButton iconOnly={true} latest={latest} />}
             <OutboundModeSwitcher iconOnly />
             <Button
-              size="sm"
-              className="app-nodrag"
+              size='sm'
+              className='app-nodrag'
               isIconOnly
               color={location.pathname.includes('/settings') ? 'primary' : 'default'}
               variant={location.pathname.includes('/settings') ? 'solid' : 'light'}
               onPress={() => navigate('/settings')}
             >
-              <IoSettings className="text-[20px]" />
+              <IoSettings className='text-[20px]' />
             </Button>
           </div>
         </div>
       ) : (
-        <div
-          style={{ width: `${siderWidthValue}px` }}
-          className="side h-full overflow-y-auto no-scrollbar"
-        >
+        <div style={{ width: `${siderWidthValue}px` }} className='side h-full overflow-y-auto no-scrollbar'>
           <div
             className={`app-drag sticky top-0 z-40 ${disableAnimation ? 'bg-background/95 backdrop-blur-sm' : 'bg-transparent backdrop-blur'} h-[49px]`}
           >
-            <div
-              className={`flex justify-between p-2 ${!useWindowFrame && platform === 'darwin' ? 'ml-[60px]' : ''}`}
-            >
-              <div className="flex ml-1">
-                <h3 className="text-lg font-bold leading-[32px]">Sparkle</h3>
+            <div className={`flex justify-between p-2 ${!useWindowFrame && platform === 'darwin' ? 'ml-[60px]' : ''}`}>
+              <div className='flex ml-1'>
+                <h3 className='text-lg font-bold leading-[32px]'>Sparkle</h3>
               </div>
               {latest && latest.version && <UpdaterButton latest={latest} />}
               <Button
-                size="sm"
-                className="app-nodrag"
+                size='sm'
+                className='app-nodrag'
                 isIconOnly
                 color={location.pathname.includes('/settings') ? 'primary' : 'default'}
                 variant={location.pathname.includes('/settings') ? 'solid' : 'light'}
@@ -396,16 +364,16 @@ const App: React.FC = () => {
                   navigate('/settings')
                 }}
               >
-                <IoSettings className="text-[20px]" />
+                <IoSettings className='text-[20px]' />
               </Button>
             </div>
           </div>
-          <div className="mt-2 mx-2">
+          <div className='mt-2 mx-2'>
             <OutboundModeSwitcher />
           </div>
           <div style={{ overflowX: 'clip' }}>
             <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={onDragEnd}>
-              <div className="grid grid-cols-2 gap-2 m-2">
+              <div className='grid grid-cols-2 gap-2 m-2'>
                 <SortableContext items={order}>
                   {order.map((key: string) => {
                     const Component = componentMap[key]
@@ -429,15 +397,12 @@ const App: React.FC = () => {
           left: `${siderWidthValue - 2}px`,
           width: '5px',
           height: '100vh',
-          cursor: 'ew-resize'
+          cursor: 'ew-resize',
         }}
         className={resizing ? 'bg-primary' : ''}
       />
-      <Divider orientation="vertical" />
-      <div
-        style={{ width: `calc(100% - ${siderWidthValue + 1}px)` }}
-        className="main grow h-full overflow-y-auto"
-      >
+      <Divider orientation='vertical' />
+      <div style={{ width: `calc(100% - ${siderWidthValue + 1}px)` }} className='main grow h-full overflow-y-auto'>
         {page}
       </div>
     </div>

@@ -2,13 +2,13 @@ import { Button } from '@heroui/react'
 import BasePage from '@renderer/components/base/base-page'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import {
+  downloadSubStore,
+  startSubStoreBackendServer,
+  startSubStoreFrontendServer,
+  stopSubStoreBackendServer,
+  stopSubStoreFrontendServer,
   subStoreFrontendPort,
   subStorePort,
-  startSubStoreFrontendServer,
-  startSubStoreBackendServer,
-  stopSubStoreFrontendServer,
-  stopSubStoreBackendServer,
-  downloadSubStore
 } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 import { HiExternalLink } from 'react-icons/hi'
@@ -33,15 +33,15 @@ const SubStore: React.FC = () => {
   return (
     <>
       <BasePage
-        title="Sub-Store"
+        title='Sub-Store'
         header={
-          <div className="flex gap-2">
+          <div className='flex gap-2'>
             <Button
-              title="检查更新"
+              title='检查更新'
               isIconOnly
-              size="sm"
-              className="app-nodrag"
-              variant="light"
+              size='sm'
+              className='app-nodrag'
+              variant='light'
               isLoading={isUpdating}
               onPress={async () => {
                 try {
@@ -50,7 +50,7 @@ const SubStore: React.FC = () => {
                   await downloadSubStore()
                   await stopSubStoreBackendServer()
                   await startSubStoreBackendServer()
-                  await new Promise((resolve) => setTimeout(resolve, 1000))
+                  await new Promise(resolve => setTimeout(resolve, 1000))
                   setFrontendPort(0)
                   await stopSubStoreFrontendServer()
                   await startSubStoreFrontendServer()
@@ -63,28 +63,28 @@ const SubStore: React.FC = () => {
                 }
               }}
             >
-              <IoMdCloudDownload className="text-lg" />
+              <IoMdCloudDownload className='text-lg' />
             </Button>
             <Button
-              title="在浏览器中打开"
+              title='在浏览器中打开'
               isIconOnly
-              size="sm"
-              className="app-nodrag"
-              variant="light"
+              size='sm'
+              className='app-nodrag'
+              variant='light'
               onPress={() => {
                 open(
-                  `http://127.0.0.1:${frontendPort}?api=${useCustomSubStore ? customSubStoreUrl : `http://127.0.0.1:${backendPort}`}`
+                  `http://127.0.0.1:${frontendPort}?api=${useCustomSubStore ? customSubStoreUrl : `http://127.0.0.1:${backendPort}`}`,
                 )
               }}
             >
-              <HiExternalLink className="text-lg" />
+              <HiExternalLink className='text-lg' />
             </Button>
           </div>
         }
       >
         <iframe
-          className="w-full h-full"
-          allow="clipboard-write; clipboard-read"
+          className='w-full h-full'
+          allow='clipboard-write; clipboard-read'
           src={`http://127.0.0.1:${frontendPort}?api=${useCustomSubStore ? customSubStoreUrl : `http://127.0.0.1:${backendPort}`}`}
         />
       </BasePage>

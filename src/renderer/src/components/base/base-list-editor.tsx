@@ -1,14 +1,11 @@
-import React from 'react'
 import { Button, Divider, Input, Tooltip } from '@heroui/react'
-import { MdDeleteForever } from 'react-icons/md'
 import type { ValidationResult } from '@renderer/utils/validate'
+import React from 'react'
+import { MdDeleteForever } from 'react-icons/md'
 
 interface EditableListProps {
   title?: string
-  items:
-    | string[]
-    | Record<string, string | string[]>
-    | Array<{ key: string; value: string | string[] }>
+  items: string[] | Record<string, string | string[]> | { key: string; value: string | string[] }[]
   onChange: (items: unknown) => void
   placeholder?: string
   part2Placeholder?: string
@@ -35,28 +32,28 @@ const EditableList: React.FC<EditableListProps> = ({
   objectMode,
   validate,
   validatePart1,
-  validatePart2
+  validatePart2,
 }) => {
   const isDual = !!parse && !!format
 
-  let processedItems: Array<{ part1: string; part2?: string }> = []
+  let processedItems: { part1: string; part2?: string }[] = []
 
   if (objectMode === 'record' && !Array.isArray(items)) {
     processedItems = Object.entries(items).map(([key, value]) => ({
       part1: key,
-      part2: Array.isArray(value) ? value.join(',') : String(value)
+      part2: Array.isArray(value) ? value.join(',') : String(value),
     }))
   } else if (objectMode === 'keyValue' && Array.isArray(items)) {
-    processedItems = (items as Array<{ key: string; value: string | string[] }>).map((item) => ({
+    processedItems = (items as { key: string; value: string | string[] }[]).map(item => ({
       part1: item.key,
-      part2: Array.isArray(item.value) ? item.value.join(',') : String(item.value)
+      part2: Array.isArray(item.value) ? item.value.join(',') : String(item.value),
     }))
   } else if (objectMode === 'array' && Array.isArray(items)) {
-    processedItems = (items as string[]).map((value) => ({ part1: value }))
+    processedItems = (items as string[]).map(value => ({ part1: value }))
   } else if (isDual && Array.isArray(items)) {
-    processedItems = (items as string[]).map((it) => ({ ...parse!(it) }))
+    processedItems = (items as string[]).map(it => ({ ...parse!(it) }))
   } else if (Array.isArray(items)) {
-    processedItems = (items as string[]).map((i) => ({ part1: i }))
+    processedItems = (items as string[]).map(i => ({ part1: i }))
   }
 
   const extra = isDual || objectMode ? { part1: '', part2: '' } : { part1: '' }
@@ -75,16 +72,16 @@ const EditableList: React.FC<EditableListProps> = ({
     }
 
     if (objectMode === 'array') {
-      const result: string[] = processedItems.map((item) => item.part1)
+      const result: string[] = processedItems.map(item => item.part1)
       onChange(result)
       return
     }
 
     if (objectMode === 'record') {
       const result: Record<string, string[]> = {}
-      processedItems.forEach((item) => {
+      processedItems.forEach(item => {
         if (item.part1.trim()) {
-          const values = item.part2 ? item.part2.split(',').map((s) => s.trim()) : []
+          const values = item.part2 ? item.part2.split(',').map(s => s.trim()) : []
           result[item.part1] = values
         }
       })
@@ -93,9 +90,9 @@ const EditableList: React.FC<EditableListProps> = ({
     }
 
     if (objectMode === 'keyValue') {
-      const result = processedItems.map((item) => ({
+      const result = processedItems.map(item => ({
         key: item.part1,
-        value: item.part2 ? item.part2.split(',').map((s) => s.trim()) : []
+        value: item.part2 ? item.part2.split(',').map(s => s.trim()) : [],
       }))
       onChange(result)
       return
@@ -107,21 +104,20 @@ const EditableList: React.FC<EditableListProps> = ({
       return
     }
 
-    onChange(processedItems.map((item) => item.part1))
+    onChange(processedItems.map(item => item.part1))
   }
 
   return (
     <>
       <div className={`flex flex-col space-y-2 ${!title ? 'mt-2' : ''}`}>
-        {title && <h4 className="text-base font-medium">{title}</h4>}
+        {title && <h4 className='text-base font-medium'>{title}</h4>}
         {displayed.map((entry, idx) => {
           const disabled = disableFirst && idx === 0
           const isExtra = idx === processedItems.length
           const isEmpty = !entry.part1.trim() && (!entry.part2 || !entry.part2.trim())
 
           // 整体验证（向后兼容）
-          const rawValidation =
-            isExtra || isEmpty ? true : validate ? validate(entry.part1, entry.part2) : true
+          const rawValidation = isExtra || isEmpty ? true : validate ? validate(entry.part1, entry.part2) : true
           const validation: ValidationResult =
             typeof rawValidation === 'boolean'
               ? { ok: rawValidation, error: rawValidation ? undefined : '格式错误' }
@@ -129,11 +125,7 @@ const EditableList: React.FC<EditableListProps> = ({
 
           // part1 单独验证
           const rawValidation1 =
-            isExtra || !entry.part1.trim()
-              ? true
-              : validatePart1
-                ? validatePart1(entry.part1)
-                : true
+            isExtra || !entry.part1.trim() ? true : validatePart1 ? validatePart1(entry.part1) : true
           const validation1: ValidationResult =
             typeof rawValidation1 === 'boolean'
               ? { ok: rawValidation1, error: rawValidation1 ? undefined : '格式错误' }
@@ -141,11 +133,7 @@ const EditableList: React.FC<EditableListProps> = ({
 
           // part2 单独验证
           const rawValidation2 =
-            isExtra || !entry.part2?.trim()
-              ? true
-              : validatePart2
-                ? validatePart2(entry.part2)
-                : true
+            isExtra || !entry.part2?.trim() ? true : validatePart2 ? validatePart2(entry.part2) : true
           const validation2: ValidationResult =
             typeof rawValidation2 === 'boolean'
               ? { ok: rawValidation2, error: rawValidation2 ? undefined : '格式错误' }
@@ -158,51 +146,47 @@ const EditableList: React.FC<EditableListProps> = ({
           const part2Error = validatePart2 ? validation2.error : validation.error
 
           return (
-            <div key={idx} className="flex items-center space-x-2">
+            <div key={idx} className='flex items-center space-x-2'>
               {isDual || objectMode ? (
                 <>
-                  <div className="w-1/3">
+                  <div className='w-1/3'>
                     <Tooltip
                       content={part1Error ?? '格式错误'}
-                      placement="left"
+                      placement='left'
                       isOpen={!part1Valid}
                       showArrow={true}
-                      color="danger"
+                      color='danger'
                       offset={10}
                     >
                       <Input
-                        size="sm"
+                        size='sm'
                         fullWidth
-                        className={
-                          part1Valid ? '' : 'border-red-500 ring-1 ring-red-500 rounded-lg'
-                        }
+                        className={part1Valid ? '' : 'border-red-500 ring-1 ring-red-500 rounded-lg'}
                         disabled={disabled}
                         placeholder={placeholder}
                         value={entry.part1}
-                        onValueChange={(v) => handleUpdate(idx, v, entry.part2)}
+                        onValueChange={v => handleUpdate(idx, v, entry.part2)}
                       />
                     </Tooltip>
                   </div>
-                  <span className="mx-1">:</span>
-                  <div className="flex-1">
+                  <span className='mx-1'>:</span>
+                  <div className='flex-1'>
                     <Tooltip
                       content={part2Error ?? '格式错误'}
-                      placement="left"
+                      placement='left'
                       isOpen={!part2Valid}
                       showArrow={true}
-                      color="danger"
+                      color='danger'
                       offset={10}
                     >
                       <Input
-                        size="sm"
+                        size='sm'
                         fullWidth
-                        className={
-                          part2Valid ? '' : 'border-red-500 ring-1 ring-red-500 rounded-lg'
-                        }
+                        className={part2Valid ? '' : 'border-red-500 ring-1 ring-red-500 rounded-lg'}
                         disabled={disabled}
                         placeholder={part2Placeholder}
                         value={entry.part2 || ''}
-                        onValueChange={(v) => handleUpdate(idx, entry.part1, v)}
+                        onValueChange={v => handleUpdate(idx, entry.part1, v)}
                       />
                     </Tooltip>
                   </div>
@@ -210,38 +194,33 @@ const EditableList: React.FC<EditableListProps> = ({
               ) : (
                 <Tooltip
                   content={part1Error ?? '格式错误'}
-                  placement="left"
+                  placement='left'
                   isOpen={!part1Valid}
                   showArrow={true}
-                  color="danger"
+                  color='danger'
                   offset={10}
                 >
                   <Input
-                    size="sm"
+                    size='sm'
                     fullWidth
                     className={part1Valid ? '' : 'border-red-500 ring-1 ring-red-500 rounded-lg'}
                     disabled={disabled}
                     placeholder={placeholder}
                     value={entry.part1}
-                    onValueChange={(v) => handleUpdate(idx, v)}
+                    onValueChange={v => handleUpdate(idx, v)}
                   />
                 </Tooltip>
               )}
               {idx < processedItems.length && !disabled && (
-                <Button
-                  size="sm"
-                  variant="flat"
-                  color="warning"
-                  onPress={() => handleUpdate(idx, '', '')}
-                >
-                  <MdDeleteForever className="text-lg" />
+                <Button size='sm' variant='flat' color='warning' onPress={() => handleUpdate(idx, '', '')}>
+                  <MdDeleteForever className='text-lg' />
                 </Button>
               )}
             </div>
           )
         })}
       </div>
-      {divider && <Divider className="mt-2 mb-2" />}
+      {divider && <Divider className='mt-2 mb-2' />}
     </>
   )
 }

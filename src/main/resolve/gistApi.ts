@@ -1,4 +1,5 @@
 import axios from 'axios'
+
 import { getAppConfig, getControledMihomoConfig } from '../config'
 import { getRuntimeConfigStr } from '../core/factory'
 
@@ -14,16 +15,16 @@ async function listGists(token: string): Promise<GistInfo[]> {
     headers: {
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${token}`,
-      'X-GitHub-Api-Version': '2022-11-28'
+      'X-GitHub-Api-Version': '2022-11-28',
     },
-    ...(port != 0 && {
+    ...(port !== 0 && {
       proxy: {
         protocol: 'http',
         host: '127.0.0.1',
-        port
-      }
+        port,
+      },
     }),
-    responseType: 'json'
+    responseType: 'json',
   })
   return res.data as GistInfo[]
 }
@@ -35,22 +36,22 @@ async function createGist(token: string, content: string): Promise<void> {
     {
       description: 'Auto Synced Sparkle Runtime Config',
       public: false,
-      files: { 'sparkle.yaml': { content } }
+      files: { 'sparkle.yaml': { content } },
     },
     {
       headers: {
         Accept: 'application/vnd.github+json',
         Authorization: `Bearer ${token}`,
-        'X-GitHub-Api-Version': '2022-11-28'
+        'X-GitHub-Api-Version': '2022-11-28',
       },
-      ...(port != 0 && {
+      ...(port !== 0 && {
         proxy: {
           protocol: 'http',
           host: '127.0.0.1',
-          port
-        }
-      })
-    }
+          port,
+        },
+      }),
+    },
   )
 }
 
@@ -60,22 +61,22 @@ async function updateGist(token: string, id: string, content: string): Promise<v
     `https://api.github.com/gists/${id}`,
     {
       description: 'Auto Synced Sparkle Runtime Config',
-      files: { 'sparkle.yaml': { content } }
+      files: { 'sparkle.yaml': { content } },
     },
     {
       headers: {
         Accept: 'application/vnd.github+json',
         Authorization: `Bearer ${token}`,
-        'X-GitHub-Api-Version': '2022-11-28'
+        'X-GitHub-Api-Version': '2022-11-28',
       },
-      ...(port != 0 && {
+      ...(port !== 0 && {
         proxy: {
           protocol: 'http',
           host: '127.0.0.1',
-          port
-        }
-      })
-    }
+          port,
+        },
+      }),
+    },
   )
 }
 
@@ -83,13 +84,13 @@ export async function getGistUrl(): Promise<string> {
   const { githubToken } = await getAppConfig()
   if (!githubToken) return ''
   const gists = await listGists(githubToken)
-  const gist = gists.find((gist) => gist.description === 'Auto Synced Sparkle Runtime Config')
+  const gist = gists.find(gist => gist.description === 'Auto Synced Sparkle Runtime Config')
   if (gist) {
     return gist.html_url
   } else {
     await uploadRuntimeConfig()
     const gists = await listGists(githubToken)
-    const gist = gists.find((gist) => gist.description === 'Auto Synced Sparkle Runtime Config')
+    const gist = gists.find(gist => gist.description === 'Auto Synced Sparkle Runtime Config')
     if (!gist) throw new Error('Gist not found')
     return gist.html_url
   }
@@ -99,7 +100,7 @@ export async function uploadRuntimeConfig(): Promise<void> {
   const { githubToken } = await getAppConfig()
   if (!githubToken) return
   const gists = await listGists(githubToken)
-  const gist = gists.find((gist) => gist.description === 'Auto Synced Sparkle Runtime Config')
+  const gist = gists.find(gist => gist.description === 'Auto Synced Sparkle Runtime Config')
   const config = await getRuntimeConfigStr()
   if (gist) {
     await updateGist(githubToken, gist.id, config)

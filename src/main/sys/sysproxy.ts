@@ -1,10 +1,12 @@
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
+
+import { net } from 'electron'
+
 import { getAppConfig, getControledMihomoConfig } from '../config'
 import { pacPort, startPacServer, stopPacServer } from '../resolve/server'
-import { promisify } from 'util'
-import { execFile } from 'child_process'
-import { servicePath } from '../utils/dirs'
-import { net } from 'electron'
 import { disableProxy, setPac, setProxy } from '../service/api'
+import { servicePath } from '../utils/dirs'
 
 let defaultBypass: string[]
 let triggerSysProxyTimer: NodeJS.Timeout | null = null
@@ -24,15 +26,7 @@ export async function triggerSysProxy(enable: boolean, onlyActiveDevice: boolean
 
 async function setSysProxy(onlyActiveDevice: boolean): Promise<void> {
   if (process.platform === 'linux')
-    defaultBypass = [
-      'localhost',
-      '.local',
-      '127.0.0.1/8',
-      '192.168.0.0/16',
-      '10.0.0.0/8',
-      '172.16.0.0/12',
-      '::1'
-    ]
+    defaultBypass = ['localhost', '.local', '127.0.0.1/8', '192.168.0.0/16', '10.0.0.0/8', '172.16.0.0/12', '::1']
   if (process.platform === 'darwin')
     defaultBypass = [
       '127.0.0.1/8',
@@ -42,7 +36,7 @@ async function setSysProxy(onlyActiveDevice: boolean): Promise<void> {
       'localhost',
       '*.local',
       '*.crashlytics.com',
-      '<local>'
+      '<local>',
     ]
   if (process.platform === 'win32')
     defaultBypass = [
@@ -66,7 +60,7 @@ async function setSysProxy(onlyActiveDevice: boolean): Promise<void> {
       '172.29.*',
       '172.30.*',
       '172.31.*',
-      '<local>'
+      '<local>',
     ]
   await startPacServer()
   const { sysProxy } = await getAppConfig()
@@ -84,17 +78,13 @@ async function setSysProxy(onlyActiveDevice: boolean): Promise<void> {
           throw new Error('服务可能未安装')
         }
       } else {
-        await execFilePromise(servicePath(), [
-          'pac',
-          '--url',
-          `http://${host || '127.0.0.1'}:${pacPort}/pac`
-        ])
+        await execFilePromise(servicePath(), ['pac', '--url', `http://${host || '127.0.0.1'}:${pacPort}/pac`])
       }
       break
     }
 
     case 'manual': {
-      if (port != 0) {
+      if (port !== 0) {
         if (useService) {
           try {
             await setProxy(`${host || '127.0.0.1'}:${port}`, bypass.join(','), '', onlyActiveDevice)
@@ -107,7 +97,7 @@ async function setSysProxy(onlyActiveDevice: boolean): Promise<void> {
             '--server',
             `${host || '127.0.0.1'}:${port}`,
             '--bypass',
-            process.platform === 'win32' ? bypass.join(';') : bypass.join(',')
+            process.platform === 'win32' ? bypass.join(';') : bypass.join(','),
           ])
         }
       }
@@ -126,7 +116,7 @@ export async function disableSysProxy(onlyActiveDevice: boolean): Promise<void> 
   if (useService) {
     try {
       await disableProxy('', onlyActiveDevice)
-    } catch (e) {
+    } catch (_e) {
       throw new Error('服务可能未安装')
     }
   } else {

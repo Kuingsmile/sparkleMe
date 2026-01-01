@@ -1,37 +1,37 @@
 import { Button, Input, Select, SelectItem, Switch, Tab, Tabs } from '@heroui/react'
+import ConfirmModal, { ConfirmButton } from '@renderer/components/base/base-confirm'
 import BasePage from '@renderer/components/base/base-page'
 import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
-import ConfirmModal, { ConfirmButton } from '@renderer/components/base/base-confirm'
+import AdvancedSetting from '@renderer/components/mihomo/advanced-settings'
+import ControllerSetting from '@renderer/components/mihomo/controller-setting'
+import EnvSetting from '@renderer/components/mihomo/env-setting'
 import PermissionModal from '@renderer/components/mihomo/permission-modal'
+import PortSetting from '@renderer/components/mihomo/port-setting'
 import ServiceModal from '@renderer/components/mihomo/service-modal'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import PortSetting from '@renderer/components/mihomo/port-setting'
 import { platform } from '@renderer/utils/init'
-import { IoMdCloudDownload } from 'react-icons/io'
-import PubSub from 'pubsub-js'
 import {
+  checkElevateTask,
+  deleteElevateTask,
+  findSystemMihomo,
+  initService,
+  installService,
   manualGrantCorePermition,
   mihomoUpgrade,
-  restartCore,
-  revokeCorePermission,
-  findSystemMihomo,
-  deleteElevateTask,
-  checkElevateTask,
-  relaunchApp,
   notDialogQuit,
-  installService,
-  uninstallService,
+  relaunchApp,
+  restartCore,
+  restartService,
+  revokeCorePermission,
   startService,
   stopService,
-  initService,
-  restartService
+  uninstallService,
 } from '@renderer/utils/ipc'
-import React, { useState, useEffect } from 'react'
-import ControllerSetting from '@renderer/components/mihomo/controller-setting'
-import EnvSetting from '@renderer/components/mihomo/env-setting'
-import AdvancedSetting from '@renderer/components/mihomo/advanced-settings'
+import PubSub from 'pubsub-js'
+import React, { useEffect, useState } from 'react'
+import { IoMdCloudDownload } from 'react-icons/io'
 
 let systemCorePathsCache: string[] | null = null
 let cachePromise: Promise<string[]> | null = null
@@ -41,7 +41,7 @@ const getSystemCorePaths = async (): Promise<string[]> => {
   if (cachePromise !== null) return cachePromise
 
   cachePromise = findSystemMihomo()
-    .then((paths) => {
+    .then(paths => {
       systemCorePathsCache = paths
       cachePromise = null
       return paths
@@ -117,7 +117,7 @@ const Mihomo: React.FC = () => {
 
       if (paths.length === 0) {
         new Notification('未找到系统内核', {
-          body: '系统中未找到可用的 mihomo 或 clash 内核，已自动切换回内置内核'
+          body: '系统中未找到可用的 mihomo 或 clash 内核，已自动切换回内置内核',
         })
         return
       }
@@ -152,7 +152,7 @@ const Mihomo: React.FC = () => {
       key: 'cancel',
       text: '取消',
       variant: 'light',
-      onPress: () => {}
+      onPress: () => {},
     },
     {
       key: 'confirm',
@@ -168,14 +168,14 @@ const Mihomo: React.FC = () => {
             new Notification('内核权限已撤销')
           }
           await patchAppConfig({
-            corePermissionMode: pendingPermissionMode as 'elevated' | 'service'
+            corePermissionMode: pendingPermissionMode as 'elevated' | 'service',
           })
 
           await restartCore()
         } catch (e) {
           alert(e)
         }
-      }
+      },
     },
     ...(platform === 'win32'
       ? [
@@ -188,28 +188,28 @@ const Mihomo: React.FC = () => {
                 await deleteElevateTask()
                 new Notification('任务计划已取消注册')
                 await patchAppConfig({
-                  corePermissionMode: pendingPermissionMode as 'elevated' | 'service'
+                  corePermissionMode: pendingPermissionMode as 'elevated' | 'service',
                 })
                 await relaunchApp()
               } catch (e) {
                 alert(e)
               }
-            }
-          }
+            },
+          },
         ]
-      : [])
+      : []),
   ]
 
   return (
-    <BasePage title="内核设置">
+    <BasePage title='内核设置'>
       {showGrantConfirm && (
         <ConfirmModal
           onChange={setShowGrantConfirm}
-          title="确认使用任务计划？"
-          description="确认后将退出应用，请手动使用管理员运行一次程序"
+          title='确认使用任务计划？'
+          description='确认后将退出应用，请手动使用管理员运行一次程序'
           onConfirm={async () => {
             await patchAppConfig({
-              corePermissionMode: pendingPermissionMode as 'elevated' | 'service'
+              corePermissionMode: pendingPermissionMode as 'elevated' | 'service',
             })
             await notDialogQuit()
           }}
@@ -218,8 +218,8 @@ const Mihomo: React.FC = () => {
       {showUnGrantConfirm && (
         <ConfirmModal
           onChange={setShowUnGrantConfirm}
-          title="确认取消任务计划？"
-          description="取消任务计划后，虚拟网卡等功能可能无法正常工作。确定要继续吗？"
+          title='确认取消任务计划？'
+          description='取消任务计划后，虚拟网卡等功能可能无法正常工作。确定要继续吗？'
           buttons={unGrantButtons}
         />
       )}
@@ -274,18 +274,18 @@ const Mihomo: React.FC = () => {
       )}
       <SettingCard>
         <SettingItem
-          title="内核版本"
+          title='内核版本'
           actions={
             core === 'mihomo' || core === 'mihomo-alpha' ? (
               <Button
-                size="sm"
+                size='sm'
                 isIconOnly
-                title="升级内核"
-                variant="light"
+                title='升级内核'
+                variant='light'
                 isLoading={upgrading}
                 onPress={handleCoreUpgrade}
               >
-                <IoMdCloudDownload className="text-lg" />
+                <IoMdCloudDownload className='text-lg' />
               </Button>
             ) : null
           }
@@ -293,102 +293,92 @@ const Mihomo: React.FC = () => {
         >
           <Select
             classNames={{ trigger: 'data-[hover=true]:bg-default-200' }}
-            className="w-[150px]"
-            size="sm"
+            className='w-[150px]'
+            size='sm'
             selectedKeys={new Set([core])}
             disallowEmptySelection={true}
-            onSelectionChange={(v) =>
-              handleCoreChange(v.currentKey as 'mihomo' | 'mihomo-alpha' | 'system')
-            }
+            onSelectionChange={v => handleCoreChange(v.currentKey as 'mihomo' | 'mihomo-alpha' | 'system')}
           >
-            <SelectItem key="mihomo">内置稳定版</SelectItem>
-            <SelectItem key="mihomo-alpha">内置预览版</SelectItem>
-            <SelectItem key="system">使用系统内核</SelectItem>
+            <SelectItem key='mihomo'>内置稳定版</SelectItem>
+            <SelectItem key='mihomo-alpha'>内置预览版</SelectItem>
+            <SelectItem key='system'>使用系统内核</SelectItem>
           </Select>
         </SettingItem>
         {core === 'system' && (
-          <SettingItem title="系统内核路径选择" divider>
+          <SettingItem title='系统内核路径选择' divider>
             <Select
               classNames={{ trigger: 'data-[hover=true]:bg-default-200' }}
-              className="w-[350px]"
-              size="sm"
+              className='w-[350px]'
+              size='sm'
               selectedKeys={new Set([appConfig?.systemCorePath || ''])}
               disallowEmptySelection={systemCorePaths.length > 0}
               isDisabled={loadingPaths}
-              onSelectionChange={(v) => {
+              onSelectionChange={v => {
                 const selectedPath = v.currentKey as string
                 if (selectedPath) handleConfigChangeWithRestart('systemCorePath', selectedPath)
               }}
             >
               {loadingPaths ? (
-                <SelectItem key="">正在查找系统内核...</SelectItem>
+                <SelectItem key=''>正在查找系统内核...</SelectItem>
               ) : systemCorePaths.length > 0 ? (
-                systemCorePaths.map((path) => <SelectItem key={path}>{path}</SelectItem>)
+                systemCorePaths.map(path => <SelectItem key={path}>{path}</SelectItem>)
               ) : (
-                <SelectItem key="">未找到系统内核</SelectItem>
+                <SelectItem key=''>未找到系统内核</SelectItem>
               )}
             </Select>
             {!loadingPaths && systemCorePaths.length === 0 && (
-              <div className="mt-2 text-sm text-warning">
-                未在系统中找到 mihomo 或 clash 内核，请安装后重试
-              </div>
+              <div className='mt-2 text-sm text-warning'>未在系统中找到 mihomo 或 clash 内核，请安装后重试</div>
             )}
           </SettingItem>
         )}
-        <SettingItem title="运行模式" divider>
+        <SettingItem title='运行模式' divider>
           <Tabs
-            size="sm"
-            color="primary"
+            size='sm'
+            color='primary'
             selectedKey={corePermissionMode}
             disabledKeys={['service']}
-            onSelectionChange={(key) => handlePermissionModeChange(key as string)}
+            onSelectionChange={key => handlePermissionModeChange(key as string)}
           >
-            <Tab key="elevated" title={platform === 'win32' ? '任务计划' : '授权运行'} />
-            <Tab key="service" title="系统服务" />
+            <Tab key='elevated' title={platform === 'win32' ? '任务计划' : '授权运行'} />
+            <Tab key='service' title='系统服务' />
           </Tabs>
         </SettingItem>
         <SettingItem title={platform === 'win32' ? '任务状态' : '授权状态'} divider>
-          <Button size="sm" color="primary" onPress={() => setShowPermissionModal(true)}>
+          <Button size='sm' color='primary' onPress={() => setShowPermissionModal(true)}>
             管理
           </Button>
         </SettingItem>
-        <SettingItem title="服务状态" divider>
-          <Button size="sm" color="primary" onPress={() => setShowServiceModal(true)}>
+        <SettingItem title='服务状态' divider>
+          <Button size='sm' color='primary' onPress={() => setShowServiceModal(true)}>
             管理
           </Button>
         </SettingItem>
-        <SettingItem title="IPv6" divider>
-          <Switch
-            size="sm"
-            isSelected={ipv6}
-            onValueChange={(v) => onChangeNeedRestart({ ipv6: v })}
-          />
+        <SettingItem title='IPv6' divider>
+          <Switch size='sm' isSelected={ipv6} onValueChange={v => onChangeNeedRestart({ ipv6: v })} />
         </SettingItem>
-        <SettingItem title="日志保留天数" divider>
+        <SettingItem title='日志保留天数' divider>
           <Input
-            size="sm"
-            type="number"
-            className="w-[100px]"
+            size='sm'
+            type='number'
+            className='w-[100px]'
             value={maxLogDays.toString()}
-            onValueChange={(v) => patchAppConfig({ maxLogDays: parseInt(v) })}
+            onValueChange={v => patchAppConfig({ maxLogDays: parseInt(v) })}
           />
         </SettingItem>
-        <SettingItem title="日志等级">
+        <SettingItem title='日志等级'>
           <Select
             classNames={{ trigger: 'data-[hover=true]:bg-default-200' }}
-            className="w-[100px]"
-            size="sm"
+            className='w-[100px]'
+            size='sm'
             selectedKeys={new Set([logLevel])}
             disallowEmptySelection={true}
-            onSelectionChange={(v) =>
-              onChangeNeedRestart({ 'log-level': v.currentKey as LogLevel })
-            }
+            onSelectionChange={v => onChangeNeedRestart({ 'log-level': v.currentKey as LogLevel })}
           >
-            <SelectItem key="silent">静默</SelectItem>
-            <SelectItem key="error">错误</SelectItem>
-            <SelectItem key="warning">警告</SelectItem>
-            <SelectItem key="info">信息</SelectItem>
-            <SelectItem key="debug">调试</SelectItem>
+            <SelectItem key='silent'>静默</SelectItem>
+            <SelectItem key='error'>错误</SelectItem>
+            <SelectItem key='warning'>警告</SelectItem>
+            <SelectItem key='info'>信息</SelectItem>
+            <SelectItem key='debug'>调试</SelectItem>
           </Select>
         </SettingItem>
       </SettingCard>

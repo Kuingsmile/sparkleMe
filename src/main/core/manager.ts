@@ -1,4 +1,24 @@
-import { ChildProcess, execFile, execFileSync, spawn } from 'child_process'
+import { ChildProcess, execFile, execFileSync, spawn } from 'node:child_process'
+import { createWriteStream, existsSync } from 'node:fs'
+import { readFile, rm, writeFile } from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
+import { promisify } from 'node:util'
+
+import { app, dialog, ipcMain, net } from 'electron'
+
+import { mainWindow } from '..'
+import {
+  getAppConfig,
+  getControledMihomoConfig,
+  getProfileConfig,
+  patchAppConfig,
+  patchControledMihomoConfig,
+} from '../config'
+import { uploadRuntimeConfig } from '../resolve/gistApi'
+import { startMonitor } from '../resolve/trafficMonitor'
+import { setSysDns } from '../service/api'
+import { disableSysProxy, triggerSysProxy } from '../sys/sysproxy'
 import {
   dataDir,
   logPath,
@@ -7,40 +27,22 @@ import {
   mihomoProfileWorkDir,
   mihomoTestDir,
   mihomoWorkConfigPath,
-  mihomoWorkDir
+  mihomoWorkDir,
 } from '../utils/dirs'
 import { generateProfile, getRuntimeConfig } from './factory'
 import {
-  getAppConfig,
-  getControledMihomoConfig,
-  getProfileConfig,
-  patchAppConfig,
-  patchControledMihomoConfig
-} from '../config'
-import { app, dialog, ipcMain, net } from 'electron'
-import {
-  startMihomoTraffic,
+  mihomoGroups,
+  patchMihomoConfig,
   startMihomoConnections,
   startMihomoLogs,
   startMihomoMemory,
+  startMihomoTraffic,
   stopMihomoConnections,
-  stopMihomoTraffic,
   stopMihomoLogs,
   stopMihomoMemory,
-  patchMihomoConfig,
-  mihomoGroups
+  stopMihomoTraffic,
 } from './mihomoApi'
-import { readFile, rm, writeFile } from 'fs/promises'
-import { promisify } from 'util'
-import { mainWindow } from '..'
-import path from 'path'
-import os from 'os'
-import { createWriteStream, existsSync } from 'fs'
-import { uploadRuntimeConfig } from '../resolve/gistApi'
-import { startMonitor } from '../resolve/trafficMonitor'
-import { disableSysProxy, triggerSysProxy } from '../sys/sysproxy'
 import { getAxios } from './mihomoApi'
-import { setSysDns } from '../service/api'
 
 const ctlParam = process.platform === 'win32' ? '-ext-ctl-pipe' : '-ext-ctl-unix'
 
@@ -83,7 +85,7 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
     disableEmbedCA = false,
     disableSystemCA = false,
     disableNftables = false,
-    safePaths = []
+    safePaths = [],
   } = await getAppConfig()
   const { 'log-level': logLevel } = await getControledMihomoConfig()
   const { current } = await getProfileConfig()
@@ -108,20 +110,17 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
       await setPublicDNS()
     } catch (error) {
       await writeFile(logPath(), `[Manager]: set dns failed, ${error}`, {
-        flag: 'a'
+        flag: 'a',
       })
     }
   }
-  const { 'rule-providers': ruleProviders, 'proxy-providers': proxyProviders } =
-    await getRuntimeConfig()
+  const { 'rule-providers': ruleProviders, 'proxy-providers': proxyProviders } = await getRuntimeConfig()
 
   const normalize = (s: string): string =>
-    s
-      .replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16)))
-      .normalize('NFC')
+    s.replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16))).normalize('NFC')
 
   const providerNames = new Set(
-    [...Object.keys(ruleProviders || {}), ...Object.keys(proxyProviders || {})].map(normalize)
+    [...Object.keys(ruleProviders || {}), ...Object.keys(proxyProviders || {})].map(normalize),
   )
   const unmatchedProviders = new Set(providerNames)
   const stdout = createWriteStream(logPath(), { flags: 'a' })
@@ -132,35 +131,30 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
     DISABLE_SYSTEM_CA: String(disableSystemCA),
     DISABLE_NFTABLES: String(disableNftables),
     SAFE_PATHS: safePaths.join(path.delimiter),
-    PATH: process.env.PATH
+    PATH: process.env.PATH,
   }
   let initialized = false
   child = spawn(
     corePath,
-    [
-      '-d',
-      diffWorkDir ? mihomoProfileWorkDir(current) : mihomoWorkDir(),
-      ctlParam,
-      mihomoIpcPath()
-    ],
+    ['-d', diffWorkDir ? mihomoProfileWorkDir(current) : mihomoWorkDir(), ctlParam, mihomoIpcPath()],
     {
-      detached: detached,
+      detached,
       stdio: detached ? 'ignore' : undefined,
-      env: env
-    }
+      env,
+    },
   )
   if (process.platform === 'win32' && child.pid) {
     os.setPriority(child.pid, os.constants.priority[mihomoCpuPriority])
   }
   if (detached) {
     child.unref()
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       resolve([new Promise(() => {})])
     })
   }
   child.on('close', async (code, signal) => {
     await writeFile(logPath(), `[Manager]: Core closed, code: ${code}, signal: ${signal}\n`, {
-      flag: 'a'
+      flag: 'a',
     })
     if (retry) {
       await writeFile(logPath(), `[Manager]: Try Restart Core\n`, { flag: 'a' })
@@ -173,7 +167,7 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
   child.stdout?.pipe(stdout)
   child.stderr?.pipe(stderr)
   return new Promise((resolve, reject) => {
-    child.stdout?.on('data', async (data) => {
+    child.stdout?.on('data', async data => {
       const str = data.toString()
       if (
         (process.platform !== 'win32' && str.includes('External controller unix listen error')) ||
@@ -207,9 +201,7 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
               }
 
               if (
-                logLine.includes(
-                  'Start TUN listening error: configure tun interface: Connect: operation not permitted'
-                )
+                logLine.includes('Start TUN listening error: configure tun interface: Connect: operation not permitted')
               ) {
                 patchControledMihomoConfig({ tun: { enable: false } })
                 mainWindow?.webContents.send('controledMihomoConfigUpdated')
@@ -217,9 +209,7 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
                 reject('虚拟网卡启动失败，前往内核设置页尝试手动授予内核权限')
               }
 
-              const isDefaultProvider = logLine.includes(
-                'Start initial compatible provider default'
-              )
+              const isDefaultProvider = logLine.includes('Start initial compatible provider default')
               const isAllProvidersMatched = providerNames.size > 0 && unmatchedProviders.size === 0
 
               if ((providerNames.size === 0 && isDefaultProvider) || isAllProvidersMatched) {
@@ -231,8 +221,8 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
                     try {
                       await mihomoGroups()
                       break
-                    } catch (error) {
-                      await new Promise((r) => setTimeout(r, retryInterval))
+                    } catch (_e) {
+                      await new Promise(r => setTimeout(r, retryInterval))
                     }
                   }
                 }
@@ -240,23 +230,21 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
                 await waitForMihomoReady()
                 initialized = true
                 Promise.all([
-                  new Promise((r) => setTimeout(r, 100)).then(() => {
+                  new Promise(r => setTimeout(r, 100)).then(() => {
                     mainWindow?.webContents.send('groupsUpdated')
                     mainWindow?.webContents.send('rulesUpdated')
                   }),
                   uploadRuntimeConfig(),
-                  new Promise((r) => setTimeout(r, 100)).then(() =>
-                    patchMihomoConfig({ 'log-level': logLevel })
-                  )
+                  new Promise(r => setTimeout(r, 100)).then(() => patchMihomoConfig({ 'log-level': logLevel })),
                 ]).then(() => resolve())
               }
             }
-            child.stdout?.on('data', (data) => {
+            child.stdout?.on('data', data => {
               if (!initialized) {
                 handleProviderInitialization(data.toString())
               }
             })
-          })
+          }),
         ])
         await startMihomoTraffic()
         await startMihomoConnections()
@@ -275,7 +263,7 @@ export async function stopCore(force = false): Promise<void> {
     }
   } catch (error) {
     await writeFile(logPath(), `[Manager]: recover dns failed, ${error}`, {
-      flag: 'a'
+      flag: 'a',
     })
   }
 
@@ -298,7 +286,7 @@ export async function stopCore(force = false): Promise<void> {
       try {
         process.kill(pid, 0)
         process.kill(pid, 'SIGINT')
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         try {
           process.kill(pid, 0)
           process.kill(pid, 'SIGKILL')
@@ -314,7 +302,7 @@ export async function stopCore(force = false): Promise<void> {
 }
 
 async function stopChildProcess(process: ChildProcess): Promise<void> {
-  return new Promise<void>((resolve) => {
+  return new Promise<void>(resolve => {
     if (!process || process.killed) {
       resolve()
       return
@@ -335,7 +323,7 @@ async function stopChildProcess(process: ChildProcess): Promise<void> {
       if (!isResolved) {
         isResolved = true
 
-        timers.forEach((timer) => clearTimeout(timer))
+        timers.forEach(timer => clearTimeout(timer))
         resolve()
       }
     }
@@ -367,7 +355,7 @@ async function stopChildProcess(process: ChildProcess): Promise<void> {
               globalThis.process.kill(pid, 0)
               process.kill('SIGKILL')
               await writeFile(logPath(), `[Manager]: Force killed process ${pid} with SIGKILL\n`, {
-                flag: 'a'
+                flag: 'a',
               })
             }
           } catch {
@@ -377,7 +365,7 @@ async function stopChildProcess(process: ChildProcess): Promise<void> {
         }
       }, 6000)
       timers.push(timer2)
-    } catch (error) {
+    } catch (_e) {
       resolveOnce()
       return
     }
@@ -417,27 +405,21 @@ async function checkProfile(): Promise<void> {
   const corePath = mihomoCorePath(core)
   const execFilePromise = promisify(execFile)
   const env = {
-    SAFE_PATHS: safePaths.join(path.delimiter)
+    SAFE_PATHS: safePaths.join(path.delimiter),
   }
   try {
     await execFilePromise(
       corePath,
-      [
-        '-t',
-        '-f',
-        diffWorkDir ? mihomoWorkConfigPath(current) : mihomoWorkConfigPath('work'),
-        '-d',
-        mihomoTestDir()
-      ],
-      { env }
+      ['-t', '-f', diffWorkDir ? mihomoWorkConfigPath(current) : mihomoWorkConfigPath('work'), '-d', mihomoTestDir()],
+      { env },
     )
   } catch (error) {
     if (error instanceof Error && 'stdout' in error) {
       const { stdout } = error as { stdout: string }
       const errorLines = stdout
         .split('\n')
-        .filter((line) => line.includes('level=error'))
-        .map((line) => line.split('level=error')[1])
+        .filter(line => line.includes('level=error'))
+        .map(line => line.split('level=error')[1])
       throw new Error(`Profile Check Failed:\n${errorLines.join('\n')}`)
     } else {
       throw error
@@ -445,9 +427,7 @@ async function checkProfile(): Promise<void> {
   }
 }
 
-export async function manualGrantCorePermition(
-  cores?: ('mihomo' | 'mihomo-alpha')[]
-): Promise<void> {
+export async function manualGrantCorePermition(cores?: ('mihomo' | 'mihomo-alpha')[]): Promise<void> {
   const execFilePromise = promisify(execFile)
 
   const grantPermission = async (coreName: 'mihomo' | 'mihomo-alpha'): Promise<void> => {
@@ -460,11 +440,7 @@ export async function manualGrantCorePermition(
         await execFilePromise('osascript', ['-e', command])
       }
       if (process.platform === 'linux') {
-        await execFilePromise('pkexec', [
-          'bash',
-          '-c',
-          `chown root:root "${corePath}" && chmod +sx "${corePath}"`
-        ])
+        await execFilePromise('pkexec', ['bash', '-c', `chown root:root "${corePath}" && chmod +sx "${corePath}"`])
       }
     } catch (error) {
       if (isUserCancelledError(error)) {
@@ -475,7 +451,7 @@ export async function manualGrantCorePermition(
   }
 
   const targetCores = cores || ['mihomo', 'mihomo-alpha']
-  await Promise.all(targetCores.map((core) => grantPermission(core)))
+  await Promise.all(targetCores.map(core => grantPermission(core)))
 }
 
 export function checkCorePermissionSync(coreName: 'mihomo' | 'mihomo-alpha'): boolean {
@@ -499,19 +475,19 @@ export async function checkCorePermission(): Promise<{ mihomo: boolean; 'mihomo-
       const { stdout } = await execFilePromise('ls', ['-l', corePath])
       const permissions = stdout.trim().split(/\s+/)[0]
       return permissions.includes('s') || permissions.includes('S')
-    } catch (error) {
+    } catch (_e) {
       return false
     }
   }
 
   const [mihomoPermission, mihomoAlphaPermission] = await Promise.all([
     checkPermission('mihomo'),
-    checkPermission('mihomo-alpha')
+    checkPermission('mihomo-alpha'),
   ])
 
   return {
     mihomo: mihomoPermission,
-    'mihomo-alpha': mihomoAlphaPermission
+    'mihomo-alpha': mihomoAlphaPermission,
   }
 }
 
@@ -539,13 +515,13 @@ export async function revokeCorePermission(cores?: ('mihomo' | 'mihomo-alpha')[]
   }
 
   const targetCores = cores || ['mihomo', 'mihomo-alpha']
-  await Promise.all(targetCores.map((core) => revokePermission(core)))
+  await Promise.all(targetCores.map(core => revokePermission(core)))
 }
 
 export async function getDefaultDevice(): Promise<string> {
   const execFilePromise = promisify(execFile)
   const { stdout: deviceOut } = await execFilePromise('route', ['-n', 'get', 'default'])
-  let device = deviceOut.split('\n').find((s) => s.includes('interface:'))
+  let device = deviceOut.split('\n').find(s => s.includes('interface:'))
   device = device?.trim().split(' ').slice(1).join(' ')
   if (!device) throw new Error('Get device failed')
   return device
@@ -555,7 +531,7 @@ async function getDefaultService(): Promise<string> {
   const execFilePromise = promisify(execFile)
   const device = await getDefaultDevice()
   const { stdout: order } = await execFilePromise('networksetup', ['-listnetworkserviceorder'])
-  const block = order.split('\n\n').find((s) => s.includes(`Device: ${device}`))
+  const block = order.split('\n\n').find(s => s.includes(`Device: ${device}`))
   if (!block) throw new Error('Get networkservice failed')
   for (const line of block.split('\n')) {
     if (line.match(/^\(\d+\).*/)) {
@@ -623,7 +599,7 @@ export async function startNetworkDetection(): Promise<void> {
     onlyActiveDevice = false,
     networkDetectionBypass = [],
     networkDetectionInterval = 10,
-    sysProxy = { enable: false }
+    sysProxy = { enable: false },
   } = await getAppConfig()
   const { tun: { device = process.platform === 'darwin' ? undefined : 'mihomo' } = {} } =
     await getControledMihomoConfig()
@@ -631,7 +607,7 @@ export async function startNetworkDetection(): Promise<void> {
     clearInterval(networkDetectionTimer)
   }
   const extendedBypass = networkDetectionBypass.concat(
-    [device, 'lo', 'docker0', 'utun'].filter((item): item is string => item !== undefined)
+    [device, 'lo', 'docker0', 'utun'].filter((item): item is string => item !== undefined),
   )
 
   networkDetectionTimer = setInterval(async () => {
@@ -662,9 +638,9 @@ export async function stopNetworkDetection(): Promise<void> {
 function isAnyNetworkInterfaceUp(excludedKeywords: string[] = []): boolean {
   const interfaces = os.networkInterfaces()
   return Object.entries(interfaces).some(([name, ifaces]) => {
-    if (excludedKeywords.some((keyword) => name.includes(keyword))) return false
+    if (excludedKeywords.some(keyword => name.includes(keyword))) return false
 
-    return ifaces?.some((iface) => {
+    return ifaces?.some(iface => {
       return !iface.internal && (iface.family === 'IPv4' || iface.family === 'IPv6')
     })
   })

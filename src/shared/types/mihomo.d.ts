@@ -34,7 +34,7 @@ interface MihomoConfig {
   proxies?: []
   'proxy-groups'?: []
   rules?: []
-  hosts?: { [key: string]: string | string[] }
+  hosts?: Record<string, string | string[]>
   'geodata-mode'?: boolean
   'geo-auto-update'?: boolean
   'geo-update-interval'?: number
@@ -101,11 +101,11 @@ interface MihomoDNSConfig {
   'default-nameserver'?: string[]
   nameserver?: string[]
   fallback?: string[]
-  'fallback-filter'?: { [key: string]: boolean | string | string[] }
+  'fallback-filter'?: Record<string, boolean | string | string[]>
   'proxy-server-nameserver'?: string[]
   'direct-nameserver'?: string[]
   'direct-nameserver-follow-policy'?: boolean
-  'nameserver-policy'?: { [key: string]: string | string[] }
+  'nameserver-policy'?: Record<string, string | string[]>
   'cache-algorithm'?: string
 }
 

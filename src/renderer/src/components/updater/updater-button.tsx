@@ -1,8 +1,9 @@
 import { Button } from '@heroui/react'
-import React, { useState, useEffect } from 'react'
-import UpdaterModal from './updater-modal'
-import { GrUpgrade } from 'react-icons/gr'
 import { cancelUpdate } from '@renderer/utils/ipc'
+import React, { useEffect, useState } from 'react'
+import { GrUpgrade } from 'react-icons/gr'
+
+import UpdaterModal from './updater-modal'
 
 interface Props {
   iconOnly?: boolean
@@ -12,7 +13,7 @@ interface Props {
   }
 }
 
-const UpdaterButton: React.FC<Props> = (props) => {
+const UpdaterButton: React.FC<Props> = props => {
   const { iconOnly, latest } = props
   const [openModal, setOpenModal] = useState(false)
   const [updateStatus, setUpdateStatus] = useState<{
@@ -21,14 +22,11 @@ const UpdaterButton: React.FC<Props> = (props) => {
     error?: string
   }>({
     downloading: false,
-    progress: 0
+    progress: 0,
   })
 
   useEffect(() => {
-    const handleUpdateStatus = (
-      _: Electron.IpcRendererEvent,
-      status: typeof updateStatus
-    ): void => {
+    const handleUpdateStatus = (_: Electron.IpcRendererEvent, status: typeof updateStatus): void => {
       setUpdateStatus(status)
     }
 
@@ -43,7 +41,7 @@ const UpdaterButton: React.FC<Props> = (props) => {
     try {
       await cancelUpdate()
       setUpdateStatus({ downloading: false, progress: 0 })
-    } catch (e) {
+    } catch (_e) {
       // ignore
     }
   }
@@ -67,8 +65,8 @@ const UpdaterButton: React.FC<Props> = (props) => {
         <Button
           isIconOnly
           className={`app-nodrag`}
-          color="danger"
-          size="md"
+          color='danger'
+          size='md'
           onPress={() => {
             setOpenModal(true)
           }}
@@ -79,8 +77,8 @@ const UpdaterButton: React.FC<Props> = (props) => {
         <Button
           isIconOnly
           className={`fixed right-[45px] app-nodrag`}
-          color="danger"
-          size="sm"
+          color='danger'
+          size='sm'
           onPress={() => {
             setOpenModal(true)
           }}

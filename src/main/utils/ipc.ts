@@ -1,8 +1,56 @@
+import path from 'node:path'
+import v8 from 'node:v8'
+
 import { app, dialog, ipcMain } from 'electron'
+
+import { closeMainWindow, mainWindow, setNotQuitDialog, showMainWindow, triggerMainWindow } from '..'
+import {
+  addOverrideItem,
+  addProfileItem,
+  changeCurrentProfile,
+  getAppConfig,
+  getControledMihomoConfig,
+  getCurrentProfileItem,
+  getFileStr,
+  getOverride,
+  getOverrideConfig,
+  getOverrideItem,
+  getProfileConfig,
+  getProfileItem,
+  getProfileStr,
+  patchAppConfig,
+  patchControledMihomoConfig,
+  removeOverrideItem,
+  removeProfileItem,
+  setFileStr,
+  setOverride,
+  setOverrideConfig,
+  setProfileConfig,
+  setProfileStr,
+  updateOverrideItem,
+  updateProfileItem,
+} from '../config'
+import {
+  getCurrentProfileStr,
+  getOverrideProfileStr,
+  getRawProfileStr,
+  getRuntimeConfig,
+  getRuntimeConfigStr,
+} from '../core/factory'
+import {
+  checkCorePermission,
+  manualGrantCorePermition,
+  quitWithoutCore,
+  restartCore,
+  revokeCorePermission,
+  startNetworkDetection,
+  stopNetworkDetection,
+} from '../core/manager'
 import {
   mihomoChangeProxy,
   mihomoCloseAllConnections,
   mihomoCloseConnection,
+  mihomoConfig,
   mihomoGroupDelay,
   mihomoGroups,
   mihomoProxies,
@@ -14,60 +62,42 @@ import {
   mihomoUpdateProxyProviders,
   mihomoUpdateRuleProviders,
   mihomoUpgrade,
-  mihomoUpgradeUI,
   mihomoUpgradeGeo,
+  mihomoUpgradeUI,
   mihomoVersion,
-  mihomoConfig,
   patchMihomoConfig,
-  restartMihomoConnections
+  restartMihomoConnections,
 } from '../core/mihomoApi'
-import { checkAutoRun, disableAutoRun, enableAutoRun } from '../sys/autoRun'
+import { subStoreCollections, subStoreSubs } from '../core/subStoreApi'
+import { cancelUpdate, checkUpdate, downloadAndInstallUpdate } from '../resolve/autoUpdater'
+import { listWebdavBackups, webdavBackup, webdavDelete, webdavRestore } from '../resolve/backup'
+import { closeFloatingWindow, showContextMenu, showFloatingWindow } from '../resolve/floatingWindow'
+import { getGistUrl } from '../resolve/gistApi'
 import {
-  getAppConfig,
-  patchAppConfig,
-  getControledMihomoConfig,
-  patchControledMihomoConfig,
-  getProfileConfig,
-  getCurrentProfileItem,
-  getProfileItem,
-  addProfileItem,
-  removeProfileItem,
-  changeCurrentProfile,
-  getProfileStr,
-  getFileStr,
-  setFileStr,
-  setProfileStr,
-  updateProfileItem,
-  setProfileConfig,
-  getOverrideConfig,
-  setOverrideConfig,
-  getOverrideItem,
-  addOverrideItem,
-  removeOverrideItem,
-  getOverride,
-  setOverride,
-  updateOverrideItem
-} from '../config'
-import {
-  startSubStoreFrontendServer,
-  startSubStoreBackendServer,
-  stopSubStoreFrontendServer,
-  stopSubStoreBackendServer,
   downloadSubStore,
+  startSubStoreBackendServer,
+  startSubStoreFrontendServer,
+  stopSubStoreBackendServer,
+  stopSubStoreFrontendServer,
   subStoreFrontendPort,
-  subStorePort
+  subStorePort,
 } from '../resolve/server'
+import { registerShortcut } from '../resolve/shortcut'
+import { applyTheme, fetchThemes, importThemes, readTheme, resolveThemes, writeTheme } from '../resolve/theme'
+import { startMonitor } from '../resolve/trafficMonitor'
+import { closeTrayIcon, copyEnv, setDockVisible, showTrayIcon } from '../resolve/tray'
 import {
-  manualGrantCorePermition,
-  quitWithoutCore,
-  restartCore,
-  startNetworkDetection,
-  stopNetworkDetection,
-  revokeCorePermission,
-  checkCorePermission
-} from '../core/manager'
-import { triggerSysProxy } from '../sys/sysproxy'
-import { checkUpdate, downloadAndInstallUpdate, cancelUpdate } from '../resolve/autoUpdater'
+  initService,
+  installService,
+  restartService,
+  serviceStatus,
+  startService,
+  stopService,
+  testServiceConnection,
+  uninstallService,
+} from '../service/manager'
+import { checkAutoRun, disableAutoRun, enableAutoRun } from '../sys/autoRun'
+import { getInterfaces } from '../sys/interface'
 import {
   checkElevateTask,
   deleteElevateTask,
@@ -77,60 +107,18 @@ import {
   readTextFile,
   resetAppConfig,
   setNativeTheme,
-  setupFirewall
+  setupFirewall,
 } from '../sys/misc'
-import {
-  serviceStatus,
-  installService,
-  uninstallService,
-  startService,
-  stopService,
-  initService,
-  testServiceConnection,
-  restartService
-} from '../service/manager'
+import { triggerSysProxy } from '../sys/sysproxy'
 import { findSystemMihomo } from '../utils/dirs'
-import {
-  getRuntimeConfig,
-  getRuntimeConfigStr,
-  getRawProfileStr,
-  getCurrentProfileStr,
-  getOverrideProfileStr
-} from '../core/factory'
-import { listWebdavBackups, webdavBackup, webdavDelete, webdavRestore } from '../resolve/backup'
-import { getInterfaces } from '../sys/interface'
-import { closeTrayIcon, copyEnv, setDockVisible, showTrayIcon } from '../resolve/tray'
-import { registerShortcut } from '../resolve/shortcut'
-import {
-  closeMainWindow,
-  mainWindow,
-  setNotQuitDialog,
-  showMainWindow,
-  triggerMainWindow
-} from '..'
-import {
-  applyTheme,
-  fetchThemes,
-  importThemes,
-  readTheme,
-  resolveThemes,
-  writeTheme
-} from '../resolve/theme'
-import { subStoreCollections, subStoreSubs } from '../core/subStoreApi'
-import { logDir } from './dirs'
-import path from 'path'
-import v8 from 'v8'
-import { getGistUrl } from '../resolve/gistApi'
-import { getIconDataURL, getImageDataURL } from './icon'
-import { startMonitor } from '../resolve/trafficMonitor'
-import { closeFloatingWindow, showContextMenu, showFloatingWindow } from '../resolve/floatingWindow'
 import { getAppName } from './appName'
+import { logDir } from './dirs'
+import { getIconDataURL, getImageDataURL } from './icon'
 import { getUserAgent } from './userAgent'
 
-function ipcErrorWrapper<T>( // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fn: (...args: any[]) => Promise<T> // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function ipcErrorWrapper<T>(
+  fn: (...args: any[]) => Promise<T>,
 ): (...args: any[]) => Promise<T | { invokeError: unknown }> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (...args: any[]) => {
     try {
       return await fn(...args)
@@ -153,45 +141,29 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('mihomoVersion', ipcErrorWrapper(mihomoVersion))
   ipcMain.handle('mihomoConfig', ipcErrorWrapper(mihomoConfig))
   ipcMain.handle('mihomoCloseConnection', (_e, id) => ipcErrorWrapper(mihomoCloseConnection)(id))
-  ipcMain.handle('mihomoCloseAllConnections', (_e, name) =>
-    ipcErrorWrapper(mihomoCloseAllConnections)(name)
-  )
+  ipcMain.handle('mihomoCloseAllConnections', (_e, name) => ipcErrorWrapper(mihomoCloseAllConnections)(name))
   ipcMain.handle('mihomoRules', ipcErrorWrapper(mihomoRules))
   ipcMain.handle('mihomoProxies', ipcErrorWrapper(mihomoProxies))
   ipcMain.handle('mihomoGroups', ipcErrorWrapper(mihomoGroups))
   ipcMain.handle('mihomoProxyProviders', ipcErrorWrapper(mihomoProxyProviders))
-  ipcMain.handle('mihomoUpdateProxyProviders', (_e, name) =>
-    ipcErrorWrapper(mihomoUpdateProxyProviders)(name)
-  )
+  ipcMain.handle('mihomoUpdateProxyProviders', (_e, name) => ipcErrorWrapper(mihomoUpdateProxyProviders)(name))
   ipcMain.handle('mihomoRuleProviders', ipcErrorWrapper(mihomoRuleProviders))
-  ipcMain.handle('mihomoUpdateRuleProviders', (_e, name) =>
-    ipcErrorWrapper(mihomoUpdateRuleProviders)(name)
-  )
-  ipcMain.handle('mihomoChangeProxy', (_e, group, proxy) =>
-    ipcErrorWrapper(mihomoChangeProxy)(group, proxy)
-  )
+  ipcMain.handle('mihomoUpdateRuleProviders', (_e, name) => ipcErrorWrapper(mihomoUpdateRuleProviders)(name))
+  ipcMain.handle('mihomoChangeProxy', (_e, group, proxy) => ipcErrorWrapper(mihomoChangeProxy)(group, proxy))
   ipcMain.handle('mihomoUnfixedProxy', (_e, group) => ipcErrorWrapper(mihomoUnfixedProxy)(group))
   ipcMain.handle('mihomoUpgradeGeo', ipcErrorWrapper(mihomoUpgradeGeo))
   ipcMain.handle('mihomoUpgradeUI', ipcErrorWrapper(mihomoUpgradeUI))
   ipcMain.handle('mihomoUpgrade', ipcErrorWrapper(mihomoUpgrade))
-  ipcMain.handle('mihomoProxyDelay', (_e, proxy, url) =>
-    ipcErrorWrapper(mihomoProxyDelay)(proxy, url)
-  )
-  ipcMain.handle('mihomoGroupDelay', (_e, group, url) =>
-    ipcErrorWrapper(mihomoGroupDelay)(group, url)
-  )
+  ipcMain.handle('mihomoProxyDelay', (_e, proxy, url) => ipcErrorWrapper(mihomoProxyDelay)(proxy, url))
+  ipcMain.handle('mihomoGroupDelay', (_e, group, url) => ipcErrorWrapper(mihomoGroupDelay)(group, url))
   ipcMain.handle('patchMihomoConfig', (_e, patch) => ipcErrorWrapper(patchMihomoConfig)(patch))
   ipcMain.handle('checkAutoRun', ipcErrorWrapper(checkAutoRun))
   ipcMain.handle('enableAutoRun', ipcErrorWrapper(enableAutoRun))
   ipcMain.handle('disableAutoRun', ipcErrorWrapper(disableAutoRun))
   ipcMain.handle('getAppConfig', (_e, force) => ipcErrorWrapper(getAppConfig)(force))
   ipcMain.handle('patchAppConfig', (_e, config) => ipcErrorWrapper(patchAppConfig)(config))
-  ipcMain.handle('getControledMihomoConfig', (_e, force) =>
-    ipcErrorWrapper(getControledMihomoConfig)(force)
-  )
-  ipcMain.handle('patchControledMihomoConfig', (_e, config) =>
-    ipcErrorWrapper(patchControledMihomoConfig)(config)
-  )
+  ipcMain.handle('getControledMihomoConfig', (_e, force) => ipcErrorWrapper(getControledMihomoConfig)(force))
+  ipcMain.handle('patchControledMihomoConfig', (_e, config) => ipcErrorWrapper(patchControledMihomoConfig)(config))
   ipcMain.handle('getProfileConfig', (_e, force) => ipcErrorWrapper(getProfileConfig)(force))
   ipcMain.handle('setProfileConfig', (_e, config) => ipcErrorWrapper(setProfileConfig)(config))
   ipcMain.handle('getCurrentProfileItem', ipcErrorWrapper(getCurrentProfileItem))
@@ -216,14 +188,14 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('restartMihomoConnections', ipcErrorWrapper(restartMihomoConnections))
   ipcMain.handle('startMonitor', (_e, detached) => ipcErrorWrapper(startMonitor)(detached))
   ipcMain.handle('triggerSysProxy', (_e, enable, onlyActiveDevice) =>
-    ipcErrorWrapper(triggerSysProxy)(enable, onlyActiveDevice)
+    ipcErrorWrapper(triggerSysProxy)(enable, onlyActiveDevice),
   )
   ipcMain.handle('manualGrantCorePermition', (_e, cores?: ('mihomo' | 'mihomo-alpha')[]) =>
-    ipcErrorWrapper(manualGrantCorePermition)(cores)
+    ipcErrorWrapper(manualGrantCorePermition)(cores),
   )
   ipcMain.handle('checkCorePermission', () => ipcErrorWrapper(checkCorePermission)())
   ipcMain.handle('revokeCorePermission', (_e, cores?: ('mihomo' | 'mihomo-alpha')[]) =>
-    ipcErrorWrapper(revokeCorePermission)(cores)
+    ipcErrorWrapper(revokeCorePermission)(cores),
   )
   ipcMain.handle('checkElevateTask', () => ipcErrorWrapper(checkElevateTask)())
   ipcMain.handle('deleteElevateTask', () => ipcErrorWrapper(deleteElevateTask)())
@@ -243,9 +215,7 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('getCurrentProfileStr', ipcErrorWrapper(getCurrentProfileStr))
   ipcMain.handle('getOverrideProfileStr', ipcErrorWrapper(getOverrideProfileStr))
   ipcMain.handle('getRuntimeConfig', ipcErrorWrapper(getRuntimeConfig))
-  ipcMain.handle('downloadAndInstallUpdate', (_e, version) =>
-    ipcErrorWrapper(downloadAndInstallUpdate)(version)
-  )
+  ipcMain.handle('downloadAndInstallUpdate', (_e, version) => ipcErrorWrapper(downloadAndInstallUpdate)(version))
   ipcMain.handle('checkUpdate', ipcErrorWrapper(checkUpdate))
   ipcMain.handle('cancelUpdate', ipcErrorWrapper(cancelUpdate))
   ipcMain.handle('getVersion', () => app.getVersion())
@@ -258,11 +228,9 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('listWebdavBackups', ipcErrorWrapper(listWebdavBackups))
   ipcMain.handle('webdavDelete', (_e, filename) => ipcErrorWrapper(webdavDelete)(filename))
   ipcMain.handle('registerShortcut', (_e, oldShortcut, newShortcut, action) =>
-    ipcErrorWrapper(registerShortcut)(oldShortcut, newShortcut, action)
+    ipcErrorWrapper(registerShortcut)(oldShortcut, newShortcut, action),
   )
-  ipcMain.handle('startSubStoreFrontendServer', () =>
-    ipcErrorWrapper(startSubStoreFrontendServer)()
-  )
+  ipcMain.handle('startSubStoreFrontendServer', () => ipcErrorWrapper(startSubStoreFrontendServer)())
   ipcMain.handle('stopSubStoreFrontendServer', () => ipcErrorWrapper(stopSubStoreFrontendServer)())
   ipcMain.handle('startSubStoreBackendServer', () => ipcErrorWrapper(startSubStoreBackendServer)())
   ipcMain.handle('stopSubStoreBackendServer', () => ipcErrorWrapper(stopSubStoreBackendServer)())
@@ -281,7 +249,7 @@ export function registerIpcMainHandlers(): void {
       if (typeof mainWindow?.setTitleBarOverlay === 'function') {
         mainWindow.setTitleBarOverlay(overlay)
       }
-    })(overlay)
+    })(overlay),
   )
   ipcMain.handle('setAlwaysOnTop', (_e, alwaysOnTop) => {
     mainWindow?.setAlwaysOnTop(alwaysOnTop)

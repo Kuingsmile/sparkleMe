@@ -1,27 +1,27 @@
-import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
-import { calcTraffic } from '@renderer/utils/calc'
-import { mihomoVersion, restartCore } from '@renderer/utils/ipc'
-import React, { useEffect, useState } from 'react'
-import { IoMdRefresh } from 'react-icons/io'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { useLocation, useNavigate } from 'react-router-dom'
-import PubSub from 'pubsub-js'
-import useSWR from 'swr'
+import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { calcTraffic } from '@renderer/utils/calc'
+import { mihomoVersion, restartCore } from '@renderer/utils/ipc'
+import PubSub from 'pubsub-js'
+import React, { useEffect, useState } from 'react'
+import { IoMdRefresh } from 'react-icons/io'
 import { LuCpu } from 'react-icons/lu'
+import { useLocation, useNavigate } from 'react-router-dom'
+import useSWR from 'swr'
 
 interface Props {
   iconOnly?: boolean
 }
 
-const MihomoCoreCard: React.FC<Props> = (props) => {
+const MihomoCoreCard: React.FC<Props> = props => {
   const { appConfig } = useAppConfig()
   const { iconOnly } = props
   const { mihomoCoreCardStatus = 'col-span-2', disableAnimation = false } = appConfig || {}
   const { data: version, mutate } = useSWR('mihomoVersion', mihomoVersion, {
     errorRetryInterval: 200,
-    errorRetryCount: 10
+    errorRetryCount: 10,
   })
   const location = useLocation()
   const navigate = useNavigate()
@@ -32,9 +32,9 @@ const MihomoCoreCard: React.FC<Props> = (props) => {
     setNodeRef,
     transform: tf,
     transition,
-    isDragging
+    isDragging,
   } = useSortable({
-    id: 'mihomo'
+    id: 'mihomo',
   })
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
   const [mem, setMem] = useState(0)
@@ -60,9 +60,9 @@ const MihomoCoreCard: React.FC<Props> = (props) => {
   if (iconOnly) {
     return (
       <div className={`${mihomoCoreCardStatus} flex justify-center`}>
-        <Tooltip content="内核设置" placement="right">
+        <Tooltip content='内核设置' placement='right'>
           <Button
-            size="sm"
+            size='sm'
             isIconOnly
             color={match ? 'primary' : 'default'}
             variant={match ? 'solid' : 'light'}
@@ -70,7 +70,7 @@ const MihomoCoreCard: React.FC<Props> = (props) => {
               navigate('/mihomo')
             }}
           >
-            <LuCpu className="text-[20px]" />
+            <LuCpu className='text-[20px]' />
           </Button>
         </Tooltip>
       </div>
@@ -83,7 +83,7 @@ const MihomoCoreCard: React.FC<Props> = (props) => {
         position: 'relative',
         transform: CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 'calc(infinity)' : undefined
+        zIndex: isDragging ? 'calc(infinity)' : undefined,
       }}
       className={`${mihomoCoreCardStatus} mihomo-core-card`}
     >
@@ -96,12 +96,7 @@ const MihomoCoreCard: React.FC<Props> = (props) => {
           className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
         >
           <CardBody>
-            <div
-              ref={setNodeRef}
-              {...attributes}
-              {...listeners}
-              className="flex justify-between h-[32px]"
-            >
+            <div ref={setNodeRef} {...attributes} {...listeners} className='flex justify-between h-[32px]'>
               <h3
                 className={`text-md font-bold leading-[32px] ${match ? 'text-primary-foreground' : 'text-foreground'} `}
               >
@@ -110,15 +105,15 @@ const MihomoCoreCard: React.FC<Props> = (props) => {
 
               <Button
                 isIconOnly
-                size="sm"
-                variant="light"
+                size='sm'
+                variant='light'
                 disabled={restarting}
-                color="default"
+                color='default'
                 onPress={async () => {
                   try {
                     setRestarting(true)
                     await restartCore()
-                    await new Promise((resolve) => setTimeout(resolve, 2000))
+                    await new Promise(resolve => setTimeout(resolve, 2000))
                     setRestarting(false)
                   } catch (e) {
                     alert(e)
@@ -133,7 +128,7 @@ const MihomoCoreCard: React.FC<Props> = (props) => {
               </Button>
             </div>
           </CardBody>
-          <CardFooter className="pt-1">
+          <CardFooter className='pt-1'>
             <div
               className={`flex justify-between w-full text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}
             >
@@ -150,27 +145,18 @@ const MihomoCoreCard: React.FC<Props> = (props) => {
           {...listeners}
           className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
         >
-          <CardBody className="pb-1 pt-0 px-0 overflow-y-visible">
-            <div className="flex justify-between">
-              <Button
-                isIconOnly
-                className="bg-transparent pointer-events-none"
-                variant="flat"
-                color="default"
-              >
+          <CardBody className='pb-1 pt-0 px-0 overflow-y-visible'>
+            <div className='flex justify-between'>
+              <Button isIconOnly className='bg-transparent pointer-events-none' variant='flat' color='default'>
                 <LuCpu
-                  color="default"
+                  color='default'
                   className={`${match ? 'text-primary-foreground' : 'text-foreground'} text-[24px] font-bold`}
                 />
               </Button>
             </div>
           </CardBody>
-          <CardFooter className="pt-1">
-            <h3
-              className={`text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}
-            >
-              内核设置
-            </h3>
+          <CardFooter className='pt-1'>
+            <h3 className={`text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}>内核设置</h3>
           </CardFooter>
         </Card>
       )}

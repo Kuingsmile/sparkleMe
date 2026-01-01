@@ -1,6 +1,6 @@
-import React, { createContext, useContext, ReactNode } from 'react'
-import useSWR from 'swr'
 import { mihomoRules } from '@renderer/utils/ipc'
+import React, { createContext, ReactNode, useContext } from 'react'
+import useSWR from 'swr'
 
 interface RulesContextType {
   rules: ControllerRules | undefined
@@ -12,7 +12,7 @@ const RulesContext = createContext<RulesContextType | undefined>(undefined)
 export const RulesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { data: rules, mutate } = useSWR<ControllerRules>('mihomoRules', mihomoRules, {
     errorRetryInterval: 200,
-    errorRetryCount: 10
+    errorRetryCount: 10,
   })
 
   React.useEffect(() => {

@@ -1,5 +1,5 @@
-import { execFile } from 'child_process'
-import { promisify } from 'util'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 
 const execFilePromise = promisify(execFile)
 
@@ -27,7 +27,7 @@ export async function execWithElevation(command: string, args: string[]): Promis
         await execFilePromise(command, args, { timeout: 30000 })
       } else {
         const psArgs = args
-          .map((arg) => {
+          .map(arg => {
             const escaped = arg.replace(/'/g, "''")
             return `'${escaped}'`
           })
@@ -39,35 +39,26 @@ export async function execWithElevation(command: string, args: string[]): Promis
             '-ExecutionPolicy',
             'Bypass',
             '-Command',
-            `& { $p = Start-Process -FilePath '${command}' -ArgumentList @(${psArgs}) -Verb RunAs -WindowStyle Hidden -PassThru -Wait; exit $p.ExitCode }`
+            `& { $p = Start-Process -FilePath '${command}' -ArgumentList @(${psArgs}) -Verb RunAs -WindowStyle Hidden -PassThru -Wait; exit $p.ExitCode }`,
           ],
-          { timeout: 30000 }
+          { timeout: 30000 },
         )
       }
     } catch (error) {
-      throw new Error(
-        `Windows 提权执行失败：${error instanceof Error ? error.message : String(error)}`
-      )
+      throw new Error(`Windows 提权执行失败：${error instanceof Error ? error.message : String(error)}`)
     }
   } else if (process.platform === 'linux') {
     try {
       await execFilePromise('pkexec', [command, ...args])
     } catch (error) {
-      throw new Error(
-        `Linux 提权执行失败：${error instanceof Error ? error.message : String(error)}`
-      )
+      throw new Error(`Linux 提权执行失败：${error instanceof Error ? error.message : String(error)}`)
     }
   } else if (process.platform === 'darwin') {
     const cmd = `${command} ${args.join(' ')}`
     try {
-      await execFilePromise('osascript', [
-        '-e',
-        `do shell script "${cmd}" with administrator privileges`
-      ])
+      await execFilePromise('osascript', ['-e', `do shell script "${cmd}" with administrator privileges`])
     } catch (error) {
-      throw new Error(
-        `macOS 提权执行失败：${error instanceof Error ? error.message : String(error)}`
-      )
+      throw new Error(`macOS 提权执行失败：${error instanceof Error ? error.message : String(error)}`)
     }
   }
 }

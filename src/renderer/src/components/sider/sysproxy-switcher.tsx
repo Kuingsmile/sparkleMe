@@ -1,19 +1,19 @@
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
 import BorderSwitch from '@renderer/components/base/border-swtich'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import { triggerSysProxy } from '@renderer/utils/ipc'
-import { AiOutlineGlobal } from 'react-icons/ai'
 import React from 'react'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { AiOutlineGlobal } from 'react-icons/ai'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 interface Props {
   iconOnly?: boolean
 }
 
-const SysproxySwitcher: React.FC<Props> = (props) => {
+const SysproxySwitcher: React.FC<Props> = props => {
   const { iconOnly } = props
   const location = useLocation()
   const navigate = useNavigate()
@@ -23,7 +23,7 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
     sysProxy,
     sysproxyCardStatus = 'col-span-1',
     onlyActiveDevice = false,
-    disableAnimation = false
+    disableAnimation = false,
   } = appConfig || {}
   const { enable, mode } = sysProxy || {}
   const { controledMihomoConfig } = useControledMihomoConfig()
@@ -34,15 +34,15 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
     setNodeRef,
     transform: tf,
     transition,
-    isDragging
+    isDragging,
   } = useSortable({
-    id: 'sysproxy'
+    id: 'sysproxy',
   })
 
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
-  const disabled = mixedPort == 0
+  const disabled = mixedPort === 0
   const onChange = async (enable: boolean): Promise<void> => {
-    if (mode == 'manual' && disabled) return
+    if (mode === 'manual' && disabled) return
     try {
       await triggerSysProxy(enable, onlyActiveDevice)
       await patchAppConfig({ sysProxy: { enable } })
@@ -56,9 +56,9 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
   if (iconOnly) {
     return (
       <div className={`${sysproxyCardStatus} flex justify-center`}>
-        <Tooltip content="系统代理" placement="right">
+        <Tooltip content='系统代理' placement='right'>
           <Button
-            size="sm"
+            size='sm'
             isIconOnly
             color={match ? 'primary' : 'default'}
             variant={match ? 'solid' : 'light'}
@@ -66,7 +66,7 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
               navigate('/sysproxy')
             }}
           >
-            <AiOutlineGlobal className="text-[20px]" />
+            <AiOutlineGlobal className='text-[20px]' />
           </Button>
         </Tooltip>
       </div>
@@ -79,7 +79,7 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
         position: 'relative',
         transform: CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 'calc(infinity)' : undefined
+        zIndex: isDragging ? 'calc(infinity)' : undefined,
       }}
       className={`${sysproxyCardStatus} sysproxy-card`}
     >
@@ -90,32 +90,23 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
         {...listeners}
         className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
       >
-        <CardBody className="pb-1 pt-0 px-0 overflow-y-visible">
-          <div className="flex justify-between">
-            <Button
-              isIconOnly
-              className="bg-transparent pointer-events-none"
-              variant="flat"
-              color="default"
-            >
+        <CardBody className='pb-1 pt-0 px-0 overflow-y-visible'>
+          <div className='flex justify-between'>
+            <Button isIconOnly className='bg-transparent pointer-events-none' variant='flat' color='default'>
               <AiOutlineGlobal
                 className={`${match ? 'text-primary-foreground' : 'text-foreground'} text-[24px] font-bold`}
               />
             </Button>
             <BorderSwitch
               isShowBorder={match && enable}
-              isSelected={!(mode != 'auto' && disabled) && enable}
-              isDisabled={mode == 'manual' && disabled}
+              isSelected={!(mode !== 'auto' && disabled) && enable}
+              isDisabled={mode === 'manual' && disabled}
               onValueChange={onChange}
             />
           </div>
         </CardBody>
-        <CardFooter className="pt-1">
-          <h3
-            className={`text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}
-          >
-            系统代理
-          </h3>
+        <CardFooter className='pt-1'>
+          <h3 className={`text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}>系统代理</h3>
         </CardFooter>
       </Card>
     </div>

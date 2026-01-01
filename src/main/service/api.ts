@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
-import { KeyManager } from './key'
+
 import { serviceIpcPath } from '../utils/dirs'
+import { KeyManager } from './key'
 
 let serviceAxios: AxiosInstance | null = null
 let keyManager: KeyManager | null = null
@@ -13,11 +14,11 @@ export const initServiceAPI = (km: KeyManager): void => {
     socketPath: serviceIpcPath(),
     timeout: 15000,
     headers: {
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/json',
+    },
   })
 
-  serviceAxios.interceptors.request.use((config) => {
+  serviceAxios.interceptors.request.use(config => {
     if (keyManager?.isInitialized()) {
       const timestamp = Math.floor(Date.now() / 1000).toString()
       const signature = keyManager.signData(timestamp)
@@ -30,13 +31,13 @@ export const initServiceAPI = (km: KeyManager): void => {
   })
 
   serviceAxios.interceptors.response.use(
-    (response) => response.data,
-    (error) => {
+    response => response.data,
+    error => {
       if (error.response?.data) {
         return Promise.reject(error.response.data)
       }
       return Promise.reject(error)
-    }
+    },
   )
 }
 
@@ -89,11 +90,7 @@ export const getProxyStatus = async (): Promise<Record<string, unknown>> => {
   return await instance.get('/sysproxy/status')
 }
 
-export const setPac = async (
-  url: string,
-  device?: string,
-  onlyActiveDevice?: boolean
-): Promise<void> => {
+export const setPac = async (url: string, device?: string, onlyActiveDevice?: boolean): Promise<void> => {
   const instance = getServiceAxios()
   return await instance.post('/sysproxy/pac', { url, device, only_active_device: onlyActiveDevice })
 }
@@ -102,14 +99,14 @@ export const setProxy = async (
   server: string,
   bypass?: string,
   device?: string,
-  onlyActiveDevice?: boolean
+  onlyActiveDevice?: boolean,
 ): Promise<void> => {
   const instance = getServiceAxios()
   return await instance.post('/sysproxy/proxy', {
     server,
     bypass,
     device,
-    only_active_device: onlyActiveDevice
+    only_active_device: onlyActiveDevice,
   })
 }
 

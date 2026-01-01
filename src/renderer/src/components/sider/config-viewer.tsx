@@ -1,23 +1,16 @@
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@heroui/react'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Switch
-} from '@heroui/react'
-import React, { useEffect, useState, useCallback } from 'react'
-import { BaseEditor } from '../base/base-editor-lazy'
-import {
+  getCurrentProfileStr,
+  getOverrideProfileStr,
   getProfileConfig,
   getRawProfileStr,
   getRuntimeConfigStr,
-  getCurrentProfileStr,
-  getOverrideProfileStr
 } from '@renderer/utils/ipc'
+import React, { useCallback, useEffect, useState } from 'react'
 import useSWR from 'swr'
-import { useAppConfig } from '@renderer/hooks/use-app-config'
+
+import { BaseEditor } from '../base/base-editor-lazy'
 
 interface Props {
   onClose: () => void
@@ -52,45 +45,37 @@ const ConfigViewer: React.FC<Props> = ({ onClose }) => {
       disableAnimation={disableAnimation}
       classNames={{
         base: 'max-w-none w-full',
-        backdrop: 'top-[48px]'
+        backdrop: 'top-[48px]',
       }}
-      size="5xl"
+      size='5xl'
       hideCloseButton
       isOpen={true}
       onOpenChange={onClose}
-      scrollBehavior="inside"
+      scrollBehavior='inside'
     >
-      <ModalContent className="h-full w-[calc(100%-100px)]">
-        <ModalHeader className="flex pb-0 app-drag">当前运行时配置</ModalHeader>
-        <ModalBody className="h-full">
+      <ModalContent className='h-full w-[calc(100%-100px)]'>
+        <ModalHeader className='flex pb-0 app-drag'>当前运行时配置</ModalHeader>
+        <ModalBody className='h-full'>
           <BaseEditor
-            language="yaml"
+            language='yaml'
             value={runtimeConfig}
-            originalValue={
-              isDiff
-                ? isOverride
-                  ? overrideConfig
-                  : isRaw
-                    ? rawProfile
-                    : profileConfig
-                : undefined
-            }
+            originalValue={isDiff ? (isOverride ? overrideConfig : isRaw ? rawProfile : profileConfig) : undefined}
             readOnly
             diffRenderSideBySide={sideBySide}
           />
         </ModalBody>
-        <ModalFooter className="pt-0 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Switch size="sm" isSelected={isDiff} onValueChange={setIsDiff}>
+        <ModalFooter className='pt-0 flex items-center justify-between'>
+          <div className='flex items-center space-x-2'>
+            <Switch size='sm' isSelected={isDiff} onValueChange={setIsDiff}>
               对比当前配置
             </Switch>
-            <Switch size="sm" isSelected={sideBySide} onValueChange={setSideBySide}>
+            <Switch size='sm' isSelected={sideBySide} onValueChange={setSideBySide}>
               侧边显示
             </Switch>
             <Switch
-              size="sm"
+              size='sm'
               isSelected={isRaw}
-              onValueChange={(value) => {
+              onValueChange={value => {
                 setIsRaw(value)
                 if (value) {
                   setIsOverride(false)
@@ -100,9 +85,9 @@ const ConfigViewer: React.FC<Props> = ({ onClose }) => {
               显示原始文本
             </Switch>
             <Switch
-              size="sm"
+              size='sm'
               isSelected={isOverride}
-              onValueChange={(value) => {
+              onValueChange={value => {
                 setIsOverride(value)
                 if (value) {
                   setIsRaw(false)
@@ -112,7 +97,7 @@ const ConfigViewer: React.FC<Props> = ({ onClose }) => {
               显示覆写后文本
             </Switch>
           </div>
-          <Button size="sm" variant="light" onPress={onClose}>
+          <Button size='sm' variant='light' onPress={onClose}>
             关闭
           </Button>
         </ModalFooter>

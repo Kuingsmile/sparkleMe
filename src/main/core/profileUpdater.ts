@@ -22,7 +22,7 @@ function calculateUpdateDelay(item: ProfileItem): number {
 export async function initProfileUpdater(): Promise<void> {
   const { items, current } = await getProfileConfig()
   const currentItem = await getCurrentProfileItem()
-  for (const item of items.filter((i) => i.id !== current)) {
+  for (const item of items.filter(i => i.id !== current)) {
     if (item.type === 'remote' && item.interval && item.autoUpdate !== false) {
       const delay = calculateUpdateDelay(item)
 
@@ -33,20 +33,16 @@ export async function initProfileUpdater(): Promise<void> {
       if (delay === 0) {
         try {
           await addProfileItem(item)
-        } catch (e) {
-          // ignore
-        }
+        } catch (_e) {}
       }
 
       intervalPool[item.id] = setTimeout(
         async () => {
           try {
             await addProfileItem(item)
-          } catch (e) {
-            // ignore
-          }
+          } catch (_e) {}
         },
-        delay === 0 ? item.interval * 60 * 1000 : delay
+        delay === 0 ? item.interval * 60 * 1000 : delay,
       )
     }
   }
@@ -57,20 +53,16 @@ export async function initProfileUpdater(): Promise<void> {
     if (delay === 0) {
       try {
         await addProfileItem(currentItem)
-      } catch (e) {
-        // ignore
-      }
+      } catch (_e) {}
     }
 
     intervalPool[currentItem.id] = setTimeout(
       async () => {
         try {
           await addProfileItem(currentItem)
-        } catch (e) {
-          // ignore
-        }
+        } catch (_e) {}
       },
-      (delay === 0 ? currentItem.interval * 60 * 1000 : delay) + 10000 // +10s
+      (delay === 0 ? currentItem.interval * 60 * 1000 : delay) + 10000, // +10s
     )
   }
 }
@@ -90,20 +82,18 @@ export async function addProfileUpdater(item: ProfileItem): Promise<void> {
     if (delay === 0) {
       try {
         await addProfileItem(item)
-      } catch (e) {
-        // ignore
-      }
+      } catch (_e) {}
     }
 
     intervalPool[item.id] = setTimeout(
       async () => {
         try {
           await addProfileItem(item)
-        } catch (e) {
+        } catch (_e) {
           // ignore
         }
       },
-      delay === 0 ? item.interval * 60 * 1000 : delay
+      delay === 0 ? item.interval * 60 * 1000 : delay,
     )
   }
 }

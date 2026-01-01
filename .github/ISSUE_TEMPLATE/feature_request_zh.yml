@@ -1,13 +1,10 @@
 ---
 body:
   - attributes:
-      description: 在提交之前，请执行并勾选以下所有选项以证明您已经阅读并理解了以下要求，否则该 issue 将被关闭。
-      label: 验证步骤
+      description: 在提交之前，请阅读并勾选统一下面的说明，否则该 issue 将被关闭。
+      label: 前提说明
       options:
-        - label: 我已在标题简短的描述了我所需的功能
-        - label: 我已在 [Issues](https://github.com/xishang0128/sparkle/issues?q=is%3Aissue) 中寻找过，但未找到我所需的功能
-        - label: 这是向 GUI 程序提出的功能请求，而不是内核程序
-        - label: 我未在最新的测试版本找到我所需的功能
+        - label: 本项目为自用项目，我理解提出的Feature请求不保证会有回复或实现
     id: ensure
     type: checkboxes
   - attributes:
@@ -27,6 +24,6 @@ body:
     type: textarea
     validations:
       required: true
-description: 请求 sparkle 未实现的功能
+description: 请求新功能或改进现有功能
 name: 功能请求
 title: '[Feature] '

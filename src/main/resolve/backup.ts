@@ -1,6 +1,7 @@
-import { getAppConfig } from '../config'
-import dayjs from 'dayjs'
 import AdmZip from 'adm-zip'
+import dayjs from 'dayjs'
+
+import { getAppConfig } from '../config'
 import {
   appConfigPath,
   controledMihomoConfigPath,
@@ -10,17 +11,12 @@ import {
   profileConfigPath,
   profilesDir,
   subStoreDir,
-  themesDir
+  themesDir,
 } from '../utils/dirs'
 
 export async function webdavBackup(): Promise<boolean> {
   const { createClient } = await import('webdav/dist/node/index.js')
-  const {
-    webdavUrl = '',
-    webdavUsername = '',
-    webdavPassword = '',
-    webdavDir = 'sparkle'
-  } = await getAppConfig()
+  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkle' } = await getAppConfig()
   const zip = new AdmZip()
 
   zip.addLocalFile(appConfigPath())
@@ -36,7 +32,7 @@ export async function webdavBackup(): Promise<boolean> {
 
   const client = createClient(webdavUrl, {
     username: webdavUsername,
-    password: webdavPassword
+    password: webdavPassword,
   })
   try {
     await client.createDirectory(webdavDir)
@@ -49,16 +45,11 @@ export async function webdavBackup(): Promise<boolean> {
 
 export async function webdavRestore(filename: string): Promise<void> {
   const { createClient } = await import('webdav/dist/node/index.js')
-  const {
-    webdavUrl = '',
-    webdavUsername = '',
-    webdavPassword = '',
-    webdavDir = 'sparkle'
-  } = await getAppConfig()
+  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkle' } = await getAppConfig()
 
   const client = createClient(webdavUrl, {
     username: webdavUsername,
-    password: webdavPassword
+    password: webdavPassword,
   })
   const zipData = await client.getFileContents(`${webdavDir}/${filename}`)
   const zip = new AdmZip(zipData as Buffer)
@@ -67,37 +58,27 @@ export async function webdavRestore(filename: string): Promise<void> {
 
 export async function listWebdavBackups(): Promise<string[]> {
   const { createClient } = await import('webdav/dist/node/index.js')
-  const {
-    webdavUrl = '',
-    webdavUsername = '',
-    webdavPassword = '',
-    webdavDir = 'sparkle'
-  } = await getAppConfig()
+  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkle' } = await getAppConfig()
 
   const client = createClient(webdavUrl, {
     username: webdavUsername,
-    password: webdavPassword
+    password: webdavPassword,
   })
   const files = await client.getDirectoryContents(webdavDir, { glob: '*.zip' })
   if (Array.isArray(files)) {
-    return files.map((file) => file.basename)
+    return files.map(file => file.basename)
   } else {
-    return files.data.map((file) => file.basename)
+    return files.data.map(file => file.basename)
   }
 }
 
 export async function webdavDelete(filename: string): Promise<void> {
   const { createClient } = await import('webdav/dist/node/index.js')
-  const {
-    webdavUrl = '',
-    webdavUsername = '',
-    webdavPassword = '',
-    webdavDir = 'sparkle'
-  } = await getAppConfig()
+  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkle' } = await getAppConfig()
 
   const client = createClient(webdavUrl, {
     username: webdavUsername,
-    password: webdavPassword
+    password: webdavPassword,
   })
   await client.deleteFile(`${webdavDir}/${filename}`)
 }

@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import { Button, Input, Switch } from '@heroui/react'
 import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
-import { Button, Input, Switch } from '@heroui/react'
-import {
-  startSubStoreFrontendServer,
-  startSubStoreBackendServer,
-  stopSubStoreFrontendServer,
-  stopSubStoreBackendServer
-} from '@renderer/utils/ipc'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import debounce from '@renderer/utils/debounce'
+import {
+  startSubStoreBackendServer,
+  startSubStoreFrontendServer,
+  stopSubStoreBackendServer,
+  stopSubStoreFrontendServer,
+} from '@renderer/utils/ipc'
 import { isValidCron } from 'cron-validator'
+import React, { useEffect, useState } from 'react'
 
 const SubStoreConfig: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
@@ -22,22 +22,18 @@ const SubStoreConfig: React.FC = () => {
     customSubStoreUrl,
     subStoreBackendSyncCron,
     subStoreBackendDownloadCron,
-    subStoreBackendUploadCron
+    subStoreBackendUploadCron,
   } = appConfig || {}
 
   const [customSubStoreUrlValue, setCustomSubStoreUrlValue] = useState(customSubStoreUrl ?? '')
   const setCustomSubStoreUrl = debounce(async (v: string) => {
     await patchAppConfig({ customSubStoreUrl: v })
   }, 500)
-  const [subStoreBackendSyncCronValue, setSubStoreBackendSyncCronValue] = useState(
-    subStoreBackendSyncCron ?? ''
-  )
+  const [subStoreBackendSyncCronValue, setSubStoreBackendSyncCronValue] = useState(subStoreBackendSyncCron ?? '')
   const [subStoreBackendDownloadCronValue, setSubStoreBackendDownloadCronValue] = useState(
-    subStoreBackendDownloadCron ?? ''
+    subStoreBackendDownloadCron ?? '',
   )
-  const [subStoreBackendUploadCronValue, setSubStoreBackendUploadCronValue] = useState(
-    subStoreBackendUploadCron ?? ''
-  )
+  const [subStoreBackendUploadCronValue, setSubStoreBackendUploadCronValue] = useState(subStoreBackendUploadCron ?? '')
 
   useEffect(() => {
     setCustomSubStoreUrlValue(customSubStoreUrl ?? '')
@@ -56,12 +52,12 @@ const SubStoreConfig: React.FC = () => {
   }, [subStoreBackendUploadCron])
 
   return (
-    <SettingCard title="Sub-Store 设置">
-      <SettingItem title="启用 Sub-Store" divider={useSubStore}>
+    <SettingCard title='Sub-Store 设置'>
+      <SettingItem title='启用 Sub-Store' divider={useSubStore}>
         <Switch
-          size="sm"
+          size='sm'
           isSelected={useSubStore}
-          onValueChange={async (v) => {
+          onValueChange={async v => {
             try {
               await patchAppConfig({ useSubStore: v })
               if (v) {
@@ -79,11 +75,11 @@ const SubStoreConfig: React.FC = () => {
       </SettingItem>
       {useSubStore && (
         <>
-          <SettingItem title="允许局域网连接" divider>
+          <SettingItem title='允许局域网连接' divider>
             <Switch
-              size="sm"
+              size='sm'
               isSelected={subStoreHost === '0.0.0.0'}
-              onValueChange={async (v) => {
+              onValueChange={async v => {
                 try {
                   if (v) {
                     await patchAppConfig({ subStoreHost: '0.0.0.0' })
@@ -98,11 +94,11 @@ const SubStoreConfig: React.FC = () => {
               }}
             />
           </SettingItem>
-          <SettingItem title="使用自建 Sub-Store 后端" divider>
+          <SettingItem title='使用自建 Sub-Store 后端' divider>
             <Switch
-              size="sm"
+              size='sm'
               isSelected={useCustomSubStore}
-              onValueChange={async (v) => {
+              onValueChange={async v => {
                 try {
                   await patchAppConfig({ useCustomSubStore: v })
                   if (v) {
@@ -117,12 +113,12 @@ const SubStoreConfig: React.FC = () => {
             />
           </SettingItem>
           {useCustomSubStore ? (
-            <SettingItem title="自建 Sub-Store 后端地址">
+            <SettingItem title='自建 Sub-Store 后端地址'>
               <Input
-                size="sm"
-                className="w-[60%]"
+                size='sm'
+                className='w-[60%]'
                 value={customSubStoreUrlValue}
-                placeholder="必须包含协议头"
+                placeholder='必须包含协议头'
                 onValueChange={(v: string) => {
                   setCustomSubStoreUrlValue(v)
                   setCustomSubStoreUrl(v)
@@ -131,11 +127,11 @@ const SubStoreConfig: React.FC = () => {
             </SettingItem>
           ) : (
             <>
-              <SettingItem title="为 Sub-Store 内所有请求启用代理" divider>
+              <SettingItem title='为 Sub-Store 内所有请求启用代理' divider>
                 <Switch
-                  size="sm"
+                  size='sm'
                   isSelected={useProxyInSubStore}
-                  onValueChange={async (v) => {
+                  onValueChange={async v => {
                     try {
                       await patchAppConfig({ useProxyInSubStore: v })
                       await startSubStoreBackendServer()
@@ -145,19 +141,16 @@ const SubStoreConfig: React.FC = () => {
                   }}
                 />
               </SettingItem>
-              <SettingItem title="定时同步订阅/文件" divider>
-                <div className="flex w-[60%] gap-2">
+              <SettingItem title='定时同步订阅/文件' divider>
+                <div className='flex w-[60%] gap-2'>
                   {subStoreBackendSyncCronValue !== subStoreBackendSyncCron && (
                     <Button
-                      size="sm"
-                      color="primary"
+                      size='sm'
+                      color='primary'
                       onPress={async () => {
-                        if (
-                          !subStoreBackendSyncCronValue ||
-                          isValidCron(subStoreBackendSyncCronValue)
-                        ) {
+                        if (!subStoreBackendSyncCronValue || isValidCron(subStoreBackendSyncCronValue)) {
                           await patchAppConfig({
-                            subStoreBackendSyncCron: subStoreBackendSyncCronValue
+                            subStoreBackendSyncCron: subStoreBackendSyncCronValue,
                           })
                           new Notification('重启应用生效')
                         } else {
@@ -169,28 +162,25 @@ const SubStoreConfig: React.FC = () => {
                     </Button>
                   )}
                   <Input
-                    size="sm"
+                    size='sm'
                     value={subStoreBackendSyncCronValue}
-                    placeholder="Cron 表达式"
+                    placeholder='Cron 表达式'
                     onValueChange={(v: string) => {
                       setSubStoreBackendSyncCronValue(v)
                     }}
                   />
                 </div>
               </SettingItem>
-              <SettingItem title="定时恢复配置" divider>
-                <div className="flex w-[60%] gap-2">
+              <SettingItem title='定时恢复配置' divider>
+                <div className='flex w-[60%] gap-2'>
                   {subStoreBackendDownloadCronValue !== subStoreBackendDownloadCron && (
                     <Button
-                      size="sm"
-                      color="primary"
+                      size='sm'
+                      color='primary'
                       onPress={async () => {
-                        if (
-                          !subStoreBackendDownloadCronValue ||
-                          isValidCron(subStoreBackendDownloadCronValue)
-                        ) {
+                        if (!subStoreBackendDownloadCronValue || isValidCron(subStoreBackendDownloadCronValue)) {
                           await patchAppConfig({
-                            subStoreBackendDownloadCron: subStoreBackendDownloadCronValue
+                            subStoreBackendDownloadCron: subStoreBackendDownloadCronValue,
                           })
                           new Notification('重启应用生效')
                         } else {
@@ -202,28 +192,25 @@ const SubStoreConfig: React.FC = () => {
                     </Button>
                   )}
                   <Input
-                    size="sm"
+                    size='sm'
                     value={subStoreBackendDownloadCronValue}
-                    placeholder="Cron 表达式"
+                    placeholder='Cron 表达式'
                     onValueChange={(v: string) => {
                       setSubStoreBackendDownloadCronValue(v)
                     }}
                   />
                 </div>
               </SettingItem>
-              <SettingItem title="定时备份配置">
-                <div className="flex w-[60%] gap-2">
+              <SettingItem title='定时备份配置'>
+                <div className='flex w-[60%] gap-2'>
                   {subStoreBackendUploadCronValue !== subStoreBackendUploadCron && (
                     <Button
-                      size="sm"
-                      color="primary"
+                      size='sm'
+                      color='primary'
                       onPress={async () => {
-                        if (
-                          !subStoreBackendUploadCronValue ||
-                          isValidCron(subStoreBackendUploadCronValue)
-                        ) {
+                        if (!subStoreBackendUploadCronValue || isValidCron(subStoreBackendUploadCronValue)) {
                           await patchAppConfig({
-                            subStoreBackendUploadCron: subStoreBackendUploadCronValue
+                            subStoreBackendUploadCron: subStoreBackendUploadCronValue,
                           })
                           new Notification('重启应用生效')
                         } else {
@@ -235,9 +222,9 @@ const SubStoreConfig: React.FC = () => {
                     </Button>
                   )}
                   <Input
-                    size="sm"
+                    size='sm'
                     value={subStoreBackendUploadCronValue}
-                    placeholder="Cron 表达式"
+                    placeholder='Cron 表达式'
                     onValueChange={(v: string) => {
                       setSubStoreBackendUploadCronValue(v)
                     }}

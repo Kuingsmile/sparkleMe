@@ -26,10 +26,10 @@ const BasePage = forwardRef<HTMLDivElement, Props>((props, ref) => {
   useEffect(() => {
     if (platform !== 'darwin' && !useWindowFrame) {
       try {
-        // @ts-ignore windowControlsOverlay
+        // @ts-expect-error windowControlsOverlay
         const windowControlsOverlay = window.navigator.windowControlsOverlay
         setOverlayWidth(window.innerWidth - windowControlsOverlay.getTitlebarAreaRect().width)
-      } catch (e) {
+      } catch (_e) {
         // ignore
       }
     }
@@ -41,39 +41,31 @@ const BasePage = forwardRef<HTMLDivElement, Props>((props, ref) => {
   })
 
   return (
-    <div ref={contentRef} className="w-full h-full">
-      <div className="sticky top-0 z-40 h-[49px] w-full bg-background">
-        <div className="app-drag p-2 flex justify-between h-[48px]">
-          <div className="title h-full text-lg leading-[32px]">{props.title}</div>
-          <div style={{ marginRight: overlayWidth }} className="header flex gap-1 h-full">
+    <div ref={contentRef} className='w-full h-full'>
+      <div className='sticky top-0 z-40 h-[49px] w-full bg-background'>
+        <div className='app-drag p-2 flex justify-between h-[48px]'>
+          <div className='title h-full text-lg leading-[32px]'>{props.title}</div>
+          <div style={{ marginRight: overlayWidth }} className='header flex gap-1 h-full'>
             {props.header}
             <Button
-              size="sm"
-              className="app-nodrag"
+              size='sm'
+              className='app-nodrag'
               isIconOnly
-              title="窗口置顶"
-              variant="light"
+              title='窗口置顶'
+              variant='light'
               color={onTop ? 'primary' : 'default'}
               onPress={async () => {
                 await setAlwaysOnTop(!onTop)
                 await updateAlwaysOnTop()
               }}
-              startContent={
-                onTop ? (
-                  <RiPushpin2Fill className="text-lg" />
-                ) : (
-                  <RiPushpin2Line className="text-lg" />
-                )
-              }
+              startContent={onTop ? <RiPushpin2Fill className='text-lg' /> : <RiPushpin2Line className='text-lg' />}
             />
           </div>
         </div>
 
         <Divider />
       </div>
-      <div className="content h-[calc(100vh-49px)] overflow-y-auto custom-scrollbar">
-        {props.children}
-      </div>
+      <div className='content h-[calc(100vh-49px)] overflow-y-auto custom-scrollbar'>{props.children}</div>
     </div>
   )
 })

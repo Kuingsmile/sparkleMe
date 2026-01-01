@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+//@ts-nocheck
 function isObject(item: any): boolean {
   return item && typeof item === 'object' && !Array.isArray(item)
 }

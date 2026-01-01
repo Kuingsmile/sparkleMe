@@ -1,13 +1,13 @@
-import React, { createContext, useContext, ReactNode, useEffect } from 'react'
-import useSWR from 'swr'
 import {
-  getProfileConfig,
-  setProfileConfig as set,
   addProfileItem as add,
+  changeCurrentProfile as change,
+  getProfileConfig,
   removeProfileItem as remove,
+  setProfileConfig as set,
   updateProfileItem as update,
-  changeCurrentProfile as change
 } from '@renderer/utils/ipc'
+import React, { createContext, ReactNode, useContext, useEffect } from 'react'
+import useSWR from 'swr'
 
 interface ProfileConfigContextType {
   profileConfig: ProfileConfig | undefined
@@ -22,9 +22,7 @@ interface ProfileConfigContextType {
 const ProfileConfigContext = createContext<ProfileConfigContextType | undefined>(undefined)
 
 export const ProfileConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { data: profileConfig, mutate: mutateProfileConfig } = useSWR('getProfileConfig', () =>
-    getProfileConfig()
-  )
+  const { data: profileConfig, mutate: mutateProfileConfig } = useSWR('getProfileConfig', () => getProfileConfig())
 
   const setProfileConfig = async (config: ProfileConfig): Promise<void> => {
     try {
@@ -99,7 +97,7 @@ export const ProfileConfigProvider: React.FC<{ children: ReactNode }> = ({ child
         addProfileItem,
         removeProfileItem,
         updateProfileItem,
-        changeCurrentProfile
+        changeCurrentProfile,
       }}
     >
       {children}

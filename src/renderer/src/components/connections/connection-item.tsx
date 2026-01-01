@@ -24,26 +24,18 @@ const ConnectionItemComponent: React.FC<Props> = ({
   displayName,
   close,
   setSelected,
-  setIsDetailModalOpen
+  setIsDetailModalOpen,
 }) => {
   const fallbackProcessName = useMemo(
     () => info.metadata.process?.replace(/\.exe$/, '') || info.metadata.sourceIP,
-    [info.metadata.process, info.metadata.sourceIP]
+    [info.metadata.process, info.metadata.sourceIP],
   )
   const processName = displayName || fallbackProcessName
 
   const destination = useMemo(
     () =>
-      info.metadata.host ||
-      info.metadata.sniffHost ||
-      info.metadata.destinationIP ||
-      info.metadata.remoteDestination,
-    [
-      info.metadata.host,
-      info.metadata.sniffHost,
-      info.metadata.destinationIP,
-      info.metadata.remoteDestination
-    ]
+      info.metadata.host || info.metadata.sniffHost || info.metadata.destinationIP || info.metadata.remoteDestination,
+    [info.metadata.host, info.metadata.sniffHost, info.metadata.destinationIP, info.metadata.remoteDestination],
   )
 
   const [timeAgo, setTimeAgo] = useState(() => dayjs(info.start).fromNow())
@@ -60,19 +52,16 @@ const ConnectionItemComponent: React.FC<Props> = ({
 
   const downloadTraffic = useMemo(() => calcTraffic(info.download), [info.download])
 
-  const uploadSpeed = useMemo(
-    () => (info.uploadSpeed ? calcTraffic(info.uploadSpeed) : null),
-    [info.uploadSpeed]
-  )
+  const uploadSpeed = useMemo(() => (info.uploadSpeed ? calcTraffic(info.uploadSpeed) : null), [info.uploadSpeed])
 
   const downloadSpeed = useMemo(
     () => (info.downloadSpeed ? calcTraffic(info.downloadSpeed) : null),
-    [info.downloadSpeed]
+    [info.downloadSpeed],
   )
 
   const hasSpeed = useMemo(
     () => Boolean(info.uploadSpeed || info.downloadSpeed),
-    [info.uploadSpeed, info.downloadSpeed]
+    [info.uploadSpeed, info.downloadSpeed],
   )
 
   const handleCardPress = useCallback(() => {
@@ -86,62 +75,45 @@ const ConnectionItemComponent: React.FC<Props> = ({
 
   return (
     <div className={`px-2 pb-2 ${index === 0 ? 'pt-2' : ''}`} style={{ minHeight: 80 }}>
-      <Card as="div" isPressable className="w-full" onPress={handleCardPress}>
-        <div className="w-full flex justify-between items-center">
+      <Card as='div' isPressable className='w-full' onPress={handleCardPress}>
+        <div className='w-full flex justify-between items-center'>
           {displayIcon && (
             <div>
-              <Avatar
-                size="lg"
-                radius="sm"
-                src={iconUrl}
-                className="bg-transparent ml-2 w-14 h-14"
-              />
+              <Avatar size='lg' radius='sm' src={iconUrl} className='bg-transparent ml-2 w-14 h-14' />
             </div>
           )}
-          <div
-            className={`w-full flex flex-col justify-start truncate relative ${displayIcon ? '-ml-2' : ''}`}
-          >
-            <CardHeader className="pb-0 gap-1 flex items-center pr-12 relative">
-              <div className="ml-2 flex-1 text-ellipsis whitespace-nowrap overflow-hidden text-left">
+          <div className={`w-full flex flex-col justify-start truncate relative ${displayIcon ? '-ml-2' : ''}`}>
+            <CardHeader className='pb-0 gap-1 flex items-center pr-12 relative'>
+              <div className='ml-2 flex-1 text-ellipsis whitespace-nowrap overflow-hidden text-left'>
                 <span style={{ textAlign: 'left' }}>
                   {processName} → {destination}
                 </span>
               </div>
-              <small className="ml-2 whitespace-nowrap text-foreground-500">{timeAgo}</small>
+              <small className='ml-2 whitespace-nowrap text-foreground-500'>{timeAgo}</small>
               <Button
                 color={info.isActive ? 'warning' : 'danger'}
-                variant="light"
+                variant='light'
                 isIconOnly
-                size="sm"
-                className="absolute right-2 transform"
+                size='sm'
+                className='absolute right-2 transform'
                 onPress={handleClose}
               >
-                {info.isActive ? <CgClose className="text-lg" /> : <CgTrash className="text-lg" />}
+                {info.isActive ? <CgClose className='text-lg' /> : <CgTrash className='text-lg' />}
               </Button>
             </CardHeader>
-            <CardFooter className="pt-2">
-              <div className="flex gap-1 overflow-x-auto no-scrollbar">
-                <Chip
-                  color={info.isActive ? 'primary' : 'danger'}
-                  size="sm"
-                  radius="sm"
-                  variant="dot"
-                >
+            <CardFooter className='pt-2'>
+              <div className='flex gap-1 overflow-x-auto no-scrollbar'>
+                <Chip color={info.isActive ? 'primary' : 'danger'} size='sm' radius='sm' variant='dot'>
                   {info.metadata.type}({info.metadata.network.toUpperCase()})
                 </Chip>
-                <Chip
-                  className="flag-emoji whitespace-nowrap overflow-hidden"
-                  size="sm"
-                  radius="sm"
-                  variant="bordered"
-                >
+                <Chip className='flag-emoji whitespace-nowrap overflow-hidden' size='sm' radius='sm' variant='bordered'>
                   {info.chains[0]}
                 </Chip>
-                <Chip size="sm" radius="sm" variant="bordered">
+                <Chip size='sm' radius='sm' variant='bordered'>
                   ↑ {uploadTraffic} ↓ {downloadTraffic}
                 </Chip>
                 {hasSpeed && (
-                  <Chip color="primary" size="sm" radius="sm" variant="bordered">
+                  <Chip color='primary' size='sm' radius='sm' variant='bordered'>
                     ↑ {uploadSpeed || '0 B'}/s ↓ {downloadSpeed || '0 B'}/s
                   </Chip>
                 )}

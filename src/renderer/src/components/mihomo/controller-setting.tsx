@@ -1,14 +1,15 @@
+import { Button, Input, Select, SelectItem, Switch, Tooltip } from '@heroui/react'
+import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
+import { mihomoUpgradeUI, restartCore } from '@renderer/utils/ipc'
+import { isValidListenAddress } from '@renderer/utils/validate'
 import React, { useState } from 'react'
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
+import { HiExternalLink } from 'react-icons/hi'
+import { IoMdCloudDownload, IoMdRefresh } from 'react-icons/io'
+
+import EditableList from '../base/base-list-editor'
 import SettingCard from '../base/base-setting-card'
 import SettingItem from '../base/base-setting-item'
-import { Button, Input, Select, SelectItem, Switch, Tooltip } from '@heroui/react'
-import { mihomoUpgradeUI, restartCore } from '@renderer/utils/ipc'
-import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import EditableList from '../base/base-list-editor'
-import { IoMdCloudDownload, IoMdRefresh } from 'react-icons/io'
-import { HiExternalLink } from 'react-icons/hi'
-import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
-import { isValidListenAddress } from '@renderer/utils/validate'
 
 const ControllerSetting: React.FC = () => {
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
@@ -17,19 +18,17 @@ const ControllerSetting: React.FC = () => {
     'external-ui': externalUi = '',
     'external-ui-url': externalUiUrl = '',
     'external-controller-cors': externalControllerCors,
-    secret
+    secret,
   } = controledMihomoConfig || {}
-  const {
-    'allow-origins': allowOrigins = [],
-    'allow-private-network': allowPrivateNetwork = true
-  } = externalControllerCors || {}
+  const { 'allow-origins': allowOrigins = [], 'allow-private-network': allowPrivateNetwork = true } =
+    externalControllerCors || {}
 
-  const initialAllowOrigins = allowOrigins.length == 1 && allowOrigins[0] == '*' ? [] : allowOrigins
+  const initialAllowOrigins = allowOrigins.length === 1 && allowOrigins[0] === '*' ? [] : allowOrigins
   const [allowOriginsInput, setAllowOriginsInput] = useState(initialAllowOrigins)
   const [externalControllerInput, setExternalControllerInput] = useState(externalController)
   const [externalUiUrlInput, setExternalUiUrlInput] = useState(externalUiUrl)
   const [secretInput, setSecretInput] = useState(secret)
-  const [enableExternalUi, setEnableExternalUi] = useState(externalUi == 'ui')
+  const [enableExternalUi, setEnableExternalUi] = useState(externalUi === 'ui')
   const [upgrading, setUpgrading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [externalControllerError, setExternalControllerError] = useState<string | null>(() => {
@@ -63,18 +62,18 @@ const ControllerSetting: React.FC = () => {
   }
 
   return (
-    <SettingCard title="外部控制器">
-      <SettingItem title="监听地址" divider={externalController !== ''}>
-        <div className="flex">
-          {externalControllerInput != externalController && !externalControllerError && (
+    <SettingCard title='外部控制器'>
+      <SettingItem title='监听地址' divider={externalController !== ''}>
+        <div className='flex'>
+          {externalControllerInput !== externalController && !externalControllerError && (
             <Button
-              size="sm"
-              color="primary"
-              className="mr-2"
+              size='sm'
+              color='primary'
+              className='mr-2'
               isDisabled={!!externalControllerError}
               onPress={() => {
                 onChangeNeedRestart({
-                  'external-controller': externalControllerInput
+                  'external-controller': externalControllerInput,
                 })
               }}
             >
@@ -83,17 +82,17 @@ const ControllerSetting: React.FC = () => {
           )}
           <Tooltip
             content={externalControllerError}
-            placement="right"
+            placement='right'
             isOpen={!!externalControllerError}
             showArrow={true}
-            color="danger"
+            color='danger'
             offset={10}
           >
             <Input
-              size="sm"
+              size='sm'
               className={`w-[200px] ${externalControllerError ? 'border-red-500 ring-1 ring-red-500 rounded-lg' : ''}`}
               value={externalControllerInput}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 setExternalControllerInput(v)
                 const r = isValidListenAddress(v)
                 setExternalControllerError(r.ok ? null : (r.error ?? '格式错误'))
@@ -105,26 +104,26 @@ const ControllerSetting: React.FC = () => {
       {externalController && externalController !== '' && (
         <>
           <SettingItem
-            title="访问密钥"
+            title='访问密钥'
             actions={
               <Button
-                size="sm"
+                size='sm'
                 isIconOnly
-                title="生成密钥"
-                variant="light"
+                title='生成密钥'
+                variant='light'
                 onPress={() => setSecretInput(generateRandomString(32))}
               >
-                <IoMdRefresh className="text-lg" />
+                <IoMdRefresh className='text-lg' />
               </Button>
             }
             divider
           >
-            <div className="flex">
-              {secretInput != secret && (
+            <div className='flex'>
+              {secretInput !== secret && (
                 <Button
-                  size="sm"
-                  color="primary"
-                  className="mr-2"
+                  size='sm'
+                  color='primary'
+                  className='mr-2'
                   onPress={() => {
                     onChangeNeedRestart({ secret: secretInput })
                   }}
@@ -133,104 +132,94 @@ const ControllerSetting: React.FC = () => {
                 </Button>
               )}
               <Input
-                size="sm"
+                size='sm'
                 type={showPassword ? 'text' : 'password'}
-                className="w-[200px]"
+                className='w-[200px]'
                 value={secretInput}
                 onValueChange={setSecretInput}
                 startContent={
                   <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="text-gray-500 hover:text-gray-700"
+                    type='button'
+                    onClick={() => setShowPassword(prev => !prev)}
+                    className='text-gray-500 hover:text-gray-700'
                   >
                     {showPassword ? (
-                      <AiOutlineEyeInvisible className="w-4 h-4" />
+                      <AiOutlineEyeInvisible className='w-4 h-4' />
                     ) : (
-                      <AiOutlineEye className="w-4 h-4" />
+                      <AiOutlineEye className='w-4 h-4' />
                     )}
                   </button>
                 }
               />
             </div>
           </SettingItem>
-          <SettingItem title="启用控制器面板" divider>
+          <SettingItem title='启用控制器面板' divider>
             <Switch
-              size="sm"
+              size='sm'
               isSelected={enableExternalUi}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 setEnableExternalUi(v)
                 onChangeNeedRestart({
-                  'external-ui': v ? 'ui' : undefined
+                  'external-ui': v ? 'ui' : undefined,
                 })
               }}
             />
           </SettingItem>
           {enableExternalUi && (
             <SettingItem
-              title="控制器面板"
+              title='控制器面板'
               actions={
                 <>
                   <Button
-                    size="sm"
+                    size='sm'
                     isIconOnly
-                    title="更新面板"
-                    variant="light"
+                    title='更新面板'
+                    variant='light'
                     isLoading={upgrading}
                     onPress={upgradeUI}
                   >
-                    <IoMdCloudDownload className="text-lg" />
+                    <IoMdCloudDownload className='text-lg' />
                   </Button>
                   <Button
-                    title="在浏览器中打开"
+                    title='在浏览器中打开'
                     isIconOnly
-                    size="sm"
-                    className="app-nodrag"
-                    variant="light"
+                    size='sm'
+                    className='app-nodrag'
+                    variant='light'
                     onPress={() => {
                       const controller = externalController.startsWith(':')
                         ? `127.0.0.1${externalController}`
                         : externalController
                       const host = controller.split(':')[0]
                       const port = controller.split(':')[1]
-                      if (
-                        ['zashboard', 'metacubexd'].find((keyword) =>
-                          externalUiUrl.includes(keyword)
-                        )
-                      ) {
-                        open(
-                          `http://${controller}/ui/#/setup?hostname=${host}&port=${port}&secret=${secret}`
-                        )
+                      if (['zashboard', 'metacubexd'].find(keyword => externalUiUrl.includes(keyword))) {
+                        open(`http://${controller}/ui/#/setup?hostname=${host}&port=${port}&secret=${secret}`)
                       } else if (externalUiUrl.includes('Razord')) {
-                        open(
-                          `http://${controller}/ui/#/proxies?host=${host}&port=${port}&secret=${secret}`
-                        )
+                        open(`http://${controller}/ui/#/proxies?host=${host}&port=${port}&secret=${secret}`)
                       } else {
                         if (secret && secret.length > 0) {
-                          open(
-                            `http://${controller}/ui/?hostname=${host}&port=${port}&secret=${secret}`
-                          )
+                          open(`http://${controller}/ui/?hostname=${host}&port=${port}&secret=${secret}`)
                         } else {
                           open(`http://${controller}/ui/?hostname=${host}&port=${port}`)
                         }
                       }
                     }}
                   >
-                    <HiExternalLink className="text-lg" />
+                    <HiExternalLink className='text-lg' />
                   </Button>
                 </>
               }
               divider
             >
-              <div className="flex">
-                {externalUiUrlInput != externalUiUrl && (
+              <div className='flex'>
+                {externalUiUrlInput !== externalUiUrl && (
                   <Button
-                    size="sm"
-                    color="primary"
-                    className="mr-2"
+                    size='sm'
+                    color='primary'
+                    className='mr-2'
                     onPress={() => {
                       onChangeNeedRestart({
-                        'external-ui-url': externalUiUrlInput
+                        'external-ui-url': externalUiUrlInput,
                       })
                     }}
                   >
@@ -239,62 +228,60 @@ const ControllerSetting: React.FC = () => {
                 )}
                 <Select
                   classNames={{ trigger: 'data-[hover=true]:bg-default-200' }}
-                  className="w-[150px]"
-                  size="sm"
+                  className='w-[150px]'
+                  size='sm'
                   selectedKeys={new Set([externalUiUrlInput])}
                   disallowEmptySelection={true}
-                  onSelectionChange={(v) => {
+                  onSelectionChange={v => {
                     setExternalUiUrlInput(v.currentKey as string)
                   }}
                 >
-                  <SelectItem key="https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip">
+                  <SelectItem key='https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip'>
                     zashboard
                   </SelectItem>
-                  <SelectItem key="https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip">
+                  <SelectItem key='https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip'>
                     metacubexd
                   </SelectItem>
-                  <SelectItem key="https://github.com/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip">
+                  <SelectItem key='https://github.com/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip'>
                     yacd-meta
                   </SelectItem>
-                  <SelectItem key="https://github.com/haishanh/yacd/archive/refs/heads/gh-pages.zip">
-                    yacd
-                  </SelectItem>
-                  <SelectItem key="https://github.com/MetaCubeX/Razord-meta/archive/refs/heads/gh-pages.zip">
+                  <SelectItem key='https://github.com/haishanh/yacd/archive/refs/heads/gh-pages.zip'>yacd</SelectItem>
+                  <SelectItem key='https://github.com/MetaCubeX/Razord-meta/archive/refs/heads/gh-pages.zip'>
                     razord-meta
                   </SelectItem>
                 </Select>
               </div>
             </SettingItem>
           )}
-          <SettingItem title="CORS 配置"></SettingItem>
-          <div className="flex flex-col space-y-2 mt-2"></div>
-          <SettingItem title="允许私有网络访问">
+          <SettingItem title='CORS 配置'></SettingItem>
+          <div className='flex flex-col space-y-2 mt-2'></div>
+          <SettingItem title='允许私有网络访问'>
             <Switch
-              size="sm"
+              size='sm'
               isSelected={allowPrivateNetwork}
-              onValueChange={(v) => {
+              onValueChange={v => {
                 onChangeNeedRestart({
                   'external-controller-cors': {
                     ...externalControllerCors,
-                    'allow-private-network': v
-                  }
+                    'allow-private-network': v,
+                  },
                 })
               }}
             />
           </SettingItem>
-          <div className="mt-1"></div>
-          <SettingItem title="允许的来源">
-            {allowOriginsInput.join(',') != initialAllowOrigins.join(',') && (
+          <div className='mt-1'></div>
+          <SettingItem title='允许的来源'>
+            {allowOriginsInput.join(',') !== initialAllowOrigins.join(',') && (
               <Button
-                size="sm"
-                color="primary"
+                size='sm'
+                color='primary'
                 onPress={() => {
-                  const finalOrigins = allowOriginsInput.length == 0 ? ['*'] : allowOriginsInput
+                  const finalOrigins = allowOriginsInput.length === 0 ? ['*'] : allowOriginsInput
                   onChangeNeedRestart({
                     'external-controller-cors': {
                       ...externalControllerCors,
-                      'allow-origins': finalOrigins
-                    }
+                      'allow-origins': finalOrigins,
+                    },
                   })
                 }}
               >
@@ -304,7 +291,7 @@ const ControllerSetting: React.FC = () => {
           </SettingItem>
           <EditableList
             items={allowOriginsInput}
-            onChange={(items) => setAllowOriginsInput(items as string[])}
+            onChange={items => setAllowOriginsInput(items as string[])}
             divider={false}
           />
         </>

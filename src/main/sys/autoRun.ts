@@ -1,10 +1,11 @@
+import { execFile } from 'node:child_process'
+import { existsSync } from 'node:fs'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import path from 'node:path'
+import { promisify } from 'node:util'
+
 import { exePath, homeDir, taskDir } from '../utils/dirs'
 import { execWithElevation } from '../utils/elevation'
-import { mkdir, readFile, rm, writeFile } from 'fs/promises'
-import { execFile } from 'child_process'
-import { existsSync } from 'fs'
-import { promisify } from 'util'
-import path from 'path'
 
 const appName = 'sparkle'
 
@@ -56,7 +57,7 @@ export async function checkAutoRun(): Promise<boolean> {
     try {
       const { stdout } = await execFilePromise('schtasks.exe', ['/query', '/tn', `${appName}`])
       return stdout.includes(appName)
-    } catch (e) {
+    } catch (_e) {
       return false
     }
   }
@@ -65,7 +66,7 @@ export async function checkAutoRun(): Promise<boolean> {
     const execFilePromise = promisify(execFile)
     const { stdout } = await execFilePromise('osascript', [
       '-e',
-      `tell application "System Events" to get the name of every login item`
+      `tell application "System Events" to get the name of every login item`,
     ])
     return stdout.includes(exePath().split('.app')[0].replace('/Applications/', ''))
   }
@@ -80,20 +81,13 @@ export async function enableAutoRun(): Promise<void> {
   if (process.platform === 'win32') {
     const taskFilePath = path.join(taskDir(), `${appName}.xml`)
     await writeFile(taskFilePath, Buffer.from(`\ufeff${taskXml}`, 'utf-16le'))
-    await execWithElevation('schtasks.exe', [
-      '/create',
-      '/tn',
-      `${appName}`,
-      '/xml',
-      `${taskFilePath}`,
-      '/f'
-    ])
+    await execWithElevation('schtasks.exe', ['/create', '/tn', `${appName}`, '/xml', `${taskFilePath}`, '/f'])
   }
   if (process.platform === 'darwin') {
     const execFilePromise = promisify(execFile)
     await execFilePromise('osascript', [
       '-e',
-      `tell application "System Events" to make login item at end with properties {path:"${exePath().split('.app')[0]}.app", hidden:false}`
+      `tell application "System Events" to make login item at end with properties {path:"${exePath().split('.app')[0]}.app", hidden:false}`,
     ])
   }
   if (process.platform === 'linux') {
@@ -129,7 +123,7 @@ export async function disableAutoRun(): Promise<void> {
     const execFilePromise = promisify(execFile)
     await execFilePromise('osascript', [
       '-e',
-      `tell application "System Events" to delete login item "${exePath().split('.app')[0].replace('/Applications/', '')}"`
+      `tell application "System Events" to delete login item "${exePath().split('.app')[0].replace('/Applications/', '')}"`,
     ])
   }
   if (process.platform === 'linux') {

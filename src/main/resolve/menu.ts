@@ -1,4 +1,5 @@
-import { app, Menu, shell, dialog } from 'electron'
+import { app, dialog, Menu, shell } from 'electron'
+
 import { mainWindow } from '..'
 import { getAppConfig } from '../config'
 import { quitWithoutCore } from '../core/manager'
@@ -18,22 +19,22 @@ export async function createApplicationMenu(): Promise<void> {
       submenu: [
         {
           label: '关于 ' + app.getName(),
-          role: 'about'
+          role: 'about',
         },
         { type: 'separator' },
         {
           label: '隐藏' + app.getName(),
           accelerator: 'Command+H',
-          role: 'hide'
+          role: 'hide',
         },
         {
           label: '隐藏其他',
           accelerator: 'Command+Alt+H',
-          role: 'hideOthers'
+          role: 'hideOthers',
         },
         {
           label: '显示全部',
-          role: 'unhide'
+          role: 'unhide',
         },
         { type: 'separator' },
         {
@@ -41,7 +42,7 @@ export async function createApplicationMenu(): Promise<void> {
           accelerator: quitWithoutCoreShortcut,
           click: () => {
             quitWithoutCore()
-          }
+          },
         },
         {
           label: '重启应用',
@@ -49,16 +50,16 @@ export async function createApplicationMenu(): Promise<void> {
           click: () => {
             app.relaunch()
             app.quit()
-          }
+          },
         },
         {
           label: '退出应用',
           accelerator: 'Command+Q',
           click: () => {
             app.quit()
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: '编辑',
@@ -66,40 +67,40 @@ export async function createApplicationMenu(): Promise<void> {
         {
           label: '撤销',
           accelerator: 'CmdOrCtrl+Z',
-          role: 'undo'
+          role: 'undo',
         },
         {
           label: '重做',
           accelerator: 'Shift+CmdOrCtrl+Z',
-          role: 'redo'
+          role: 'redo',
         },
         { type: 'separator' },
         {
           label: '剪切',
           accelerator: 'CmdOrCtrl+X',
-          role: 'cut'
+          role: 'cut',
         },
         {
           label: '复制',
           accelerator: 'CmdOrCtrl+C',
-          role: 'copy'
+          role: 'copy',
         },
         {
           label: '粘贴',
           accelerator: 'CmdOrCtrl+V',
-          role: 'paste'
+          role: 'paste',
         },
         {
           label: '删除',
           accelerator: 'CmdOrCtrl+Backspace',
-          role: 'delete'
+          role: 'delete',
         },
         {
           label: '全选',
           accelerator: 'CmdOrCtrl+A',
-          role: 'selectAll'
-        }
-      ]
+          role: 'selectAll',
+        },
+      ],
     },
     {
       label: '工具',
@@ -109,21 +110,21 @@ export async function createApplicationMenu(): Promise<void> {
           submenu: [
             {
               label: '应用目录',
-              click: () => shell.openPath(dataDir())
+              click: () => shell.openPath(dataDir()),
             },
             {
               label: '工作目录',
-              click: () => shell.openPath(mihomoWorkDir())
+              click: () => shell.openPath(mihomoWorkDir()),
             },
             {
               label: '内核目录',
-              click: () => shell.openPath(mihomoCoreDir())
+              click: () => shell.openPath(mihomoCoreDir()),
             },
             {
               label: '日志目录',
-              click: () => shell.openPath(logDir())
-            }
-          ]
+              click: () => shell.openPath(logDir()),
+            },
+          ],
         },
         { type: 'separator' },
         {
@@ -133,7 +134,7 @@ export async function createApplicationMenu(): Promise<void> {
             if (mainWindow) {
               mainWindow.reload()
             }
-          }
+          },
         },
         {
           label: '开发者工具',
@@ -141,9 +142,9 @@ export async function createApplicationMenu(): Promise<void> {
             if (mainWindow) {
               mainWindow.webContents.toggleDevTools()
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: '窗口',
@@ -151,19 +152,19 @@ export async function createApplicationMenu(): Promise<void> {
         {
           label: '最小化',
           accelerator: 'CmdOrCtrl+M',
-          role: 'minimize'
+          role: 'minimize',
         },
         {
           label: '关闭',
           accelerator: 'CmdOrCtrl+W',
-          role: 'close'
+          role: 'close',
         },
         { type: 'separator' },
         {
           label: '前置所有窗口',
-          role: 'front'
-        }
-      ]
+          role: 'front',
+        },
+      ],
     },
     {
       label: '帮助',
@@ -172,13 +173,13 @@ export async function createApplicationMenu(): Promise<void> {
           label: '了解更多',
           click: () => {
             shell.openExternal('https://github.com/xishang0128/sparkle')
-          }
+          },
         },
         {
           label: '报告问题',
           click: () => {
             shell.openExternal('https://github.com/xishang0128/sparkle/issues')
-          }
+          },
         },
         { type: 'separator' },
         {
@@ -189,12 +190,12 @@ export async function createApplicationMenu(): Promise<void> {
               title: '关于 Sparkle',
               message: 'Sparkle',
               detail: `版本：${app.getVersion()}\n一个基于 Electron 的代理工具`,
-              buttons: ['确定']
+              buttons: ['确定'],
             })
-          }
-        }
-      ]
-    }
+          },
+        },
+      ],
+    },
   ]
 
   const menu = Menu.buildFromTemplate(template)

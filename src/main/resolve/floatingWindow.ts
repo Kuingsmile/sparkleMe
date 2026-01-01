@@ -1,13 +1,19 @@
+import path, { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { is } from '@electron-toolkit/utils'
 import { BrowserWindow, ipcMain } from 'electron'
 import windowStateKeeper from 'electron-window-state'
-import { join } from 'path'
+
 import { getAppConfig, patchAppConfig } from '../config'
 import { applyTheme } from './theme'
 import { buildContextMenu, showTrayIcon } from './tray'
 
 export let floatingWindow: BrowserWindow | null = null
 let triggerTimeoutRef: NodeJS.Timeout | null = null
+
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+const preloadPath = fileURLToPath(new URL('../preload/index.mjs', import.meta.url))
 
 async function preallocateGpuResources(): Promise<void> {
   const preallocWin = new BrowserWindow({
@@ -17,11 +23,11 @@ async function preallocateGpuResources(): Promise<void> {
     frame: false,
     webPreferences: {
       offscreen: true,
-      sandbox: true
-    }
+      sandbox: false,
+    },
   })
   await preallocWin.loadURL('about:blank')
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(() => {
       if (!preallocWin.isDestroyed()) preallocWin.destroy()
       resolve()
@@ -34,7 +40,7 @@ async function createFloatingWindow(): Promise<void> {
   await preallocateGpuResources()
 
   const floatingWindowState = windowStateKeeper({
-    file: 'floating-window-state.json'
+    file: 'floating-window-state.json',
   })
   const { customTheme = 'default.css' } = await getAppConfig()
   floatingWindow = new BrowserWindow({
@@ -53,10 +59,10 @@ async function createFloatingWindow(): Promise<void> {
     fullscreenable: false,
     closable: false,
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: preloadPath,
       spellcheck: false,
-      sandbox: false
-    }
+      sandbox: false,
+    },
   })
   floatingWindowState.manage(floatingWindow)
   floatingWindow.on('ready-to-show', () => {
@@ -76,7 +82,7 @@ async function createFloatingWindow(): Promise<void> {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     floatingWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/floating.html`)
   } else {
-    floatingWindow.loadFile(join(__dirname, '../renderer/floating.html'))
+    floatingWindow.loadFile(join(dirname, '../renderer/floating.html'))
   }
 }
 

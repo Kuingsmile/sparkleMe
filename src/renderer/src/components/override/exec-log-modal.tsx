@@ -1,22 +1,14 @@
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Divider
-} from '@heroui/react'
-import React, { useEffect, useState } from 'react'
-import { getOverride } from '@renderer/utils/ipc'
+import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { getOverride } from '@renderer/utils/ipc'
+import React, { useEffect, useState } from 'react'
 
 interface Props {
   id: string
   onClose: () => void
 }
 
-const ExecLogModal: React.FC<Props> = (props) => {
+const ExecLogModal: React.FC<Props> = props => {
   const { id, onClose } = props
   const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [logs, setLogs] = useState<string[]>([])
@@ -37,22 +29,22 @@ const ExecLogModal: React.FC<Props> = (props) => {
       hideCloseButton
       isOpen={true}
       onOpenChange={onClose}
-      scrollBehavior="inside"
+      scrollBehavior='inside'
     >
       <ModalContent>
-        <ModalHeader className="flex app-drag">执行日志</ModalHeader>
+        <ModalHeader className='flex app-drag'>执行日志</ModalHeader>
         <ModalBody>
-          {logs.map((log) => {
+          {logs.map(log => {
             return (
               <>
-                <small className="break-all select-text">{log}</small>
+                <small className='break-all select-text'>{log}</small>
                 <Divider />
               </>
             )
           })}
         </ModalBody>
         <ModalFooter>
-          <Button size="sm" variant="light" onPress={onClose}>
+          <Button size='sm' variant='light' onPress={onClose}>
             关闭
           </Button>
         </ModalFooter>

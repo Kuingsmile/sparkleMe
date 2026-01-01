@@ -1,10 +1,12 @@
-import { exec } from 'child_process'
-import { promisify } from 'util'
-import { getAppConfig, patchControledMihomoConfig } from '../config'
-import { patchMihomoConfig } from '../core/mihomoApi'
-import { mainWindow } from '..'
+import { exec } from 'node:child_process'
+import { promisify } from 'node:util'
+
 import { ipcMain, net } from 'electron'
+
+import { mainWindow } from '..'
+import { getAppConfig, patchControledMihomoConfig } from '../config'
 import { getDefaultDevice } from '../core/manager'
+import { patchMihomoConfig } from '../core/mihomoApi'
 
 export async function getCurrentSSID(): Promise<string | undefined> {
   if (process.platform === 'win32') {
@@ -63,7 +65,7 @@ export async function startSSIDCheck(): Promise<void> {
 async function getSSIDByAirport(): Promise<string | undefined> {
   const execPromise = promisify(exec)
   const { stdout } = await execPromise(
-    '/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I'
+    '/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I',
   )
   if (stdout.trim().startsWith('WARNING')) {
     throw new Error('airport cannot be used')
@@ -103,9 +105,7 @@ async function getSSIDByNetsh(): Promise<string | undefined> {
 
 async function getSSIDByIwconfig(): Promise<string | undefined> {
   const execPromise = promisify(exec)
-  const { stdout } = await execPromise(
-    `iwconfig 2>/dev/null | grep 'ESSID' | awk -F'"' '{print $2}'`
-  )
+  const { stdout } = await execPromise(`iwconfig 2>/dev/null | grep 'ESSID' | awk -F'"' '{print $2}'`)
   if (stdout.trim() !== '') {
     return stdout.trim()
   }

@@ -145,6 +145,7 @@ interface SubscriptionUserInfo {
   download: number
   total: number
   expire: number
+  [key: string]: any
 }
 
 interface OverrideConfig {

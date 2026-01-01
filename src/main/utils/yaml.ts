@@ -5,7 +5,7 @@ export function parseYaml<T = unknown>(content: string): T {
 
   const result =
     yaml.parse(processedContent, {
-      merge: true
+      merge: true,
     }) || {}
   return result as T
 }

@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-import fs from 'fs'
+import { execSync } from 'node:child_process'
+import fs from 'node:fs'
+import path from 'node:path'
+import zlib from 'node:zlib'
+
 import AdmZip from 'adm-zip'
-import path from 'path'
-import zlib from 'zlib'
 import { extract } from 'tar'
-import { execSync } from 'child_process'
 
 const cwd = process.cwd()
 const TEMP_DIR = path.join(cwd, 'node_modules/.temp')
@@ -20,8 +20,7 @@ if (process.env.SKIP_PREPARE === '1') {
 }
 
 /* ======= mihomo alpha======= */
-const MIHOMO_ALPHA_VERSION_URL =
-  'https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt'
+const MIHOMO_ALPHA_VERSION_URL = 'https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt'
 const MIHOMO_ALPHA_URL_PREFIX = `https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha`
 let MIHOMO_ALPHA_VERSION
 
@@ -33,16 +32,16 @@ const MIHOMO_ALPHA_MAP = {
   'darwin-arm64': 'mihomo-darwin-arm64',
   'linux-x64': 'mihomo-linux-amd64-v3',
   'linux-arm64': 'mihomo-linux-arm64',
-  'linux-loong64': 'mihomo-linux-loong64-abi2'
+  'linux-loong64': 'mihomo-linux-loong64-abi2',
 }
 
 // Fetch the latest alpha release version from the version.txt file
 async function getLatestAlphaVersion() {
   try {
     const response = await fetch(MIHOMO_ALPHA_VERSION_URL, {
-      method: 'GET'
+      method: 'GET',
     })
-    let v = await response.text()
+    const v = await response.text()
     MIHOMO_ALPHA_VERSION = v.trim() // Trim to remove extra whitespaces
     console.log(`Latest alpha version: ${MIHOMO_ALPHA_VERSION}`)
   } catch (error) {
@@ -52,8 +51,7 @@ async function getLatestAlphaVersion() {
 }
 
 /* ======= mihomo release ======= */
-const MIHOMO_VERSION_URL =
-  'https://github.com/MetaCubeX/mihomo/releases/latest/download/version.txt'
+const MIHOMO_VERSION_URL = 'https://github.com/MetaCubeX/mihomo/releases/latest/download/version.txt'
 const MIHOMO_URL_PREFIX = `https://github.com/MetaCubeX/mihomo/releases/download`
 let MIHOMO_VERSION
 
@@ -65,16 +63,16 @@ const MIHOMO_MAP = {
   'darwin-arm64': 'mihomo-darwin-arm64',
   'linux-x64': 'mihomo-linux-amd64-v3',
   'linux-arm64': 'mihomo-linux-arm64',
-  'linux-loong64': 'mihomo-linux-loong64-abi2'
+  'linux-loong64': 'mihomo-linux-loong64-abi2',
 }
 
 // Fetch the latest release version from the version.txt file
 async function getLatestReleaseVersion() {
   try {
     const response = await fetch(MIHOMO_VERSION_URL, {
-      method: 'GET'
+      method: 'GET',
     })
-    let v = await response.text()
+    const v = await response.text()
     MIHOMO_VERSION = v.trim() // Trim to remove extra whitespaces
     console.log(`Latest release version: ${MIHOMO_VERSION}`)
   } catch (error) {
@@ -110,7 +108,7 @@ function MihomoAlpha() {
     targetFile: `mihomo-alpha${isWin ? '.exe' : ''}`,
     exeFile,
     zipFile,
-    downloadURL
+    downloadURL,
   }
 }
 
@@ -127,7 +125,7 @@ function mihomo() {
     targetFile: `mihomo${isWin ? '.exe' : ''}`,
     exeFile,
     zipFile,
-    downloadURL
+    downloadURL,
   }
 }
 /**
@@ -155,7 +153,7 @@ async function resolveSidecar(binInfo) {
 
     if (zipFile.endsWith('.zip')) {
       const zip = new AdmZip(tempZip)
-      zip.getEntries().forEach((entry) => {
+      zip.getEntries().forEach(entry => {
         console.log(`[DEBUG]: "${name}" entry name`, entry.entryName)
       })
       zip.extractAllTo(tempDir, true)
@@ -166,11 +164,11 @@ async function resolveSidecar(binInfo) {
       fs.mkdirSync(tempDir, { recursive: true })
       await extract({
         cwd: tempDir,
-        file: tempZip
+        file: tempZip,
       })
       const files = fs.readdirSync(tempDir)
       console.log(`[DEBUG]: "${name}" files in tempDir:`, files)
-      const extractedFile = files.find((file) => file.startsWith('虚空终端-'))
+      const extractedFile = files.find(file => file.startsWith('虚空终端-'))
       if (extractedFile) {
         const extractedFilePath = path.join(tempDir, extractedFile)
         fs.renameSync(extractedFilePath, sidecarPath)
@@ -185,7 +183,7 @@ async function resolveSidecar(binInfo) {
       const readStream = fs.createReadStream(tempZip)
       const writeStream = fs.createWriteStream(sidecarPath)
       await new Promise((resolve, reject) => {
-        const onError = (error) => {
+        const onError = error => {
           console.error(`[ERROR]: "${name}" gz failed:`, error.message)
           reject(error)
         }
@@ -240,7 +238,7 @@ async function resolveResource(binInfo) {
 async function downloadFile(url, path) {
   const response = await fetch(url, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/octet-stream' }
+    headers: { 'Content-Type': 'application/octet-stream' },
   })
   const buffer = await response.arrayBuffer()
   fs.writeFileSync(path, new Uint8Array(buffer))
@@ -251,32 +249,32 @@ async function downloadFile(url, path) {
 const resolveMmdb = () =>
   resolveResource({
     file: 'country.mmdb',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb`
+    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb`,
   })
 const resolveMetadb = () =>
   resolveResource({
     file: 'geoip.metadb',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb`
+    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb`,
   })
 const resolveGeosite = () =>
   resolveResource({
     file: 'geosite.dat',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat`
+    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat`,
   })
 const resolveGeoIP = () =>
   resolveResource({
     file: 'geoip.dat',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat`
+    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat`,
   })
 const resolveASN = () =>
   resolveResource({
     file: 'ASN.mmdb',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb`
+    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb`,
   })
 const resolveEnableLoopback = () =>
   resolveResource({
     file: 'enableLoopback.exe',
-    downloadURL: `https://github.com/Kuingsmile/uwp-tool/releases/download/latest/enableLoopback.exe`
+    downloadURL: `https://github.com/Kuingsmile/uwp-tool/releases/download/latest/enableLoopback.exe`,
   })
 const resolveSparkleService = () => {
   const map = {
@@ -287,24 +285,24 @@ const resolveSparkleService = () => {
     'darwin-arm64': 'sparkle-service-darwin-arm64',
     'linux-x64': 'sparkle-service-linux-amd64-v3',
     'linux-arm64': 'sparkle-service-linux-arm64',
-    'linux-loong64': 'sparkle-service-linux-loong64-abi2'
+    'linux-loong64': 'sparkle-service-linux-loong64-abi2',
   }
   if (!map[`${platform}-${arch}`]) {
     throw new Error(`unsupported platform "${platform}-${arch}"`)
   }
   const base = map[`${platform}-${arch}`]
-  const ext = platform == 'win32' ? '.exe' : ''
+  const ext = platform === 'win32' ? '.exe' : ''
 
   return resolveResource({
     file: `sparkle-service${ext}`,
     downloadURL: `https://github.com/xishang0128/sparkle-service/releases/download/pre-release/${base}${ext}`,
-    needExecutable: true
+    needExecutable: true,
   })
 }
 const resolveRunner = () =>
   resolveResource({
     file: 'sparkle-run.exe',
-    downloadURL: `https://github.com/xishang0128/sparkle-run/releases/download/${arch}/sparkle-run.exe`
+    downloadURL: `https://github.com/xishang0128/sparkle-run/releases/download/${arch}/sparkle-run.exe`,
   })
 
 const resolveMonitor = async () => {
@@ -313,10 +311,7 @@ const resolveMonitor = async () => {
   if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true })
   }
-  await downloadFile(
-    `https://github.com/xishang0128/sparkle-run/releases/download/monitor/${arch}.zip`,
-    tempZip
-  )
+  await downloadFile(`https://github.com/xishang0128/sparkle-run/releases/download/monitor/${arch}.zip`, tempZip)
   const zip = new AdmZip(tempZip)
   const resDir = path.join(cwd, 'extra', 'files')
   const targetPath = path.join(resDir, 'TrafficMonitor')
@@ -331,13 +326,12 @@ const resolveMonitor = async () => {
 const resolve7zip = () =>
   resolveResource({
     file: '7za.exe',
-    downloadURL: `https://github.com/develar/7zip-bin/raw/master/win/${arch}/7za.exe`
+    downloadURL: `https://github.com/develar/7zip-bin/raw/master/win/${arch}/7za.exe`,
   })
 const resolveSubstore = () =>
   resolveResource({
     file: 'sub-store.bundle.js',
-    downloadURL:
-      'https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store.bundle.js'
+    downloadURL: 'https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store.bundle.js',
   })
 const resolveSubstoreFrontend = async () => {
   const tempDir = path.join(TEMP_DIR, 'substore-frontend')
@@ -345,10 +339,7 @@ const resolveSubstoreFrontend = async () => {
   if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true })
   }
-  await downloadFile(
-    'https://github.com/sub-store-org/Sub-Store-Front-End/releases/latest/download/dist.zip',
-    tempZip
-  )
+  await downloadFile('https://github.com/sub-store-org/Sub-Store-Front-End/releases/latest/download/dist.zip', tempZip)
   const zip = new AdmZip(tempZip)
   const resDir = path.join(cwd, 'extra', 'files')
   const targetPath = path.join(resDir, 'sub-store-frontend')
@@ -360,7 +351,7 @@ const resolveSubstoreFrontend = async () => {
 
   if (platform !== 'win32') {
     try {
-      const fixPermissions = (dir) => {
+      const fixPermissions = dir => {
         const items = fs.readdirSync(dir, { withFileTypes: true })
         for (const item of items) {
           const fullPath = path.join(dir, item.name)
@@ -392,7 +383,7 @@ const resolveFont = async () => {
   await downloadFile(
     // 'https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf',
     'https://github.com/Sav22999/emoji/raw/refs/heads/master/font/twemoji.ttf',
-    targetPath
+    targetPath,
   )
 
   console.log(`[INFO]: twemoji.ttf finished`)
@@ -402,12 +393,12 @@ const tasks = [
   {
     name: 'mihomo-alpha',
     func: () => getLatestAlphaVersion().then(() => resolveSidecar(MihomoAlpha())),
-    retry: 5
+    retry: 5,
   },
   {
     name: 'mihomo',
     func: () => getLatestReleaseVersion().then(() => resolveSidecar(mihomo())),
-    retry: 5
+    retry: 5,
   },
   { name: 'mmdb', func: resolveMmdb, retry: 5 },
   { name: 'metadb', func: resolveMetadb, retry: 5 },
@@ -417,47 +408,47 @@ const tasks = [
   {
     name: 'font',
     func: resolveFont,
-    retry: 5
+    retry: 5,
   },
   {
     name: 'enableLoopback',
     func: resolveEnableLoopback,
     retry: 5,
-    winOnly: true
+    winOnly: true,
   },
   {
     name: 'sparkle-service',
     func: resolveSparkleService,
-    retry: 5
+    retry: 5,
   },
   {
     name: 'runner',
     func: resolveRunner,
     retry: 5,
-    winOnly: true
+    winOnly: true,
   },
   {
     name: 'monitor',
     func: resolveMonitor,
     retry: 5,
-    winOnly: true
+    winOnly: true,
   },
   {
     name: 'substore',
     func: resolveSubstore,
-    retry: 5
+    retry: 5,
   },
   {
     name: 'substorefrontend',
     func: resolveSubstoreFrontend,
-    retry: 5
+    retry: 5,
   },
   {
     name: '7zip',
     func: resolve7zip,
     retry: 5,
-    winOnly: true
-  }
+    winOnly: true,
+  },
 ]
 
 async function runTask() {

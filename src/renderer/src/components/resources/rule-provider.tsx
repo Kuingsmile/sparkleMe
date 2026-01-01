@@ -1,19 +1,16 @@
-import {
-  mihomoRuleProviders,
-  mihomoUpdateRuleProviders,
-  getRuntimeConfig
-} from '@renderer/utils/ipc'
+import { Button, Chip } from '@heroui/react'
 import { getHash } from '@renderer/utils/hash'
-import Viewer from './viewer'
+import { getRuntimeConfig, mihomoRuleProviders, mihomoUpdateRuleProviders } from '@renderer/utils/ipc'
+import dayjs from 'dayjs'
 import { Fragment, useEffect, useMemo, useState } from 'react'
+import { CgLoadbarDoc } from 'react-icons/cg'
+import { IoMdRefresh } from 'react-icons/io'
+import { MdEditDocument } from 'react-icons/md'
 import useSWR from 'swr'
+
 import SettingCard from '../base/base-setting-card'
 import SettingItem from '../base/base-setting-item'
-import { Button, Chip } from '@heroui/react'
-import { IoMdRefresh } from 'react-icons/io'
-import { CgLoadbarDoc } from 'react-icons/cg'
-import { MdEditDocument } from 'react-icons/md'
-import dayjs from 'dayjs'
+import Viewer from './viewer'
 
 const RuleProvider: React.FC = () => {
   const [showDetails, setShowDetails] = useState({
@@ -22,7 +19,7 @@ const RuleProvider: React.FC = () => {
     type: '',
     title: '',
     format: '',
-    privderType: ''
+    privderType: '',
   })
   useEffect(() => {
     if (showDetails.title) {
@@ -31,14 +28,14 @@ const RuleProvider: React.FC = () => {
           const providers = await getRuntimeConfig()
           const provider = providers?.['rule-providers']?.[name] as ProxyProviderConfig
           if (provider) {
-            setShowDetails((prev) => ({
+            setShowDetails(prev => ({
               ...prev,
               show: true,
-              path: provider?.path || `rules/${getHash(provider?.url || '')}`
+              path: provider?.path || `rules/${getHash(provider?.url || '')}`,
             }))
           }
         } catch {
-          setShowDetails((prev) => ({ ...prev, path: '' }))
+          setShowDetails(prev => ({ ...prev, path: '' }))
         }
       }
       fetchProviderPath(showDetails.title)
@@ -47,7 +44,7 @@ const RuleProvider: React.FC = () => {
 
   const { data, mutate } = useSWR('mihomoRuleProviders', mihomoRuleProviders, {
     errorRetryInterval: 200,
-    errorRetryCount: 10
+    errorRetryCount: 10,
   })
 
   useEffect(() => {
@@ -62,14 +59,14 @@ const RuleProvider: React.FC = () => {
   const providers = useMemo(() => {
     if (!data) return []
     return Object.values(data.providers).sort((a, b) => {
-      const order = { File: 1, Inline: 2, HTTP: 3 }
+      const order = { File: 1, Inline: 2, HTTP: 3 } as Record<string, number>
       return (order[a.vehicleType] || 4) - (order[b.vehicleType] || 4)
     })
   }, [data])
   const [updating, setUpdating] = useState(Array(providers.length).fill(false))
 
   const onUpdate = async (name: string, index: number): Promise<void> => {
-    setUpdating((prev) => {
+    setUpdating(prev => {
       prev[index] = true
       return [...prev]
     })
@@ -79,7 +76,7 @@ const RuleProvider: React.FC = () => {
     } catch (e) {
       new Notification(`${name} 更新失败\n${e}`)
     } finally {
-      setUpdating((prev) => {
+      setUpdating(prev => {
         prev[index] = false
         return [...prev]
       })
@@ -106,15 +103,15 @@ const RuleProvider: React.FC = () => {
               type: '',
               title: '',
               format: '',
-              privderType: ''
+              privderType: '',
             })
           }
         />
       )}
-      <SettingItem title="规则集合" divider>
+      <SettingItem title='规则集合' divider>
         <Button
-          size="sm"
-          color="primary"
+          size='sm'
+          color='primary'
           onPress={() => {
             providers.forEach((provider, index) => {
               onUpdate(provider.name, index)
@@ -129,19 +126,19 @@ const RuleProvider: React.FC = () => {
           <SettingItem
             title={provider.name}
             actions={
-              <Chip className="ml-2" size="sm">
+              <Chip className='ml-2' size='sm'>
                 {provider.ruleCount}
               </Chip>
             }
           >
-            <div className="flex h-[32px] leading-[32px] text-foreground-500">
+            <div className='flex h-[32px] leading-[32px] text-foreground-500'>
               <div>{dayjs(provider.updatedAt).fromNow()}</div>
               {provider.format !== 'MrsRule' && provider.vehicleType !== 'Inline' && (
                 <Button
                   isIconOnly
-                  title={provider.vehicleType == 'File' ? '编辑' : '查看'}
-                  className="ml-2"
-                  size="sm"
+                  title={provider.vehicleType === 'File' ? '编辑' : '查看'}
+                  className='ml-2'
+                  size='sm'
                   onPress={() => {
                     setShowDetails({
                       show: false,
@@ -149,11 +146,11 @@ const RuleProvider: React.FC = () => {
                       path: provider.name,
                       type: provider.vehicleType,
                       title: provider.name,
-                      format: provider.format
+                      format: provider.format,
                     })
                   }}
                 >
-                  {provider.vehicleType == 'File' ? (
+                  {provider.vehicleType === 'File' ? (
                     <MdEditDocument className={`text-lg`} />
                   ) : (
                     <CgLoadbarDoc className={`text-lg`} />
@@ -162,9 +159,9 @@ const RuleProvider: React.FC = () => {
               )}
               <Button
                 isIconOnly
-                title="更新"
-                className="ml-2"
-                size="sm"
+                title='更新'
+                className='ml-2'
+                size='sm'
                 onPress={() => {
                   onUpdate(provider.name, index)
                 }}
@@ -174,10 +171,10 @@ const RuleProvider: React.FC = () => {
             </div>
           </SettingItem>
           <SettingItem
-            title={<div className="text-foreground-500">{provider.format || 'InlineRule'}</div>}
+            title={<div className='text-foreground-500'>{provider.format || 'InlineRule'}</div>}
             divider={index !== providers.length - 1}
           >
-            <div className="h-[32px] leading-[32px] text-foreground-500">
+            <div className='h-[32px] leading-[32px] text-foreground-500'>
               {provider.vehicleType}::{provider.behavior}
             </div>
           </SettingItem>

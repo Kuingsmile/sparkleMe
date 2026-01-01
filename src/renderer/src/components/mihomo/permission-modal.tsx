@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from 'react'
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Button,
   Card,
   CardBody,
   CardHeader,
   Chip,
-  Divider
+  Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
 } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { platform } from '@renderer/utils/init'
 import {
   checkCorePermission,
   checkElevateTask,
   manualGrantCorePermition,
-  revokeCorePermission
+  revokeCorePermission,
 } from '@renderer/utils/ipc'
-import { platform } from '@renderer/utils/init'
+import React, { useEffect, useState } from 'react'
 
 interface Props {
   onChange: (open: boolean) => void
@@ -27,13 +27,13 @@ interface Props {
   onGrant: () => Promise<void>
 }
 
-const PermissionModal: React.FC<Props> = (props) => {
+const PermissionModal: React.FC<Props> = props => {
   const { onChange, onRevoke, onGrant } = props
   const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [loading, setLoading] = useState<{ mihomo?: boolean; 'mihomo-alpha'?: boolean }>({})
-  const [hasPermission, setHasPermission] = useState<
-    { mihomo: boolean; 'mihomo-alpha': boolean } | boolean | null
-  >(null)
+  const [hasPermission, setHasPermission] = useState<{ mihomo: boolean; 'mihomo-alpha': boolean } | boolean | null>(
+    null,
+  )
   const isWindows = platform === 'win32'
 
   const checkPermissions = async (): Promise<void> => {
@@ -68,10 +68,7 @@ const PermissionModal: React.FC<Props> = (props) => {
     }
   }
 
-  const handleCoreAction = async (
-    coreName: 'mihomo' | 'mihomo-alpha',
-    isGrant: boolean
-  ): Promise<void> => {
+  const handleCoreAction = async (coreName: 'mihomo' | 'mihomo-alpha', isGrant: boolean): Promise<void> => {
     setLoading({ ...loading, [coreName]: true })
     try {
       if (isGrant) {
@@ -114,41 +111,30 @@ const PermissionModal: React.FC<Props> = (props) => {
       disableAnimation={disableAnimation}
       hideCloseButton
       isOpen={true}
-      size="5xl"
+      size='5xl'
       onOpenChange={onChange}
-      scrollBehavior="inside"
+      scrollBehavior='inside'
       classNames={{
         base: 'max-w-none w-full',
-        backdrop: 'top-[48px]'
+        backdrop: 'top-[48px]',
       }}
     >
-      <ModalContent className="w-[450px]">
-        <ModalHeader className="flex flex-col gap-1">
-          {isWindows ? '任务计划管理' : '内核授权管理'}
-        </ModalHeader>
+      <ModalContent className='w-[450px]'>
+        <ModalHeader className='flex flex-col gap-1'>{isWindows ? '任务计划管理' : '内核授权管理'}</ModalHeader>
         <ModalBody>
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {isWindows ? (
               <>
-                <Card
-                  shadow="sm"
-                  className="border-none bg-gradient-to-br from-default-50 to-default-100"
-                >
-                  <CardBody className="py-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">任务计划状态</span>
+                <Card shadow='sm' className='border-none bg-gradient-to-br from-default-50 to-default-100'>
+                  <CardBody className='py-4'>
+                    <div className='flex items-center justify-between'>
+                      <div className='flex items-center gap-2'>
+                        <span className='text-sm font-medium'>任务计划状态</span>
                       </div>
                       <Chip
-                        color={
-                          typeof hasPermission === 'boolean'
-                            ? hasPermission
-                              ? 'success'
-                              : 'warning'
-                            : 'default'
-                        }
-                        variant="flat"
-                        size="sm"
+                        color={typeof hasPermission === 'boolean' ? (hasPermission ? 'success' : 'warning') : 'default'}
+                        variant='flat'
+                        size='sm'
                       >
                         {hasPermission === null
                           ? '检查中...'
@@ -164,45 +150,45 @@ const PermissionModal: React.FC<Props> = (props) => {
 
                 <Divider />
 
-                <div className="text-xs text-default-500 space-y-2">
-                  <div className="flex items-start gap-2">
-                    <span className="mt-0.5">•</span>
+                <div className='text-xs text-default-500 space-y-2'>
+                  <div className='flex items-start gap-2'>
+                    <span className='mt-0.5'>•</span>
                     <span>任务计划将以特权拉起客户端自身</span>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <span className="mt-0.5">•</span>
+                  <div className='flex items-start gap-2'>
+                    <span className='mt-0.5'>•</span>
                     <span>可以让内核以管理员权限运行，无需每次 UAC 提示</span>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <span className="mt-0.5">•</span>
+                  <div className='flex items-start gap-2'>
+                    <span className='mt-0.5'>•</span>
                     <span>取消注册后可能需要手动提权才能使用某些功能</span>
                   </div>
                 </div>
               </>
             ) : (
               <>
-                <div className="space-y-3">
-                  <Card shadow="sm" className="border-none">
-                    <CardHeader className="pb-0 pt-4 px-4 flex-col items-start">
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-semibold text-medium">内置正式版</h4>
+                <div className='space-y-3'>
+                  <Card shadow='sm' className='border-none'>
+                    <CardHeader className='pb-0 pt-4 px-4 flex-col items-start'>
+                      <div className='flex items-center justify-between w-full'>
+                        <div className='flex items-center gap-2'>
+                          <h4 className='font-semibold text-medium'>内置正式版</h4>
                         </div>
                         <Chip
                           color={getStatusColor('mihomo') === 'bg-success' ? 'success' : 'warning'}
-                          variant="flat"
-                          size="sm"
+                          variant='flat'
+                          size='sm'
                         >
                           {getStatusText('mihomo')}
                         </Chip>
                       </div>
                     </CardHeader>
-                    <CardBody className="pt-3 px-4 pb-4">
+                    <CardBody className='pt-3 px-4 pb-4'>
                       {typeof hasPermission !== 'boolean' && hasPermission?.mihomo ? (
                         <Button
-                          size="sm"
-                          color="warning"
-                          variant="flat"
+                          size='sm'
+                          color='warning'
+                          variant='flat'
                           onPress={() => handleCoreAction('mihomo', false)}
                           isLoading={loading.mihomo}
                           fullWidth
@@ -211,9 +197,9 @@ const PermissionModal: React.FC<Props> = (props) => {
                         </Button>
                       ) : (
                         <Button
-                          size="sm"
-                          color="primary"
-                          variant="shadow"
+                          size='sm'
+                          color='primary'
+                          variant='shadow'
                           onPress={() => handleCoreAction('mihomo', true)}
                           isLoading={loading.mihomo}
                           fullWidth
@@ -224,29 +210,27 @@ const PermissionModal: React.FC<Props> = (props) => {
                     </CardBody>
                   </Card>
 
-                  <Card shadow="sm" className="border-none">
-                    <CardHeader className="pb-0 pt-4 px-4 flex-col items-start">
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-semibold text-medium">内置预览版</h4>
+                  <Card shadow='sm' className='border-none'>
+                    <CardHeader className='pb-0 pt-4 px-4 flex-col items-start'>
+                      <div className='flex items-center justify-between w-full'>
+                        <div className='flex items-center gap-2'>
+                          <h4 className='font-semibold text-medium'>内置预览版</h4>
                         </div>
                         <Chip
-                          color={
-                            getStatusColor('mihomo-alpha') === 'bg-success' ? 'success' : 'warning'
-                          }
-                          variant="flat"
-                          size="sm"
+                          color={getStatusColor('mihomo-alpha') === 'bg-success' ? 'success' : 'warning'}
+                          variant='flat'
+                          size='sm'
                         >
                           {getStatusText('mihomo-alpha')}
                         </Chip>
                       </div>
                     </CardHeader>
-                    <CardBody className="pt-3 px-4 pb-4">
+                    <CardBody className='pt-3 px-4 pb-4'>
                       {typeof hasPermission !== 'boolean' && hasPermission?.['mihomo-alpha'] ? (
                         <Button
-                          size="sm"
-                          color="warning"
-                          variant="flat"
+                          size='sm'
+                          color='warning'
+                          variant='flat'
                           onPress={() => handleCoreAction('mihomo-alpha', false)}
                           isLoading={loading['mihomo-alpha']}
                           fullWidth
@@ -255,9 +239,9 @@ const PermissionModal: React.FC<Props> = (props) => {
                         </Button>
                       ) : (
                         <Button
-                          size="sm"
-                          color="primary"
-                          variant="shadow"
+                          size='sm'
+                          color='primary'
+                          variant='shadow'
                           onPress={() => handleCoreAction('mihomo-alpha', true)}
                           isLoading={loading['mihomo-alpha']}
                           fullWidth
@@ -269,11 +253,11 @@ const PermissionModal: React.FC<Props> = (props) => {
                   </Card>
                 </div>
 
-                <div className="text-xs text-default-500 space-y-2">
-                  <div className="flex items-start gap-2">
+                <div className='text-xs text-default-500 space-y-2'>
+                  <div className='flex items-start gap-2'>
                     <span>授权后内核将获得必要的系统权限</span>
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div className='flex items-start gap-2'>
                     <span>可以使用 TUN 等高级网络功能</span>
                   </div>
                 </div>
@@ -281,36 +265,26 @@ const PermissionModal: React.FC<Props> = (props) => {
             )}
           </div>
         </ModalBody>
-        <ModalFooter className="space-x-2">
+        <ModalFooter className='space-x-2'>
           <Button
-            size="sm"
-            variant="light"
+            size='sm'
+            variant='light'
             onPress={() => onChange(false)}
-            isDisabled={Object.values(loading).some((v) => v)}
+            isDisabled={Object.values(loading).some(v => v)}
           >
             关闭
           </Button>
           {isWindows &&
             (() => {
               const hasAnyPermission = typeof hasPermission === 'boolean' ? hasPermission : false
-              const isLoading = Object.values(loading).some((v) => v)
+              const isLoading = Object.values(loading).some(v => v)
 
               return hasAnyPermission ? (
-                <Button
-                  size="sm"
-                  color="warning"
-                  onPress={() => handleAction(onRevoke)}
-                  isLoading={isLoading}
-                >
+                <Button size='sm' color='warning' onPress={() => handleAction(onRevoke)} isLoading={isLoading}>
                   取消注册
                 </Button>
               ) : (
-                <Button
-                  size="sm"
-                  color="primary"
-                  onPress={() => handleAction(onGrant)}
-                  isLoading={isLoading}
-                >
+                <Button size='sm' color='primary' onPress={() => handleAction(onGrant)} isLoading={isLoading}>
                   注册计划
                 </Button>
               )

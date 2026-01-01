@@ -1,35 +1,29 @@
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { registerIpcMainHandlers } from './utils/ipc'
+import { execSync, spawn } from 'node:child_process'
+import { existsSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { app, BrowserWindow, dialog, ipcMain, Menu, Notification, powerMonitor, shell } from 'electron'
 import windowStateKeeper from 'electron-window-state'
-import {
-  app,
-  shell,
-  BrowserWindow,
-  Menu,
-  dialog,
-  Notification,
-  powerMonitor,
-  ipcMain
-} from 'electron'
-import { addOverrideItem, addProfileItem, getAppConfig, patchControledMihomoConfig } from './config'
-import { quitWithoutCore, startCore, stopCore } from './core/manager'
-import { triggerSysProxy } from './sys/sysproxy'
-import icon from '../../resources/icon.png?asset'
-import { createTray } from './resolve/tray'
-import { createApplicationMenu } from './resolve/menu'
-import { init } from './utils/init'
-import { join } from 'path'
-import { initShortcut } from './resolve/shortcut'
-import { execSync, spawn } from 'child_process'
-import { createElevateTaskSync } from './sys/misc'
-import { initProfileUpdater } from './core/profileUpdater'
-import { existsSync, writeFileSync } from 'fs'
-import { exePath, taskDir } from './utils/dirs'
-import path from 'path'
-import { startMonitor } from './resolve/trafficMonitor'
-import { showFloatingWindow } from './resolve/floatingWindow'
 import iconv from 'iconv-lite'
+
+import icon from '../../resources/icon.png?asset'
+import { addOverrideItem, addProfileItem, getAppConfig, patchControledMihomoConfig } from './config'
 import { getAppConfigSync } from './config/app'
+import { quitWithoutCore, startCore, stopCore } from './core/manager'
+import { initProfileUpdater } from './core/profileUpdater'
+import { showFloatingWindow } from './resolve/floatingWindow'
+import { createApplicationMenu } from './resolve/menu'
+import { initShortcut } from './resolve/shortcut'
+import { startMonitor } from './resolve/trafficMonitor'
+import { createTray } from './resolve/tray'
+import { createElevateTaskSync } from './sys/misc'
+import { triggerSysProxy } from './sys/sysproxy'
+import { exePath, taskDir } from './utils/dirs'
+import { init } from './utils/init'
+import { registerIpcMainHandlers } from './utils/ipc'
 import { getUserAgent } from './utils/userAgent'
 
 let quitTimeout: NodeJS.Timeout | null = null
@@ -39,12 +33,11 @@ let windowShown = false
 let createWindowPromiseResolve: (() => void) | null = null
 let createWindowPromise: Promise<void> | null = null
 
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+const preloadPath = fileURLToPath(new URL('../preload/index.mjs', import.meta.url))
+
 async function scheduleLightweightMode(): Promise<void> {
-  const {
-    autoLightweight = false,
-    autoLightweightDelay = 60,
-    autoLightweightMode = 'core'
-  } = await getAppConfig()
+  const { autoLightweight = false, autoLightweightDelay = 60, autoLightweightMode = 'core' } = await getAppConfig()
 
   if (!autoLightweight) return
 
@@ -99,10 +92,7 @@ if (
       } catch {
         // ignore
       }
-      dialog.showErrorBox(
-        '首次启动请以管理员权限运行',
-        `首次启动请以管理员权限运行\n${createErrorStr}\n${eStr}`
-      )
+      dialog.showErrorBox('首次启动请以管理员权限运行', `首次启动请以管理员权限运行\n${createErrorStr}\n${eStr}`)
     } finally {
       app.exit()
     }
@@ -129,7 +119,7 @@ exit
   spawn('sh', ['-c', `"${script}"`], {
     shell: true,
     detached: true,
-    stdio: 'ignore'
+    stdio: 'ignore',
   })
 }
 
@@ -191,7 +181,7 @@ function showWindow(): number {
 }
 
 function showQuitConfirmDialog(): Promise<boolean> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     if (!mainWindow) {
       resolve(true)
       return
@@ -213,7 +203,7 @@ app.on('window-all-closed', () => {
   // Don't quit app when all windows are closed
 })
 
-app.on('before-quit', async (e) => {
+app.on('before-quit', async e => {
   if (!isQuitting && !notQuitDialog) {
     e.preventDefault()
 
@@ -339,8 +329,7 @@ app.whenReady().then(async () => {
 })
 
 async function handleDeepLink(url: string): Promise<void> {
-  if (!url.startsWith('clash://') && !url.startsWith('mihomo://') && !url.startsWith('sparkle://'))
-    return
+  if (!url.startsWith('clash://') && !url.startsWith('mihomo://') && !url.startsWith('sparkle://')) return
 
   const urlObj = new URL(url)
   switch (urlObj.host) {
@@ -358,7 +347,7 @@ async function handleDeepLink(url: string): Promise<void> {
           await addProfileItem({
             type: 'remote',
             name: profileName ?? undefined,
-            url: profileUrl
+            url: profileUrl,
           })
           mainWindow?.webContents.send('profileConfigUpdated')
           new Notification({ title: '订阅导入成功' }).show()
@@ -385,7 +374,7 @@ async function handleDeepLink(url: string): Promise<void> {
             type: 'remote',
             name: profileName ?? (name ? decodeURIComponent(name) : undefined),
             url: urlParam,
-            ext: url.pathname.endsWith('.js') ? 'js' : 'yaml'
+            ext: url.pathname.endsWith('.js') ? 'js' : 'yaml',
           })
           mainWindow?.webContents.send('overrideConfigUpdated')
           new Notification({ title: '覆写导入成功' }).show()
@@ -409,25 +398,25 @@ async function showProfileInstallConfirm(url: string, name?: string | null): Pro
       const axios = (await import('axios')).default
       const response = await axios.head(url, {
         headers: {
-          'User-Agent': await getUserAgent()
+          'User-Agent': await getUserAgent(),
         },
-        timeout: 5000
+        timeout: 5000,
       })
 
       if (response.headers['content-disposition']) {
         extractedName = parseFilename(response.headers['content-disposition'])
       }
-    } catch (error) {
+    } catch (_error) {
       // ignore
     }
   }
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const delay = showWindow()
     setTimeout(() => {
       mainWindow?.webContents.send('show-profile-install-confirm', {
         url,
-        name: extractedName || name
+        name: extractedName || name,
       })
       const handleConfirm = (_event: Electron.IpcMainEvent, confirmed: boolean): void => {
         ipcMain.off('profile-install-confirm-result', handleConfirm)
@@ -452,7 +441,7 @@ async function showOverrideInstallConfirm(url: string, name?: string | null): Pr
   if (!mainWindow) {
     await createWindow()
   }
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     let finalName = name
     if (!finalName) {
       const urlObj = new URL(url)
@@ -464,7 +453,7 @@ async function showOverrideInstallConfirm(url: string, name?: string | null): Pr
     setTimeout(() => {
       mainWindow?.webContents.send('show-override-install-confirm', {
         url,
-        name: finalName
+        name: finalName,
       })
       const handleConfirm = (_event: Electron.IpcMainEvent, confirmed: boolean): void => {
         ipcMain.off('override-install-confirm-result', handleConfirm)
@@ -483,7 +472,7 @@ export async function createWindow(appConfig?: AppConfig): Promise<void> {
     return
   }
   isCreatingWindow = true
-  createWindowPromise = new Promise<void>((resolve) => {
+  createWindowPromise = new Promise<void>(resolve => {
     createWindowPromiseResolve = resolve
   })
   try {
@@ -495,12 +484,10 @@ export async function createWindow(appConfig?: AppConfig): Promise<void> {
         windowStateKeeper({
           defaultWidth: 800,
           defaultHeight: 700,
-          file: 'window-state.json'
-        })
+          file: 'window-state.json',
+        }),
       ),
-      process.platform === 'darwin'
-        ? createApplicationMenu()
-        : Promise.resolve(Menu.setApplicationMenu(null))
+      process.platform === 'darwin' ? createApplicationMenu() : Promise.resolve(Menu.setApplicationMenu(null)),
     ])
     mainWindow = new BrowserWindow({
       minWidth: 800,
@@ -516,15 +503,15 @@ export async function createWindow(appConfig?: AppConfig): Promise<void> {
       titleBarOverlay: useWindowFrame
         ? false
         : {
-            height: 49
+            height: 49,
           },
       autoHideMenuBar: true,
-      ...(process.platform === 'linux' ? { icon: icon } : {}),
+      ...(process.platform === 'linux' ? { icon } : {}),
       webPreferences: {
-        preload: join(__dirname, '../preload/index.js'),
+        preload: preloadPath,
         spellcheck: false,
-        sandbox: false
-      }
+        sandbox: false,
+      },
     })
     mainWindowState.manage(mainWindow)
     mainWindow.on('ready-to-show', async () => {
@@ -544,7 +531,7 @@ export async function createWindow(appConfig?: AppConfig): Promise<void> {
       mainWindow?.webContents.reload()
     })
 
-    mainWindow.on('close', async (event) => {
+    mainWindow.on('close', async event => {
       event.preventDefault()
       mainWindow?.hide()
       if (windowShown) {
@@ -573,7 +560,7 @@ export async function createWindow(appConfig?: AppConfig): Promise<void> {
       await stopCore()
     })
 
-    mainWindow.webContents.setWindowOpenHandler((details) => {
+    mainWindow.webContents.setWindowOpenHandler(details => {
       shell.openExternal(details.url)
       return { action: 'deny' }
     })
@@ -582,7 +569,7 @@ export async function createWindow(appConfig?: AppConfig): Promise<void> {
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
     } else {
-      mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+      mainWindow.loadFile(join(dirname, '../renderer/index.html'))
     }
   } finally {
     isCreatingWindow = false

@@ -1,22 +1,24 @@
-import { getControledMihomoConfig } from './controledMihomo'
-import { mihomoProfileWorkDir, mihomoWorkDir, profileConfigPath, profilePath } from '../utils/dirs'
-import { addProfileUpdater, delProfileUpdater } from '../core/profileUpdater'
-import { readFile, writeFile, rm, mkdir } from 'fs/promises'
-import { restartCore } from '../core/manager'
-import { getAppConfig } from './app'
-import { existsSync } from 'fs'
+import crypto from 'node:crypto'
+import { existsSync } from 'node:fs'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import http from 'node:http'
+import https from 'node:https'
+import { dirname, join } from 'node:path'
+import tls from 'node:tls'
+import { URL } from 'node:url'
+
 import axios, { AxiosResponse } from 'axios'
-import https from 'https'
-import http from 'http'
-import tls from 'tls'
-import crypto from 'crypto'
-import { URL } from 'url'
-import { parseYaml, stringifyYaml } from '../utils/yaml'
-import { defaultProfile } from '../utils/template'
+
+import { restartCore } from '../core/manager'
+import { addProfileUpdater, delProfileUpdater } from '../core/profileUpdater'
 import { subStorePort } from '../resolve/server'
-import { dirname, join } from 'path'
+import { mihomoProfileWorkDir, mihomoWorkDir, profileConfigPath, profilePath } from '../utils/dirs'
 import { deepMerge } from '../utils/merge'
+import { defaultProfile } from '../utils/template'
 import { getUserAgent } from '../utils/userAgent'
+import { parseYaml, stringifyYaml } from '../utils/yaml'
+import { getAppConfig } from './app'
+import { getControledMihomoConfig } from './controledMihomo'
 
 let profileConfig: ProfileConfig // profile.yaml
 
@@ -41,7 +43,7 @@ export async function setProfileConfig(config: ProfileConfig): Promise<void> {
 export async function getProfileItem(id: string | undefined): Promise<ProfileItem | undefined> {
   const { items } = await getProfileConfig()
   if (!id || id === 'default') return { id: 'default', type: 'local', name: '空白订阅' }
-  return items.find((item) => item.id === id)
+  return items.find(item => item.id === id)
 }
 
 export async function changeCurrentProfile(id: string): Promise<void> {
@@ -61,7 +63,7 @@ export async function changeCurrentProfile(id: string): Promise<void> {
 
 export async function updateProfileItem(item: ProfileItem): Promise<void> {
   const config = await getProfileConfig()
-  const index = config.items.findIndex((i) => i.id === item.id)
+  const index = config.items.findIndex(i => i.id === item.id)
   if (index === -1) {
     throw new Error('Profile not found')
   }
@@ -88,7 +90,7 @@ export async function addProfileItem(item: Partial<ProfileItem>): Promise<void> 
 
 export async function removeProfileItem(id: string): Promise<void> {
   const config = await getProfileConfig()
-  config.items = config.items?.filter((item) => item.id !== id)
+  config.items = config.items?.filter(item => item.id !== id)
   let shouldRestart = false
   if (config.current === id) {
     shouldRestart = true
@@ -131,7 +133,7 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
     interval: item.interval || 0,
     override: item.override || [],
     useProxy: item.useProxy || false,
-    updated: new Date().getTime()
+    updated: new Date().getTime(),
   } as ProfileItem
   switch (newItem.type) {
     case 'remote': {
@@ -142,16 +144,16 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
         const urlObj = new URL(`http://127.0.0.1:${subStorePort}${item.url}`)
         urlObj.searchParams.set('target', 'ClashMeta')
         urlObj.searchParams.set('noCache', 'true')
-        if (newItem.useProxy && mixedPort != 0) {
+        if (newItem.useProxy && mixedPort !== 0) {
           urlObj.searchParams.set('proxy', `http://127.0.0.1:${mixedPort}`)
         } else {
           urlObj.searchParams.delete('proxy')
         }
         res = await axios.get(urlObj.toString(), {
           headers: {
-            'User-Agent': await getUserAgent()
+            'User-Agent': await getUserAgent(),
           },
-          responseType: 'text'
+          responseType: 'text',
         })
       } else {
         try {
@@ -160,11 +162,10 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
           if (item.fingerprint) {
             const expected = item.fingerprint.replace(/:/g, '').toUpperCase()
             const verify = (s: tls.TLSSocket) => {
-              if (getCertFingerprint(s.getPeerCertificate()) !== expected)
-                s.destroy(new Error('证书指纹不匹配'))
+              if (getCertFingerprint(s.getPeerCertificate()) !== expected) s.destroy(new Error('证书指纹不匹配'))
             }
 
-            if (newItem.useProxy && mixedPort != 0) {
+            if (newItem.useProxy && mixedPort !== 0) {
               const urlObj = new URL(item.url)
               const hostname = urlObj.hostname
               const port = urlObj.port || '443'
@@ -173,7 +174,7 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
                   host: '127.0.0.1',
                   port: mixedPort,
                   method: 'CONNECT',
-                  path: `${hostname}:${port}`
+                  path: `${hostname}:${port}`,
                 })
 
                 req.on('connect', (res, sock, head) => {
@@ -182,14 +183,13 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
                     return
                   }
                   if (head.length > 0) sock.unshift(head)
-                  const tls$ = tls.connect(
-                    { socket: sock, servername: hostname, rejectUnauthorized: false },
-                    () => verify(tls$)
+                  const tls$ = tls.connect({ socket: sock, servername: hostname, rejectUnauthorized: false }, () =>
+                    verify(tls$),
                   )
                   cb?.(null, tls$)
                 })
 
-                req.on('error', (e) => cb?.(e, null!))
+                req.on('error', e => cb?.(e, null!))
                 req.end()
                 return null!
               }
@@ -210,10 +210,10 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
             ...(newItem.useProxy &&
               mixedPort &&
               !item.fingerprint && {
-                proxy: { protocol: 'http', host: '127.0.0.1', port: mixedPort }
+                proxy: { protocol: 'http', host: '127.0.0.1', port: mixedPort },
               }),
             headers: { 'User-Agent': newItem.ua || (await getUserAgent()) },
-            responseType: 'text'
+            responseType: 'text',
           })
         } catch (error) {
           if (axios.isAxiosError(error)) {
@@ -235,30 +235,22 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
 
       const data = res.data
       const headers = res.headers
-      const contentDispositionKey = Object.keys(headers).find((k) =>
-        k.toLowerCase().endsWith('content-disposition')
-      )
+      const contentDispositionKey = Object.keys(headers).find(k => k.toLowerCase().endsWith('content-disposition'))
       if (contentDispositionKey && newItem.name === 'Remote File') {
         newItem.name = parseFilename(headers[contentDispositionKey])
       }
-      const homeKey = Object.keys(headers).find((k) =>
-        k.toLowerCase().endsWith('profile-web-page-url')
-      )
+      const homeKey = Object.keys(headers).find(k => k.toLowerCase().endsWith('profile-web-page-url'))
       if (homeKey) {
         newItem.home = headers[homeKey]
       }
-      const intervalKey = Object.keys(headers).find((k) =>
-        k.toLowerCase().endsWith('profile-update-interval')
-      )
+      const intervalKey = Object.keys(headers).find(k => k.toLowerCase().endsWith('profile-update-interval'))
       if (intervalKey) {
         newItem.interval = parseInt(headers[intervalKey]) * 60
         if (newItem.interval) {
           newItem.locked = true
         }
       }
-      const userinfoKey = Object.keys(headers).find((k) =>
-        k.toLowerCase().endsWith('subscription-userinfo')
-      )
+      const userinfoKey = Object.keys(headers).find(k => k.toLowerCase().endsWith('subscription-userinfo'))
       if (userinfoKey) {
         newItem.extra = parseSubinfo(headers[userinfoKey])
       }
@@ -328,7 +320,7 @@ function parseFilename(str: string): string {
 function parseSubinfo(str: string): SubscriptionUserInfo {
   const parts = str.split(';')
   const obj = {} as SubscriptionUserInfo
-  parts.forEach((part) => {
+  parts.forEach(part => {
     const [key, value] = part.trim().split('=')
     obj[key] = parseInt(value)
   })
@@ -345,10 +337,7 @@ export async function getFileStr(path: string): Promise<string> {
   if (isAbsolutePath(path)) {
     return await readFile(path, 'utf-8')
   } else {
-    return await readFile(
-      join(diffWorkDir ? mihomoProfileWorkDir(current) : mihomoWorkDir(), path),
-      'utf-8'
-    )
+    return await readFile(join(diffWorkDir ? mihomoProfileWorkDir(current) : mihomoWorkDir(), path), 'utf-8')
   }
 }
 

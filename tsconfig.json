@@ -1,4 +1,28 @@
 {
-  "files": [],
-  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.web.json" }]
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "ESNext",
+    "strict": true,
+    "jsx": "react-jsx",
+    "importHelpers": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+    "types": ["node", "vite/client"],
+    "typeRoots": ["./node_modules/@types", "./src/shared/types/"],
+    "paths": {
+      "@renderer/*": ["src/renderer/src/*"],
+      "~/*": ["src/main/*"],
+      "root/*": ["./*"],
+      "#/*": ["src/shared/*"]
+    },
+    "lib": ["ESNext", "dom", "dom.iterable", "ScriptHost"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "src/**/*.d.ts", "tests/**/*.ts", "electron.vite.config.*", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist", "out"]
 }

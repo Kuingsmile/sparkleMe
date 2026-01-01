@@ -1,6 +1,5 @@
 import { TitleBarOverlayOptions } from 'electron'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function ipcErrorWrapper(response: any): any {
   if (typeof response === 'object' && 'invokeError' in response) {
     throw response.invokeError
@@ -22,9 +21,7 @@ export async function mihomoCloseConnection(id: string): Promise<void> {
 }
 
 export async function mihomoCloseAllConnections(name?: string): Promise<void> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('mihomoCloseAllConnections', name)
-  )
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoCloseAllConnections', name))
 }
 
 export async function mihomoRules(): Promise<ControllerRules> {
@@ -44,9 +41,7 @@ export async function mihomoProxyProviders(): Promise<ControllerProxyProviders> 
 }
 
 export async function mihomoUpdateProxyProviders(name: string): Promise<void> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('mihomoUpdateProxyProviders', name)
-  )
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoUpdateProxyProviders', name))
 }
 
 export async function mihomoRuleProviders(): Promise<ControllerRuleProviders> {
@@ -54,18 +49,11 @@ export async function mihomoRuleProviders(): Promise<ControllerRuleProviders> {
 }
 
 export async function mihomoUpdateRuleProviders(name: string): Promise<void> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('mihomoUpdateRuleProviders', name)
-  )
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoUpdateRuleProviders', name))
 }
 
-export async function mihomoChangeProxy(
-  group: string,
-  proxy: string
-): Promise<ControllerProxiesDetail> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('mihomoChangeProxy', group, proxy)
-  )
+export async function mihomoChangeProxy(group: string, proxy: string): Promise<ControllerProxiesDetail> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoChangeProxy', group, proxy))
 }
 
 export async function mihomoUnfixedProxy(group: string): Promise<ControllerProxiesDetail> {
@@ -84,10 +72,7 @@ export async function mihomoUpgrade(): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoUpgrade'))
 }
 
-export async function mihomoProxyDelay(
-  proxy: string,
-  url?: string
-): Promise<ControllerProxiesDelay> {
+export async function mihomoProxyDelay(proxy: string, url?: string): Promise<ControllerProxiesDelay> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoProxyDelay', proxy, url))
 }
 
@@ -120,15 +105,11 @@ export async function patchAppConfig(patch: Partial<AppConfig>): Promise<void> {
 }
 
 export async function getControledMihomoConfig(force = false): Promise<Partial<MihomoConfig>> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('getControledMihomoConfig', force)
-  )
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getControledMihomoConfig', force))
 }
 
 export async function patchControledMihomoConfig(patch: Partial<MihomoConfig>): Promise<void> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('patchControledMihomoConfig', patch)
-  )
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('patchControledMihomoConfig', patch))
 }
 
 export async function getProfileConfig(force = false): Promise<ProfileConfig> {
@@ -224,17 +205,11 @@ export async function startMonitor(): Promise<void> {
 }
 
 export async function triggerSysProxy(enable: boolean, onlyActiveDevice: boolean): Promise<void> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('triggerSysProxy', enable, onlyActiveDevice)
-  )
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('triggerSysProxy', enable, onlyActiveDevice))
 }
 
-export async function manualGrantCorePermition(
-  cores?: ('mihomo' | 'mihomo-alpha')[]
-): Promise<void> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('manualGrantCorePermition', cores)
-  )
+export async function manualGrantCorePermition(cores?: ('mihomo' | 'mihomo-alpha')[]): Promise<void> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('manualGrantCorePermition', cores))
 }
 
 export async function checkCorePermission(): Promise<{ mihomo: boolean; 'mihomo-alpha': boolean }> {
@@ -253,9 +228,7 @@ export async function revokeCorePermission(cores?: ('mihomo' | 'mihomo-alpha')[]
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('revokeCorePermission', cores))
 }
 
-export async function serviceStatus(): Promise<
-  'running' | 'stopped' | 'not-installed' | 'unknown'
-> {
+export async function serviceStatus(): Promise<'running' | 'stopped' | 'not-installed' | 'unknown'> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('serviceStatus'))
 }
 
@@ -324,9 +297,7 @@ export async function checkUpdate(): Promise<AppVersion | undefined> {
 }
 
 export async function downloadAndInstallUpdate(version: string): Promise<void> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('downloadAndInstallUpdate', version)
-  )
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('downloadAndInstallUpdate', version))
 }
 
 export async function cancelUpdate(): Promise<void> {
@@ -476,11 +447,7 @@ export async function showContextMenu(): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('showContextMenu'))
 }
 
-export async function openFile(
-  type: 'profile' | 'override',
-  id: string,
-  ext?: 'yaml' | 'js'
-): Promise<void> {
+export async function openFile(type: 'profile' | 'override', id: string, ext?: 'yaml' | 'js'): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('openFile', type, id, ext))
 }
 
@@ -558,14 +525,8 @@ export async function applyTheme(theme: string): Promise<void> {
   }
 }
 
-export async function registerShortcut(
-  oldShortcut: string,
-  newShortcut: string,
-  action: string
-): Promise<boolean> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('registerShortcut', oldShortcut, newShortcut, action)
-  )
+export async function registerShortcut(oldShortcut: string, newShortcut: string, action: string): Promise<boolean> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('registerShortcut', oldShortcut, newShortcut, action))
 }
 
 export async function copyEnv(type: 'bash' | 'cmd' | 'powershell' | 'nushell'): Promise<void> {
