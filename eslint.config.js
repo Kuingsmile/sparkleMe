@@ -131,7 +131,7 @@ export default [
     },
   },
   {
-    files: ['**/*.cjs', '**/tailwind.config.js', '**/postcss.config.js'],
+    files: ['**/*.{cjs,js}', '**/tailwind.config.js', '**/postcss.config.js'],
     languageOptions: {
       globals: {
         ...globals.node,

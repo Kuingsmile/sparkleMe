@@ -16,7 +16,7 @@ import {
 
 export async function webdavBackup(): Promise<boolean> {
   const { createClient } = await import('webdav/dist/node/index.js')
-  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkle' } = await getAppConfig()
+  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkleme' } = await getAppConfig()
   const zip = new AdmZip()
 
   zip.addLocalFile(appConfigPath())
@@ -45,7 +45,7 @@ export async function webdavBackup(): Promise<boolean> {
 
 export async function webdavRestore(filename: string): Promise<void> {
   const { createClient } = await import('webdav/dist/node/index.js')
-  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkle' } = await getAppConfig()
+  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkleme' } = await getAppConfig()
 
   const client = createClient(webdavUrl, {
     username: webdavUsername,
@@ -58,7 +58,7 @@ export async function webdavRestore(filename: string): Promise<void> {
 
 export async function listWebdavBackups(): Promise<string[]> {
   const { createClient } = await import('webdav/dist/node/index.js')
-  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkle' } = await getAppConfig()
+  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkleme' } = await getAppConfig()
 
   const client = createClient(webdavUrl, {
     username: webdavUsername,
@@ -74,7 +74,7 @@ export async function listWebdavBackups(): Promise<string[]> {
 
 export async function webdavDelete(filename: string): Promise<void> {
   const { createClient } = await import('webdav/dist/node/index.js')
-  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkle' } = await getAppConfig()
+  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkleme' } = await getAppConfig()
 
   const client = createClient(webdavUrl, {
     username: webdavUsername,

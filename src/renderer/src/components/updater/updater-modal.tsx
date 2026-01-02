@@ -65,10 +65,10 @@ const UpdaterModal: React.FC<Props> = props => {
               className='flex app-nodrag'
               onPress={() => {
                 if (version.includes('beta')) {
-                  open('https://github.com/xishang0128/sparkle/releases/tag/pre-release')
+                  open('https://github.com/Kuingsmile/sparkleme/releases/tag/pre-release')
                   return
                 }
-                open(`https://github.com/xishang0128/sparkle/releases/tag/${version}`)
+                open(`https://github.com/Kuingsmile/sparkleme/releases/tag/${version}`)
               }}
             >
               前往下载

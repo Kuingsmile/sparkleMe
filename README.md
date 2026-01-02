@@ -1,10 +1,10 @@
-# Sparkle
+# SparkleMe
 
 <h3 align="center">Another <a href="https://github.com/MetaCubeX/mihomo">Mihomo</a> GUI</h3>
 
 <p align="center">
-  <a href="https://github.com/xishang0128/sparkle/releases">
-    <img src="https://img.shields.io/github/release/xishang0128/sparkle/all.svg">
+  <a href="https://github.com/Kuingsmile/sparkleme/releases">
+    <img src="https://img.shields.io/github/release/Kuingsmile/sparkleme/all.svg">
   </a>
   <a href="https://t.me/+y7rcYjEKIiI1NzZl">
     <img src="https://img.shields.io/badge/Telegram-Group-blue?logo=telegram">
@@ -33,7 +33,7 @@
 
 ### 技术架构
 
-Sparkle 基于 Electron + React + TypeScript 构建
+SparkleMe 基于 Electron + React + TypeScript 构建
 
 #### 前端技术栈
 
@@ -54,8 +54,8 @@ Sparkle 基于 Electron + React + TypeScript 构建
 1. **克隆项目**
 
 ```bash
-git clone https://github.com/xishang0128/sparkle.git
-cd sparkle
+git clone https://github.com/Kuingsmile/sparkleme.git
+cd sparkleme
 ```
 
 2. **安装依赖**
@@ -86,7 +86,7 @@ windows 开发时可能会出现页面白屏，关闭 tun（虚拟网卡）即�
 ### 项目结构
 
 ```
-sparkle/
+sparkleme/
 ├── src/
 │   ├── main/               # Electron 主进程
 │   │   ├── core/           # 内核管理
@@ -238,12 +238,6 @@ node --version
 - 修改类型定义后需要重启 TypeScript 服务
 - 预加载脚本修改后需要重启应用
 
-## Star History
+### 许可证
 
-<a href="https://www.star-history.com/#xishang0128/sparkle&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=xishang0128/sparkle&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=xishang0128/sparkle&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=xishang0128/sparkle&type=Date" />
- </picture>
-</a>
+GNU General Public License v3.0

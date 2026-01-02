@@ -78,10 +78,10 @@ if (
       } else {
         writeFileSync(path.join(taskDir(), 'param.txt'), 'empty')
       }
-      if (!existsSync(path.join(taskDir(), 'sparkle-run.exe'))) {
-        throw new Error('sparkle-run.exe not found')
+      if (!existsSync(path.join(taskDir(), 'sparkleme-run.exe'))) {
+        throw new Error('sparkleme-run.exe not found')
       } else {
-        execSync('%SystemRoot%\\System32\\schtasks.exe /run /tn sparkle-run')
+        execSync('%SystemRoot%\\System32\\schtasks.exe /run /tn sparkleme-run')
       }
     } catch (e) {
       let createErrorStr = `${createError}`
@@ -260,7 +260,7 @@ powerMonitor.on('shutdown', async () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('sparkle.app')
+  electronApp.setAppUserModelId('sparkleme.app')
   try {
     await initPromise
   } catch (e) {
@@ -329,7 +329,13 @@ app.whenReady().then(async () => {
 })
 
 async function handleDeepLink(url: string): Promise<void> {
-  if (!url.startsWith('clash://') && !url.startsWith('mihomo://') && !url.startsWith('sparkle://')) return
+  if (
+    !url.startsWith('clash://') &&
+    !url.startsWith('mihomo://') &&
+    !url.startsWith('sparkle://') &&
+    !url.startsWith('sparkleme://')
+  )
+    return
 
   const urlObj = new URL(url)
   switch (urlObj.host) {

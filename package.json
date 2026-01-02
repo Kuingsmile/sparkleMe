@@ -1,6 +1,6 @@
 {
-  "name": "sparkle-me",
-  "description": "Sparkle",
+  "name": "sparkleme",
+  "description": "SparkleMe",
   "version": "1.7.0",
   "packageManager": "pnpm@10.15.0",
   "author": "Kuingsmile",

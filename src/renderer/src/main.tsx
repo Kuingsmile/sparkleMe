@@ -18,7 +18,6 @@ import { RulesProvider } from './hooks/use-rules'
 import { openDevTools, quitApp } from './utils/ipc'
 
 let F12Count = 0
-console.log('Renderer process platform:', platform)
 
 init().then(() => {
   document.addEventListener('keydown', e => {

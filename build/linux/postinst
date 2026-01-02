@@ -2,22 +2,22 @@
 
 if type update-alternatives 2>/dev/null >&1; then
     # Remove previous link if it doesn't use update-alternatives
-    if [ -L '/usr/bin/sparkle' -a -e '/usr/bin/sparkle' -a "`readlink '/usr/bin/sparkle'`" != '/etc/alternatives/sparkle' ]; then
-        rm -f '/usr/bin/sparkle'
+    if [ -L '/usr/bin/sparkleme' -a -e '/usr/bin/sparkleme' -a "`readlink '/usr/bin/sparkleme'`" != '/etc/alternatives/sparkleme' ]; then
+        rm -f '/usr/bin/sparkleme'
     fi
-    update-alternatives --install '/usr/bin/sparkle' 'sparkle' '/opt/sparkle/sparkle' 100 || ln -sf '/opt/sparkle/sparkle' '/usr/bin/sparkle'
+    update-alternatives --install '/usr/bin/sparkleme' 'sparkleme' '/opt/sparkleme/sparkleme' 100 || ln -sf '/opt/sparkleme/sparkleme' '/usr/bin/sparkleme'
 else
-    ln -sf '/opt/sparkle/sparkle' '/usr/bin/sparkle'
+    ln -sf '/opt/sparkleme/sparkleme' '/usr/bin/sparkleme'
 fi
 
-sed -i 's/Name=sparkle/Name=Sparkle/' '/usr/share/applications/sparkle.desktop'
+sed -i 's/Name=sparkleme/Name=SparkleMe/' '/usr/share/applications/sparkleme.desktop'
 
-chmod 4755 '/opt/sparkle/chrome-sandbox' || true
-chmod +sx /opt/sparkle/resources/sidecar/mihomo
-chmod +sx /opt/sparkle/resources/sidecar/mihomo-alpha
+chmod 4755 '/opt/sparkleme/chrome-sandbox' || true
+chmod +sx /opt/sparkleme/resources/sidecar/mihomo
+chmod +sx /opt/sparkleme/resources/sidecar/mihomo-alpha
 
-if [ -d '/opt/sparkle/resources/files/sub-store-frontend' ]; then
-    chmod -R go-w '/opt/sparkle/resources/files/sub-store-frontend' 2>/dev/null || true
+if [ -d '/opt/sparkleme/resources/files/sub-store-frontend' ]; then
+    chmod -R go-w '/opt/sparkleme/resources/files/sub-store-frontend' 2>/dev/null || true
 fi
 
 if hash update-mime-database 2>/dev/null; then

@@ -65,23 +65,23 @@ export function themesDir(): string {
 
 export function mihomoIpcPath(): string {
   if (process.platform === 'win32') {
-    return '\\\\.\\pipe\\Sparkle\\mihomo'
+    return '\\\\.\\pipe\\SparkleMe\\mihomo'
   }
   const { core = 'mihomo' } = getAppConfigSync()
   if (core === 'system') {
-    return '/tmp/sparkle-mihomo-external.sock'
+    return '/tmp/sparkleme-mihomo-external.sock'
   }
   if (!checkCorePermissionSync(core as 'mihomo' | 'mihomo-alpha')) {
-    return '/tmp/sparkle-mihomo-api-noperm.sock'
+    return '/tmp/sparkleme-mihomo-api-noperm.sock'
   }
-  return '/tmp/sparkle-mihomo-api.sock'
+  return '/tmp/sparkleme-mihomo-api.sock'
 }
 
 export function serviceIpcPath(): string {
   if (process.platform === 'win32') {
-    return '\\\\.\\pipe\\sparkle\\service'
+    return '\\\\.\\pipe\\sparkleme\\service'
   }
-  return '/tmp/sparkle-service.sock'
+  return '/tmp/sparkleme-service.sock'
 }
 
 export function mihomoCoreDir(): string {
@@ -111,7 +111,7 @@ function systemCorePath(): string {
 
 export function servicePath(): string {
   const isWin = process.platform === 'win32'
-  return path.join(resourcesFilesDir(), `sparkle-service${isWin ? '.exe' : ''}`)
+  return path.join(resourcesFilesDir(), `sparkleme-service${isWin ? '.exe' : ''}`)
 }
 
 export function appConfigPath(): string {

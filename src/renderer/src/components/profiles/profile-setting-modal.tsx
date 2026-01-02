@@ -122,7 +122,7 @@ const ProfileSettingModal: React.FC<Props> = props => {
                   try {
                     const url = await getGistUrl()
                     if (url !== '') {
-                      await navigator.clipboard.writeText(`${url}/raw/sparkle.yaml`)
+                      await navigator.clipboard.writeText(`${url}/raw/sparkleme.yaml`)
                     }
                   } catch (e) {
                     alert(e)

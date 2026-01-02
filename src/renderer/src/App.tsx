@@ -254,7 +254,7 @@ const App: React.FC = () => {
     >
       {showQuitConfirm && (
         <ConfirmModal
-          title='确定要退出 Sparkle 吗？'
+          title='确定要退出 SparkleMe 吗？'
           description={
             <div>
               <p></p>

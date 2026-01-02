@@ -172,13 +172,13 @@ export async function createApplicationMenu(): Promise<void> {
         {
           label: '了解更多',
           click: () => {
-            shell.openExternal('https://github.com/xishang0128/sparkle')
+            shell.openExternal('https://github.com/Kuingsmile/sparkleMe')
           },
         },
         {
           label: '报告问题',
           click: () => {
-            shell.openExternal('https://github.com/xishang0128/sparkle/issues')
+            shell.openExternal('https://github.com/Kuingsmile/sparkleMe/issues')
           },
         },
         { type: 'separator' },
@@ -187,8 +187,8 @@ export async function createApplicationMenu(): Promise<void> {
           click: () => {
             dialog.showMessageBox(mainWindow!, {
               type: 'info',
-              title: '关于 Sparkle',
-              message: 'Sparkle',
+              title: '关于 SparkleMe',
+              message: 'SparkleMe',
               detail: `版本：${app.getVersion()}\n一个基于 Electron 的代理工具`,
               buttons: ['确定'],
             })

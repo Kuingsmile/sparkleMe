@@ -1,5 +1,5 @@
-appId: sparkle.app
-productName: Sparkle
+appId: sparkleme.app
+productName: SparkleMe
 directories:
   buildResources: build
 files:
@@ -19,11 +19,12 @@ extraResources:
   - from: './extra/'
     to: ''
 protocols:
-  name: 'Sparkle URI Scheme'
+  name: 'SparkleMe URI Scheme'
   schemes:
     - 'clash'
     - 'mihomo'
     - 'sparkle'
+    - 'sparkleme'
 win:
   target:
     - nsis
@@ -56,8 +57,8 @@ pkg:
 linux:
   desktop:
     entry:
-      Name: Sparkle
-      MimeType: 'x-scheme-handler/clash;x-scheme-handler/mihomo;x-scheme-handler/sparkle'
+      Name: SparkleMe
+      MimeType: 'x-scheme-handler/clash;x-scheme-handler/mihomo;x-scheme-handler/sparkle;x-scheme-handler/sparkleme;'
   target:
     - deb
     - rpm

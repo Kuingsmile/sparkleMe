@@ -249,43 +249,43 @@ async function downloadFile(url, path) {
 const resolveMmdb = () =>
   resolveResource({
     file: 'country.mmdb',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb`,
+    downloadURL: `https://github.com/Kuingsmile/meta-rules-dat/releases/download/latest/country-lite.mmdb`,
   })
 const resolveMetadb = () =>
   resolveResource({
     file: 'geoip.metadb',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb`,
+    downloadURL: `https://github.com/Kuingsmile/meta-rules-dat/releases/download/latest/geoip.metadb`,
   })
 const resolveGeosite = () =>
   resolveResource({
     file: 'geosite.dat',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat`,
+    downloadURL: `https://github.com/Kuingsmile/meta-rules-dat/releases/download/latest/geosite.dat`,
   })
 const resolveGeoIP = () =>
   resolveResource({
     file: 'geoip.dat',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat`,
+    downloadURL: `https://github.com/Kuingsmile/meta-rules-dat/releases/download/latest/geoip.dat`,
   })
 const resolveASN = () =>
   resolveResource({
     file: 'ASN.mmdb',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb`,
+    downloadURL: `https://github.com/Kuingsmile/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb`,
   })
 const resolveEnableLoopback = () =>
   resolveResource({
     file: 'enableLoopback.exe',
     downloadURL: `https://github.com/Kuingsmile/uwp-tool/releases/download/latest/enableLoopback.exe`,
   })
-const resolveSparkleService = () => {
+const resolveSparkleMeService = () => {
   const map = {
-    'win32-x64': 'sparkle-service-windows-amd64-v3',
-    'win32-ia32': 'sparkle-service-windows-386',
-    'win32-arm64': 'sparkle-service-windows-arm64',
-    'darwin-x64': 'sparkle-service-darwin-amd64-v3',
-    'darwin-arm64': 'sparkle-service-darwin-arm64',
-    'linux-x64': 'sparkle-service-linux-amd64-v3',
-    'linux-arm64': 'sparkle-service-linux-arm64',
-    'linux-loong64': 'sparkle-service-linux-loong64-abi2',
+    'win32-x64': 'sparkleme-service-windows-amd64-v3',
+    'win32-ia32': 'sparkleme-service-windows-386',
+    'win32-arm64': 'sparkleme-service-windows-arm64',
+    'darwin-x64': 'sparkleme-service-darwin-amd64-v3',
+    'darwin-arm64': 'sparkleme-service-darwin-arm64',
+    'linux-x64': 'sparkleme-service-linux-amd64-v3',
+    'linux-arm64': 'sparkleme-service-linux-arm64',
+    'linux-loong64': 'sparkleme-service-linux-loong64-abi2',
   }
   if (!map[`${platform}-${arch}`]) {
     throw new Error(`unsupported platform "${platform}-${arch}"`)
@@ -294,15 +294,15 @@ const resolveSparkleService = () => {
   const ext = platform === 'win32' ? '.exe' : ''
 
   return resolveResource({
-    file: `sparkle-service${ext}`,
-    downloadURL: `https://github.com/xishang0128/sparkle-service/releases/download/pre-release/${base}${ext}`,
+    file: `sparkleme-service${ext}`,
+    downloadURL: `https://github.com/Kuingsmile/sparkleme-service/releases/download/pre-release/${base}${ext}`,
     needExecutable: true,
   })
 }
 const resolveRunner = () =>
   resolveResource({
-    file: 'sparkle-run.exe',
-    downloadURL: `https://github.com/xishang0128/sparkle-run/releases/download/${arch}/sparkle-run.exe`,
+    file: 'sparkleme-run.exe',
+    downloadURL: `https://github.com/Kuingsmile/sparkleme-run/releases/download/${arch}/sparkleme-run.exe`,
   })
 
 const resolveMonitor = async () => {
@@ -311,7 +311,7 @@ const resolveMonitor = async () => {
   if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true })
   }
-  await downloadFile(`https://github.com/xishang0128/sparkle-run/releases/download/monitor/${arch}.zip`, tempZip)
+  await downloadFile(`https://github.com/Kuingsmile/TrafficMonitor-auto/releases/download/monitor/${arch}.zip`, tempZip)
   const zip = new AdmZip(tempZip)
   const resDir = path.join(cwd, 'extra', 'files')
   const targetPath = path.join(resDir, 'TrafficMonitor')
@@ -331,7 +331,7 @@ const resolve7zip = () =>
 const resolveSubstore = () =>
   resolveResource({
     file: 'sub-store.bundle.js',
-    downloadURL: 'https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store.bundle.js',
+    downloadURL: 'https://github.com/Kuingsmile/Sub-Store/releases/latest/download/sub-store.bundle.js',
   })
 const resolveSubstoreFrontend = async () => {
   const tempDir = path.join(TEMP_DIR, 'substore-frontend')
@@ -374,17 +374,12 @@ const resolveSubstoreFrontend = async () => {
   console.log(`[INFO]: sub-store-frontend finished`)
 }
 const resolveFont = async () => {
-  // const targetPath = path.join(cwd, 'src', 'renderer', 'src', 'assets', 'NotoColorEmoji.ttf')
   const targetPath = path.join(cwd, 'src', 'renderer', 'src', 'assets', 'twemoji.ttf')
 
   if (fs.existsSync(targetPath)) {
     return
   }
-  await downloadFile(
-    // 'https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf',
-    'https://github.com/Sav22999/emoji/raw/refs/heads/master/font/twemoji.ttf',
-    targetPath,
-  )
+  await downloadFile('https://github.com/Kuingsmile/emoji/raw/refs/heads/master/font/twemoji.ttf', targetPath)
 
   console.log(`[INFO]: twemoji.ttf finished`)
 }
@@ -417,8 +412,8 @@ const tasks = [
     winOnly: true,
   },
   {
-    name: 'sparkle-service',
-    func: resolveSparkleService,
+    name: 'sparkleme-service',
+    func: resolveSparkleMeService,
     retry: 5,
   },
   {

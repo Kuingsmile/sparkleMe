@@ -47,7 +47,7 @@ export async function openUWPTool(): Promise<void> {
 export async function setupFirewall(): Promise<void> {
   const execPromise = promisify(exec)
   const removeCommand = `
-  $rules = @("mihomo", "mihomo-alpha", "Sparkle")
+  $rules = @("mihomo", "mihomo-alpha", "Sparkle", "SparkleMe")
   foreach ($rule in $rules) {
     if (Get-NetFirewallRule -DisplayName $rule -ErrorAction SilentlyContinue) {
       Remove-NetFirewallRule -DisplayName $rule -ErrorAction SilentlyContinue
@@ -58,6 +58,7 @@ export async function setupFirewall(): Promise<void> {
   New-NetFirewallRule -DisplayName "mihomo" -Direction Inbound -Action Allow -Program "${mihomoCorePath('mihomo')}" -Enabled True -Profile Any -ErrorAction SilentlyContinue
   New-NetFirewallRule -DisplayName "mihomo-alpha" -Direction Inbound -Action Allow -Program "${mihomoCorePath('mihomo-alpha')}" -Enabled True -Profile Any -ErrorAction SilentlyContinue
   New-NetFirewallRule -DisplayName "Sparkle" -Direction Inbound -Action Allow -Program "${exePath()}" -Enabled True -Profile Any -ErrorAction SilentlyContinue
+  New-NetFirewallRule -DisplayName "SparkleMe" -Direction Inbound -Action Allow -Program "${exePath()}" -Enabled True -Profile Any -ErrorAction SilentlyContinue
   `
 
   if (process.platform === 'win32') {
@@ -100,7 +101,7 @@ const elevateTaskXml = `<?xml version="1.0" encoding="UTF-16"?>
   </Settings>
   <Actions Context="Author">
     <Exec>
-      <Command>"${path.join(taskDir(), `sparkle-run.exe`)}"</Command>
+      <Command>"${path.join(taskDir(), `sparkleme-run.exe`)}"</Command>
       <Arguments>"${exePath()}"</Arguments>
     </Exec>
   </Actions>
@@ -108,15 +109,15 @@ const elevateTaskXml = `<?xml version="1.0" encoding="UTF-16"?>
 `
 
 export function createElevateTaskSync(): void {
-  const taskFilePath = path.join(taskDir(), `sparkle-run.xml`)
+  const taskFilePath = path.join(taskDir(), `sparkleme-run.xml`)
   writeFileSync(taskFilePath, Buffer.from(`\ufeff${elevateTaskXml}`, 'utf-16le'))
-  copyFileSync(path.join(resourcesFilesDir(), 'sparkle-run.exe'), path.join(taskDir(), 'sparkle-run.exe'))
-  execSync(`%SystemRoot%\\System32\\schtasks.exe /create /tn "sparkle-run" /xml "${taskFilePath}" /f`)
+  copyFileSync(path.join(resourcesFilesDir(), 'sparkleme-run.exe'), path.join(taskDir(), 'sparkleme-run.exe'))
+  execSync(`%SystemRoot%\\System32\\schtasks.exe /create /tn "sparkleme-run" /xml "${taskFilePath}" /f`)
 }
 
 export async function deleteElevateTask(): Promise<void> {
   try {
-    execSync(`%SystemRoot%\\System32\\schtasks.exe /delete /tn "sparkle-run" /f`)
+    execSync(`%SystemRoot%\\System32\\schtasks.exe /delete /tn "sparkleme-run" /f`)
   } catch {
     // ignore
   }

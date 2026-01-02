@@ -7,7 +7,7 @@ import { promisify } from 'node:util'
 import { exePath, homeDir, taskDir } from '../utils/dirs'
 import { execWithElevation } from '../utils/elevation'
 
-const appName = 'sparkle'
+const appName = 'sparkleme'
 
 const taskXml = `<?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
@@ -44,7 +44,7 @@ const taskXml = `<?xml version="1.0" encoding="UTF-16"?>
   </Settings>
   <Actions Context="Author">
     <Exec>
-      <Command>"${path.join(taskDir(), `sparkle-run.exe`)}"</Command>
+      <Command>"${path.join(taskDir(), `sparkleme-run.exe`)}"</Command>
       <Arguments>"${exePath()}"</Arguments>
     </Exec>
   </Actions>
@@ -93,13 +93,13 @@ export async function enableAutoRun(): Promise<void> {
   if (process.platform === 'linux') {
     let desktop = `
 [Desktop Entry]
-Name=sparkle
+Name=sparkleme
 Exec=${exePath()} %U
 Terminal=false
 Type=Application
-Icon=sparkle
-StartupWMClass=sparkle
-Comment=Sparkle
+Icon=sparkleme
+StartupWMClass=sparkleme
+Comment=Sparkleme
 Categories=Utility;
 `
 

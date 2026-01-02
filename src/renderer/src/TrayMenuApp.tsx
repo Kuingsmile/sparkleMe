@@ -1,10 +1,11 @@
-import { useEffect, useState, useMemo } from 'react'
-import { Button, ScrollShadow, Chip, Accordion, AccordionItem } from '@heroui/react'
-import { IoRefresh, IoClose, IoCheckmarkCircle } from 'react-icons/io5'
-import { useGroups } from './hooks/use-groups'
-import { mihomoChangeProxy, mihomoGroupDelay, mihomoCloseAllConnections } from './utils/ipc'
+import { Accordion, AccordionItem, Button, Chip, ScrollShadow } from '@heroui/react'
+import { useEffect, useMemo, useState } from 'react'
+import { IoCheckmarkCircle, IoClose, IoRefresh } from 'react-icons/io5'
+
 import { useAppConfig } from './hooks/use-app-config'
+import { useGroups } from './hooks/use-groups'
 import { calcTraffic } from './utils/calc'
+import { mihomoChangeProxy, mihomoCloseAllConnections, mihomoGroupDelay } from './utils/ipc'
 
 interface TrafficData {
   up: number
@@ -41,7 +42,7 @@ const TrayMenuApp: React.FC = () => {
     try {
       await mihomoGroupDelay(groupName, testUrl)
       mutate()
-    } catch (e) {
+    } catch (_e) {
       // ignore
     } finally {
       setTestingGroup(null)
@@ -95,7 +96,7 @@ const TrayMenuApp: React.FC = () => {
       <div className='flex items-center justify-between px-3 py-2 border-b border-divider bg-content2/50'>
         <div className='flex items-center gap-2'>
           <div className='w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50' />
-          <span className='text-sm font-semibold'>Sparkle</span>
+          <span className='text-sm font-semibold'>SparkleMe</span>
         </div>
         <div className='flex items-center gap-1'>
           <Button size='sm' variant='light' isIconOnly onPress={handleRefresh} className='min-w-6 w-6 h-6'>

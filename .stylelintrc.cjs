@@ -4,6 +4,7 @@ module.exports = {
   rules: {
     // 这里是允许了空的style标签
     'no-empty-source': null,
+    'import-notation': 'string',
     'selector-class-pattern': null,
     // 禁止空块
     'block-no-empty': true,

@@ -102,7 +102,7 @@ jobs:
       - name: Keep product name lowercase on Linux
         if: matrix.os == 'ubuntu-latest'
         run: |
-          sed -i "s/productName: Sparkle/productName: sparkle/" electron-builder.yml
+          sed -i "s/productName: SparkleMe/productName: sparkleme/" electron-builder.yml
 
       - name: Install Build Tools
         if: matrix.os == 'ubuntu-latest' && matrix.format == 'pacman'
@@ -167,9 +167,9 @@ jobs:
           set -e
           VERSION=$(jq -r '.version' package.json)
           mkdir workdir
-          fakeroot dpkg-deb -R dist/sparkle-linux-${VERSION}-loong64.deb workdir
+          fakeroot dpkg-deb -R dist/sparkleme-linux-${VERSION}-loong64.deb workdir
           fakeroot sed -i 's/^Architecture: .*/Architecture: loongarch64/' workdir/DEBIAN/control
-          fakeroot dpkg-deb -b workdir dist/sparkle-linux-${VERSION}-loongarch64.deb
+          fakeroot dpkg-deb -b workdir dist/sparkleme-linux-${VERSION}-loongarch64.deb
           rm -rf workdir
 
       - name: Create Changelog
@@ -187,9 +187,9 @@ jobs:
         with:
           name: ${{ matrix.os }}-${{ matrix.arch }}${{ matrix.format && '-' || '' }}${{ matrix.format || '' }}
           path: |
-            dist/sparkle*
-            !dist/sparkle.app.plist
-            !dist/sparkle*blockmap*
+            dist/sparkleme*
+            !dist/sparkleme.app.plist
+            !dist/sparkleme*blockmap*
             latest.yml
             changelog.md
 
