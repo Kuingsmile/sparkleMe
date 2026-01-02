@@ -1,29 +1,41 @@
 {
   "name": "sparkleme",
-  "description": "SparkleMe",
   "version": "1.7.0",
-  "packageManager": "pnpm@10.15.0",
-  "author": "Kuingsmile",
+  "description": "SparkleMe",
   "homepage": "https://github.com/Kuingsmile/sparkleMe",
+  "author": "Kuingsmile",
   "type": "module",
   "main": "./out/main/index.js",
   "scripts": {
     "artifact": "node scripts/artifact.mjs",
+    "build:linux": "electron-vite build && electron-builder --publish never --linux",
+    "build:mac": "electron-vite build && electron-builder --publish never --mac",
     "build:win": "electron-vite build && electron-builder --publish never --win",
+    "bump": "bump-version",
     "checksum": "node scripts/checksum.mjs",
+    "cz": "git-cz",
+    "dev": "electron-vite dev",
+    "postinstall": "electron-builder install-app-deps",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "lint:style": "stylelint \"src/**/*.(vue|less|scss|css)\" --fix",
+    "prepare": "node scripts/prepare.js",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
-    "typecheck": "npm run typecheck:node && npm run typecheck:web",
-    "prepare": "node scripts/prepare.js",
-    "updater": "node scripts/updater.js",
-    "dev": "electron-vite dev",
-    "cz": "git-cz",
-    "bump": "bump-version",
-    "postinstall": "electron-builder install-app-deps",
-    "build:mac": "electron-vite build && electron-builder --publish never --mac",
-    "build:linux": "electron-vite build && electron-builder --publish never --linux"
+    "updater": "node scripts/updater.js"
+  },
+  "commitlint": {
+    "extends": [
+      "./node_modules/node-bump-version/dist/commitlint-node/index.js"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-customizable"
+    },
+    "cz-customizable": {
+      "config": "./node_modules/node-bump-version/.cz-config.cjs"
+    }
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
@@ -66,7 +78,6 @@
     "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.23",
-    "node-bump-version": "^2.0.0",
     "cron-validator": "^1.4.0",
     "driver.js": "^1.4.0",
     "electron": "^37.10.3",
@@ -88,6 +99,7 @@
     "monaco-yaml": "^5.4.0",
     "nanoid": "^5.1.6",
     "next-themes": "^0.4.6",
+    "node-bump-version": "^2.0.0",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
     "pubsub-js": "^1.9.5",
@@ -115,6 +127,7 @@
     "vite": "^7.3.0",
     "vite-plugin-monaco-editor": "1.1.0"
   },
+  "packageManager": "pnpm@10.15.0",
   "pnpm": {
     "onlyBuiltDependencies": [
       "electron"
@@ -125,18 +138,5 @@
     "patchedDependencies": {
       "vite-plugin-monaco-editor@1.1.0": "patches/vite-plugin-monaco-editor@1.1.0.patch"
     }
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-customizable"
-    },
-    "cz-customizable": {
-      "config": "./node_modules/node-bump-version/.cz-config.cjs"
-    }
-  },
-  "commitlint": {
-    "extends": [
-      "./node_modules/node-bump-version/dist/commitlint-node/index.js"
-    ]
   }
 }

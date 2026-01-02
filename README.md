@@ -4,12 +4,11 @@
 
 <p align="center">
   <a href="https://github.com/Kuingsmile/sparkleme/releases">
-    <img src="https://img.shields.io/github/release/Kuingsmile/sparkleme/all.svg">
-  </a>
-  <a href="https://t.me/+y7rcYjEKIiI1NzZl">
-    <img src="https://img.shields.io/badge/Telegram-Group-blue?logo=telegram">
+    <img src="https://img.shields.io/github/release/Kuingsmile/sparkleme/all.svg" alt="Release">
   </a>
 </p>
+
+本项目为用了各种GUI软件结果纷纷跑路后的自用开发版，fork自Sparkle，改动自用为主。
 
 ## 特性
 
@@ -22,8 +21,6 @@
 - [x] 深度集成 Sub-Store，轻松管理订阅
 
 ## 开发
-
-本项目为用了各种GUI软件结果纷纷跑路后的自用版，fork自Sparkle，后续改动为自用为主。
 
 ### 环境要求
 
@@ -82,40 +79,6 @@ pnpm dev
 ### 注意事项
 
 windows 开发时可能会出现页面白屏，关闭 tun（虚拟网卡）即可
-
-### 项目结构
-
-```
-sparkleme/
-├── src/
-│   ├── main/               # Electron 主进程
-│   │   ├── core/           # 内核管理
-│   │   ├── config/         # 配置管理
-│   │   ├── resolve/        # 解析器
-│   │   ├── sys/            # 系统集成
-│   │   └── utils/          # 工具函数
-│   ├── renderer/           # Electron 渲染进程（前端界面）
-│   │   ├── src/
-│   │   │   ├── assets/     # 静态资源
-│   │   │   ├── components/ # React 组件
-│   │   │   ├── pages/      # 页面组件
-│   │   │   ├── hooks/      # 自定义 hooks
-│   │   │   ├── routes/     # 路由配置
-│   │   │   └── utils/      # 前端工具
-│   │   └── index.html      # 渲染进程入口 HTML
-│   ├── preload/            # Electron 预加载脚本（进程间通信桥梁）
-│   │   ├── index.ts        # 预加载脚本主文件
-│   │   └── index.d.ts      # 预加载脚本类型定义
-│   └── shared/             # 共享资源
-│       └── types           # 全局类型定义
-├── resources/              # 应用资源文件
-├── build/                  # 构建配置
-├── extra/                  # 额外资源
-├── dist/                   # 构建输出目录
-├── electron-builder.yml    # 打包配置
-├── package.json            # 项目配置
-└── README.md               # 项目说明
-```
 
 ### 可用脚本
 
@@ -192,51 +155,6 @@ pnpm build:linux deb --x64
 - **Windows**: `.exe` 安装包和 `.7z` 便携版
 - **macOS**: `.pkg` 安装包
 - **Linux**: `.deb`、`.rpm`、`.pkg.tar.xz(pacman)` 等格式
-
-### 常见问题
-
-#### 包管理器要求
-
-本项目使用 pnpm 作为包管理器。
-
-确保使用 pnpm 9.0.0 或更高版本：
-
-```bash
-pnpm --version
-```
-
-#### Node.js 版本要求
-
-确保使用 Node.js 20.0.0 或更高版本：
-
-```bash
-node --version
-```
-
-#### 开发环境问题
-
-- 确保 Node.js 版本 >= 20.0.0
-- 使用 pnpm 进行依赖管理
-
-### 贡献指南
-
-1. Fork 本仓库
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
-
-### 开发注意事项
-
-- 请确保代码通过 ESLint 检查
-- 提交前运行 `pnpm format` 格式化代码
-- 遵循现有的代码风格和命名规范
-- 添加新功能时请更新相关文档
-- 主进程代码修改后需要重启开发服务器
-- 渲染进程代码支持热重载
-- 所有命令都使用 pnpm 执行
-- 修改类型定义后需要重启 TypeScript 服务
-- 预加载脚本修改后需要重启应用
 
 ### 许可证
 
