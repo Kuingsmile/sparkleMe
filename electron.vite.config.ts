@@ -20,10 +20,10 @@ export default defineConfig({
     },
     resolve: {
       alias: {
-        '@renderer/*': resolve('src/renderer/src'),
-        '~/*': resolve('src/main'),
-        'root/*': resolve('./'),
-        '#/*': resolve('src/shared'),
+        '@renderer': resolve('src/renderer/src'),
+        '~': resolve('src/main'),
+        root: resolve('./'),
+        '#': resolve('src/shared'),
       },
     },
   },
@@ -33,10 +33,10 @@ export default defineConfig({
     },
     resolve: {
       alias: {
-        '@renderer/*': resolve('src/renderer/src'),
-        '~/*': resolve('src/main'),
-        'root/*': resolve('./'),
-        '#/*': resolve('src/shared'),
+        '@renderer': resolve('src/renderer/src'),
+        '~': resolve('src/main'),
+        root: resolve('./'),
+        '#': resolve('src/shared'),
       },
     },
   },
