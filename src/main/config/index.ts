@@ -1,5 +1,5 @@
-export { getAppConfig, patchAppConfig } from './app'
-export { getControledMihomoConfig, patchControledMihomoConfig } from './controledMihomo'
+export { getAppConfig, patchAppConfig } from '~/config/app'
+export { getControledMihomoConfig, patchControledMihomoConfig } from '~/config/controledMihomo'
 export {
   addOverrideItem,
   createOverride,
@@ -10,7 +10,7 @@ export {
   setOverride,
   setOverrideConfig,
   updateOverrideItem,
-} from './override'
+} from '~/config/override'
 export {
   addProfileItem,
   changeCurrentProfile,
@@ -27,4 +27,4 @@ export {
   setProfileConfig,
   setProfileStr,
   updateProfileItem,
-} from './profile'
+} from '~/config/profile'

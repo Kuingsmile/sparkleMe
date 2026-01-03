@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 
-import { serviceIpcPath } from '../utils/dirs'
-import { KeyManager } from './key'
+import { KeyManager } from '~/service/key'
+import { serviceIpcPath } from '~/utils/dirs'
 
 let serviceAxios: AxiosInstance | null = null
 let keyManager: KeyManager | null = null

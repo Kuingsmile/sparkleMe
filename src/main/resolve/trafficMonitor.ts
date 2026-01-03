@@ -3,8 +3,8 @@ import { existsSync } from 'node:fs'
 import { readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
-import { getAppConfig } from '../config'
-import { dataDir, resourcesFilesDir } from '../utils/dirs'
+import { getAppConfig } from '~/config'
+import { dataDir, resourcesFilesDir } from '~/utils/dirs'
 
 let child: ChildProcess
 

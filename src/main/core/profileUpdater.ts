@@ -1,4 +1,4 @@
-import { addProfileItem, getCurrentProfileItem, getProfileConfig } from '../config'
+import { addProfileItem, getCurrentProfileItem, getProfileConfig } from '~/config'
 
 const intervalPool: Record<string, NodeJS.Timeout> = {}
 

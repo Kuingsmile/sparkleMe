@@ -4,10 +4,6 @@ import { fileURLToPath } from 'node:url'
 import { is } from '@electron-toolkit/utils'
 import { app, BrowserWindow, clipboard, ipcMain, Menu, nativeImage, screen, shell, Tray } from 'electron'
 
-import icoIcon from '../../../resources/icon.ico?asset'
-import pngIcon from '../../../resources/icon.png?asset'
-import templateIcon from '../../../resources/iconTemplate.png?asset'
-import { mainWindow, setNotQuitDialog, showMainWindow, triggerMainWindow } from '..'
 import {
   changeCurrentProfile,
   getAppConfig,
@@ -15,19 +11,24 @@ import {
   getProfileConfig,
   patchAppConfig,
   patchControledMihomoConfig,
-} from '../config'
-import { quitWithoutCore, restartCore } from '../core/manager'
+} from '~/config'
+import { quitWithoutCore, restartCore } from '~/core/manager'
 import {
   mihomoChangeProxy,
   mihomoCloseAllConnections,
   mihomoGroupDelay,
   mihomoGroups,
   patchMihomoConfig,
-} from '../core/mihomoApi'
-import { triggerSysProxy } from '../sys/sysproxy'
-import { dataDir, logDir, mihomoCoreDir, mihomoWorkDir } from '../utils/dirs'
-import { floatingWindow, triggerFloatingWindow } from './floatingWindow'
-import { applyTheme } from './theme'
+} from '~/core/mihomoApi'
+import { mainWindow, setNotQuitDialog, showMainWindow, triggerMainWindow } from '~/index'
+import { floatingWindow, triggerFloatingWindow } from '~/resolve/floatingWindow'
+import { applyTheme } from '~/resolve/theme'
+import { triggerSysProxy } from '~/sys/sysproxy'
+import { dataDir, logDir, mihomoCoreDir, mihomoWorkDir } from '~/utils/dirs'
+
+import icoIcon from '../../../resources/icon.ico?asset'
+import pngIcon from '../../../resources/icon.png?asset'
+import templateIcon from '../../../resources/iconTemplate.png?asset'
 
 export let tray: Tray | null = null
 let customTrayWindow: BrowserWindow | null = null

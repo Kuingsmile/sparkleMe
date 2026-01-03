@@ -1,9 +1,9 @@
 import { app, dialog, Menu, shell } from 'electron'
 
-import { mainWindow } from '..'
-import { getAppConfig } from '../config'
-import { quitWithoutCore } from '../core/manager'
-import { dataDir, logDir, mihomoCoreDir, mihomoWorkDir } from '../utils/dirs'
+import { getAppConfig } from '~/config'
+import { quitWithoutCore } from '~/core/manager'
+import { mainWindow } from '~/index'
+import { dataDir, logDir, mihomoCoreDir, mihomoWorkDir } from '~/utils/dirs'
 
 export async function createApplicationMenu(): Promise<void> {
   if (process.platform !== 'darwin') {

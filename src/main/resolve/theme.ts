@@ -5,10 +5,10 @@ import path from 'node:path'
 import AdmZip from 'adm-zip'
 import axios from 'axios'
 
-import { mainWindow } from '..'
-import { getControledMihomoConfig } from '../config'
-import { themesDir } from '../utils/dirs'
-import { floatingWindow } from './floatingWindow'
+import { getControledMihomoConfig } from '~/config'
+import { mainWindow } from '~/index'
+import { floatingWindow } from '~/resolve/floatingWindow'
+import { themesDir } from '~/utils/dirs'
 
 let insertedCSSKeyMain: string | undefined
 let insertedCSSKeyFloating: string | undefined

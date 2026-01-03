@@ -6,10 +6,10 @@ import tls from 'node:tls'
 
 import axios, { AxiosResponse } from 'axios'
 
-import { overrideConfigPath, overridePath } from '../utils/dirs'
-import { parseYaml, stringifyYaml } from '../utils/yaml'
-import { getControledMihomoConfig } from './controledMihomo'
-import { getCertFingerprint } from './profile'
+import { getControledMihomoConfig } from '~/config/controledMihomo'
+import { getCertFingerprint } from '~/config/profile'
+import { overrideConfigPath, overridePath } from '~/utils/dirs'
+import { parseYaml, stringifyYaml } from '~/utils/yaml'
 
 let overrideConfig: OverrideConfig // override.yaml
 

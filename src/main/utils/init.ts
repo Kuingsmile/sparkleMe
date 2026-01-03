@@ -4,12 +4,13 @@ import path from 'node:path'
 
 import { app } from 'electron'
 
-import { getAppConfig, getControledMihomoConfig, patchAppConfig, patchControledMihomoConfig } from '../config'
-import { startNetworkDetection } from '../core/manager'
-import { startPacServer, startSubStoreBackendServer, startSubStoreFrontendServer } from '../resolve/server'
-import { initKeyManager } from '../service/manager'
-import { startSSIDCheck } from '../sys/ssid'
-import { triggerSysProxy } from '../sys/sysproxy'
+import { getAppConfig, getControledMihomoConfig, patchAppConfig, patchControledMihomoConfig } from '~/config'
+import { startNetworkDetection } from '~/core/manager'
+import { startPacServer, startSubStoreBackendServer, startSubStoreFrontendServer } from '~/resolve/server'
+import { initKeyManager } from '~/service/manager'
+import { startSSIDCheck } from '~/sys/ssid'
+import { triggerSysProxy } from '~/sys/sysproxy'
+
 import {
   appConfigPath,
   controledMihomoConfigPath,

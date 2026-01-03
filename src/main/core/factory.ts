@@ -13,10 +13,10 @@ import {
   getProfileConfig,
   getProfileItem,
   getProfileStr,
-} from '../config'
-import { mihomoProfileWorkDir, mihomoWorkConfigPath, mihomoWorkDir, overridePath } from '../utils/dirs'
-import { deepMerge } from '../utils/merge'
-import { parseYaml, stringifyYaml } from '../utils/yaml'
+} from '~/config'
+import { mihomoProfileWorkDir, mihomoWorkConfigPath, mihomoWorkDir, overridePath } from '~/utils/dirs'
+import { deepMerge } from '~/utils/merge'
+import { parseYaml, stringifyYaml } from '~/utils/yaml'
 
 let runtimeConfigStr: string,
   rawProfileStr: string,

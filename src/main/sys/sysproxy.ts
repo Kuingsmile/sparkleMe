@@ -3,10 +3,10 @@ import { promisify } from 'node:util'
 
 import { net } from 'electron'
 
-import { getAppConfig, getControledMihomoConfig } from '../config'
-import { pacPort, startPacServer, stopPacServer } from '../resolve/server'
-import { disableProxy, setPac, setProxy } from '../service/api'
-import { servicePath } from '../utils/dirs'
+import { getAppConfig, getControledMihomoConfig } from '~/config'
+import { pacPort, startPacServer, stopPacServer } from '~/resolve/server'
+import { disableProxy, setPac, setProxy } from '~/service/api'
+import { servicePath } from '~/utils/dirs'
 
 let defaultBypass: string[]
 let triggerSysProxyTimer: NodeJS.Timeout | null = null

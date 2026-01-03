@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url'
 import { is } from '@electron-toolkit/utils'
 import { app } from 'electron'
 
-import { getAppConfigSync } from '../config/app'
-import { checkCorePermissionSync } from '../core/manager'
+import { getAppConfigSync } from '~/config/app'
+import { checkCorePermissionSync } from '~/core/manager'
 
 export const homeDir = app.getPath('home')
 const dirname = path.dirname(fileURLToPath(import.meta.url))

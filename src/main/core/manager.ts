@@ -7,18 +7,19 @@ import { promisify } from 'node:util'
 
 import { app, dialog, ipcMain, net } from 'electron'
 
-import { mainWindow } from '..'
 import {
   getAppConfig,
   getControledMihomoConfig,
   getProfileConfig,
   patchAppConfig,
   patchControledMihomoConfig,
-} from '../config'
-import { uploadRuntimeConfig } from '../resolve/gistApi'
-import { startMonitor } from '../resolve/trafficMonitor'
-import { setSysDns } from '../service/api'
-import { disableSysProxy, triggerSysProxy } from '../sys/sysproxy'
+} from '~/config'
+import { mainWindow } from '~/index'
+import { uploadRuntimeConfig } from '~/resolve/gistApi'
+import { startMonitor } from '~/resolve/trafficMonitor'
+import { setSysDns } from '~/service/api'
+import { disableSysProxy, triggerSysProxy } from '~/sys/sysproxy'
+
 import {
   dataDir,
   logPath,

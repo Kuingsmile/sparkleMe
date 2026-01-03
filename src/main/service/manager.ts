@@ -1,11 +1,11 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 
-import { getAppConfig, patchAppConfig } from '../config/app'
-import { servicePath } from '../utils/dirs'
-import { execWithElevation } from '../utils/elevation'
-import { getServiceAxios, initServiceAPI, ping, test } from './api'
-import { KeyManager } from './key'
+import { getAppConfig, patchAppConfig } from '~/config/app'
+import { getServiceAxios, initServiceAPI, ping, test } from '~/service/api'
+import { KeyManager } from '~/service/key'
+import { servicePath } from '~/utils/dirs'
+import { execWithElevation } from '~/utils/elevation'
 
 let keyManager: KeyManager | null = null
 

@@ -1,11 +1,11 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { copyFile, readFile, rename, unlink, writeFile } from 'node:fs/promises'
 
-import { appConfigPath } from '../utils/dirs'
-import { decryptString, encryptString, isEncrypted } from '../utils/encrypt'
-import { deepMerge } from '../utils/merge'
-import { defaultConfig } from '../utils/template'
-import { parseYaml, stringifyYaml } from '../utils/yaml'
+import { appConfigPath } from '~/utils/dirs'
+import { decryptString, encryptString, isEncrypted } from '~/utils/encrypt'
+import { deepMerge } from '~/utils/merge'
+import { defaultConfig } from '~/utils/template'
+import { parseYaml, stringifyYaml } from '~/utils/yaml'
 
 let appConfig: AppConfig
 let writePromise: Promise<void> = Promise.resolve()

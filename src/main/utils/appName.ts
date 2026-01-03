@@ -4,7 +4,7 @@ import path from 'node:path'
 
 import plist from 'plist'
 
-import { findBestAppPath, isIOSApp } from './icon'
+import { findBestAppPath, isIOSApp } from '~/utils/icon'
 
 export async function getAppName(appPath: string): Promise<string> {
   if (process.platform === 'darwin') {

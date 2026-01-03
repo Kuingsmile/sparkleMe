@@ -1,7 +1,7 @@
 import AdmZip from 'adm-zip'
 import dayjs from 'dayjs'
 
-import { getAppConfig } from '../config'
+import { getAppConfig } from '~/config'
 import {
   appConfigPath,
   controledMihomoConfigPath,
@@ -12,7 +12,7 @@ import {
   profilesDir,
   subStoreDir,
   themesDir,
-} from '../utils/dirs'
+} from '~/utils/dirs'
 
 export async function webdavBackup(): Promise<boolean> {
   const { createClient } = await import('webdav/dist/node/index.js')

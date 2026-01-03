@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-import { getAppConfig, getControledMihomoConfig } from '../config'
-import { getRuntimeConfigStr } from '../core/factory'
+import { getAppConfig, getControledMihomoConfig } from '~/config'
+import { getRuntimeConfigStr } from '~/core/factory'
 
 interface GistInfo {
   id: string

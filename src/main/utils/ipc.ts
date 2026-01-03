@@ -3,7 +3,6 @@ import v8 from 'node:v8'
 
 import { app, dialog, ipcMain } from 'electron'
 
-import { closeMainWindow, mainWindow, setNotQuitDialog, showMainWindow, triggerMainWindow } from '..'
 import {
   addOverrideItem,
   addProfileItem,
@@ -29,14 +28,14 @@ import {
   setProfileStr,
   updateOverrideItem,
   updateProfileItem,
-} from '../config'
+} from '~/config'
 import {
   getCurrentProfileStr,
   getOverrideProfileStr,
   getRawProfileStr,
   getRuntimeConfig,
   getRuntimeConfigStr,
-} from '../core/factory'
+} from '~/core/factory'
 import {
   checkCorePermission,
   manualGrantCorePermition,
@@ -45,7 +44,7 @@ import {
   revokeCorePermission,
   startNetworkDetection,
   stopNetworkDetection,
-} from '../core/manager'
+} from '~/core/manager'
 import {
   mihomoChangeProxy,
   mihomoCloseAllConnections,
@@ -67,12 +66,13 @@ import {
   mihomoVersion,
   patchMihomoConfig,
   restartMihomoConnections,
-} from '../core/mihomoApi'
-import { subStoreCollections, subStoreSubs } from '../core/subStoreApi'
-import { cancelUpdate, checkUpdate, downloadAndInstallUpdate } from '../resolve/autoUpdater'
-import { listWebdavBackups, webdavBackup, webdavDelete, webdavRestore } from '../resolve/backup'
-import { closeFloatingWindow, showContextMenu, showFloatingWindow } from '../resolve/floatingWindow'
-import { getGistUrl } from '../resolve/gistApi'
+} from '~/core/mihomoApi'
+import { subStoreCollections, subStoreSubs } from '~/core/subStoreApi'
+import { closeMainWindow, mainWindow, setNotQuitDialog, showMainWindow, triggerMainWindow } from '~/index'
+import { cancelUpdate, checkUpdate, downloadAndInstallUpdate } from '~/resolve/autoUpdater'
+import { listWebdavBackups, webdavBackup, webdavDelete, webdavRestore } from '~/resolve/backup'
+import { closeFloatingWindow, showContextMenu, showFloatingWindow } from '~/resolve/floatingWindow'
+import { getGistUrl } from '~/resolve/gistApi'
 import {
   downloadSubStore,
   startSubStoreBackendServer,
@@ -81,11 +81,11 @@ import {
   stopSubStoreFrontendServer,
   subStoreFrontendPort,
   subStorePort,
-} from '../resolve/server'
-import { registerShortcut } from '../resolve/shortcut'
-import { applyTheme, fetchThemes, importThemes, readTheme, resolveThemes, writeTheme } from '../resolve/theme'
-import { startMonitor } from '../resolve/trafficMonitor'
-import { closeTrayIcon, copyEnv, setDockVisible, showTrayIcon } from '../resolve/tray'
+} from '~/resolve/server'
+import { registerShortcut } from '~/resolve/shortcut'
+import { applyTheme, fetchThemes, importThemes, readTheme, resolveThemes, writeTheme } from '~/resolve/theme'
+import { startMonitor } from '~/resolve/trafficMonitor'
+import { closeTrayIcon, copyEnv, setDockVisible, showTrayIcon } from '~/resolve/tray'
 import {
   initService,
   installService,
@@ -95,9 +95,9 @@ import {
   stopService,
   testServiceConnection,
   uninstallService,
-} from '../service/manager'
-import { checkAutoRun, disableAutoRun, enableAutoRun } from '../sys/autoRun'
-import { getInterfaces } from '../sys/interface'
+} from '~/service/manager'
+import { checkAutoRun, disableAutoRun, enableAutoRun } from '~/sys/autoRun'
+import { getInterfaces } from '~/sys/interface'
 import {
   checkElevateTask,
   deleteElevateTask,
@@ -108,13 +108,13 @@ import {
   resetAppConfig,
   setNativeTheme,
   setupFirewall,
-} from '../sys/misc'
-import { triggerSysProxy } from '../sys/sysproxy'
-import { findSystemMihomo } from '../utils/dirs'
-import { getAppName } from './appName'
-import { logDir } from './dirs'
-import { getIconDataURL, getImageDataURL } from './icon'
-import { getUserAgent } from './userAgent'
+} from '~/sys/misc'
+import { triggerSysProxy } from '~/sys/sysproxy'
+import { getAppName } from '~/utils/appName'
+import { findSystemMihomo } from '~/utils/dirs'
+import { logDir } from '~/utils/dirs'
+import { getIconDataURL, getImageDataURL } from '~/utils/icon'
+import { getUserAgent } from '~/utils/userAgent'
 
 function ipcErrorWrapper<T>(
   fn: (...args: any[]) => Promise<T>,

@@ -8,21 +8,20 @@ import { promisify } from 'node:util'
 import axios, { AxiosRequestConfig, CancelTokenSource } from 'axios'
 import { app, shell } from 'electron'
 
-import { mainWindow, setNotQuitDialog } from '..'
-import { getAppConfig, getControledMihomoConfig } from '../config'
-import { disableSysProxy } from '../sys/sysproxy'
-import { dataDir, exeDir, exePath, isPortable, resourcesFilesDir } from '../utils/dirs'
-import { parseYaml } from '../utils/yaml'
+import { getAppConfig, getControledMihomoConfig } from '~/config'
+import { mainWindow, setNotQuitDialog } from '~/index'
+import { disableSysProxy } from '~/sys/sysproxy'
+import { dataDir, exeDir, exePath, isPortable, resourcesFilesDir } from '~/utils/dirs'
+import { parseYaml } from '~/utils/yaml'
 
 let downloadCancelToken: CancelTokenSource | null = null
 
 export async function checkUpdate(): Promise<AppVersion | undefined> {
   const { 'mixed-port': mixedPort = 7890 } = await getControledMihomoConfig()
   const { updateChannel = 'stable' } = await getAppConfig()
-  let url = 'https://github.com/Kuingsmile/sparkleMe/releases/latest/download/latest.yml'
-  if (updateChannel === 'beta') {
-    url = 'https://github.com/Kuingsmile/sparkleMe/releases/download/pre-release/latest.yml'
-  }
+  const url = `https://github.com/Kuingsmile/sparkleMe/releases/${
+    updateChannel === 'beta' ? 'download/pre-release/latest.yml' : 'latest/download/latest.yml'
+  }`
   const res = await axios.get(url, {
     headers: { 'Content-Type': 'application/octet-stream' },
     ...(mixedPort !== 0 && {
@@ -38,8 +37,6 @@ export async function checkUpdate(): Promise<AppVersion | undefined> {
   const currentVersion = app.getVersion()
   if (latest.version !== currentVersion) {
     return latest
-  } else {
-    return undefined
   }
 }
 

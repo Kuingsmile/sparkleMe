@@ -1,13 +1,13 @@
 import axios, { AxiosInstance } from 'axios'
 import WebSocket from 'ws'
 
-import { mainWindow } from '..'
-import { getAppConfig, getControledMihomoConfig } from '../config'
-import { floatingWindow } from '../resolve/floatingWindow'
-import { tray } from '../resolve/tray'
-import { calcTraffic } from '../utils/calc'
-import { mihomoIpcPath } from '../utils/dirs'
-import { getRuntimeConfig } from './factory'
+import { getAppConfig, getControledMihomoConfig } from '~/config'
+import { getRuntimeConfig } from '~/core/factory'
+import { mainWindow } from '~/index'
+import { floatingWindow } from '~/resolve/floatingWindow'
+import { tray } from '~/resolve/tray'
+import { calcTraffic } from '~/utils/calc'
+import { mihomoIpcPath } from '~/utils/dirs'
 
 let axiosIns: AxiosInstance = null!
 let mihomoTrafficWs: WebSocket | null = null

@@ -8,8 +8,8 @@ import axios from 'axios'
 import { app } from 'electron'
 import { getIcon } from 'file-icon-info'
 
-import { getControledMihomoConfig } from '../config'
-import { darwinDefaultIcon, otherDevicesIcon, windowsDefaultIcon } from './defaultIcon'
+import { getControledMihomoConfig } from '~/config'
+import { darwinDefaultIcon, otherDevicesIcon, windowsDefaultIcon } from '~/utils/defaultIcon'
 
 export function isIOSApp(appPath: string): boolean {
   const appDir = appPath.endsWith('.app')

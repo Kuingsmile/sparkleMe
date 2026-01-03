@@ -9,16 +9,16 @@ import { URL } from 'node:url'
 
 import axios, { AxiosResponse } from 'axios'
 
-import { restartCore } from '../core/manager'
-import { addProfileUpdater, delProfileUpdater } from '../core/profileUpdater'
-import { subStorePort } from '../resolve/server'
-import { mihomoProfileWorkDir, mihomoWorkDir, profileConfigPath, profilePath } from '../utils/dirs'
-import { deepMerge } from '../utils/merge'
-import { defaultProfile } from '../utils/template'
-import { getUserAgent } from '../utils/userAgent'
-import { parseYaml, stringifyYaml } from '../utils/yaml'
-import { getAppConfig } from './app'
-import { getControledMihomoConfig } from './controledMihomo'
+import { getAppConfig } from '~/config/app'
+import { getControledMihomoConfig } from '~/config/controledMihomo'
+import { restartCore } from '~/core/manager'
+import { addProfileUpdater, delProfileUpdater } from '~/core/profileUpdater'
+import { subStorePort } from '~/resolve/server'
+import { mihomoProfileWorkDir, mihomoWorkDir, profileConfigPath, profilePath } from '~/utils/dirs'
+import { deepMerge } from '~/utils/merge'
+import { defaultProfile } from '~/utils/template'
+import { getUserAgent } from '~/utils/userAgent'
+import { parseYaml, stringifyYaml } from '~/utils/yaml'
 
 let profileConfig: ProfileConfig // profile.yaml
 

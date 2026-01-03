@@ -5,9 +5,9 @@ import { is } from '@electron-toolkit/utils'
 import { BrowserWindow, ipcMain } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 
-import { getAppConfig, patchAppConfig } from '../config'
-import { applyTheme } from './theme'
-import { buildContextMenu, showTrayIcon } from './tray'
+import { getAppConfig, patchAppConfig } from '~/config'
+import { applyTheme } from '~/resolve/theme'
+import { buildContextMenu, showTrayIcon } from '~/resolve/tray'
 
 export let floatingWindow: BrowserWindow | null = null
 let triggerTimeoutRef: NodeJS.Timeout | null = null

@@ -1,11 +1,11 @@
 import { readFile, writeFile } from 'node:fs/promises'
 
-import { generateProfile } from '../core/factory'
-import { controledMihomoConfigPath } from '../utils/dirs'
-import { deepMerge } from '../utils/merge'
-import { defaultControledMihomoConfig } from '../utils/template'
-import { parseYaml, stringifyYaml } from '../utils/yaml'
-import { getAppConfig } from './app'
+import { getAppConfig } from '~/config/app'
+import { generateProfile } from '~/core/factory'
+import { controledMihomoConfigPath } from '~/utils/dirs'
+import { deepMerge } from '~/utils/merge'
+import { defaultControledMihomoConfig } from '~/utils/template'
+import { parseYaml, stringifyYaml } from '~/utils/yaml'
 
 let controledMihomoConfig: Partial<MihomoConfig> // mihomo.yaml
 

@@ -1,11 +1,11 @@
 import { app, globalShortcut, ipcMain, Notification } from 'electron'
 
-import { mainWindow, setNotQuitDialog, triggerMainWindow } from '..'
-import { getAppConfig, getControledMihomoConfig, patchAppConfig, patchControledMihomoConfig } from '../config'
-import { quitWithoutCore, restartCore } from '../core/manager'
-import { patchMihomoConfig } from '../core/mihomoApi'
-import { triggerSysProxy } from '../sys/sysproxy'
-import { floatingWindow, triggerFloatingWindow } from './floatingWindow'
+import { getAppConfig, getControledMihomoConfig, patchAppConfig, patchControledMihomoConfig } from '~/config'
+import { quitWithoutCore, restartCore } from '~/core/manager'
+import { patchMihomoConfig } from '~/core/mihomoApi'
+import { mainWindow, setNotQuitDialog, triggerMainWindow } from '~/index'
+import { floatingWindow, triggerFloatingWindow } from '~/resolve/floatingWindow'
+import { triggerSysProxy } from '~/sys/sysproxy'
 
 export async function registerShortcut(oldShortcut: string, newShortcut: string, action: string): Promise<boolean> {
   if (oldShortcut !== '') {

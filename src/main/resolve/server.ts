@@ -10,9 +10,10 @@ import axios from 'axios'
 import { nativeImage } from 'electron'
 import express from 'express'
 
+import { getAppConfig, getControledMihomoConfig } from '~/config'
+import { mihomoWorkDir, subStoreDir, substoreLogPath } from '~/utils/dirs'
+
 import subStoreIcon from '../../../resources/subStoreIcon.png?asset'
-import { getAppConfig, getControledMihomoConfig } from '../config'
-import { mihomoWorkDir, subStoreDir, substoreLogPath } from '../utils/dirs'
 
 export let pacPort: number
 export let subStorePort: number

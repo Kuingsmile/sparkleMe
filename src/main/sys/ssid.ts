@@ -3,10 +3,10 @@ import { promisify } from 'node:util'
 
 import { ipcMain, net } from 'electron'
 
-import { mainWindow } from '..'
-import { getAppConfig, patchControledMihomoConfig } from '../config'
-import { getDefaultDevice } from '../core/manager'
-import { patchMihomoConfig } from '../core/mihomoApi'
+import { getAppConfig, patchControledMihomoConfig } from '~/config'
+import { getDefaultDevice } from '~/core/manager'
+import { patchMihomoConfig } from '~/core/mihomoApi'
+import { mainWindow } from '~/index'
 
 export async function getCurrentSSID(): Promise<string | undefined> {
   if (process.platform === 'win32') {

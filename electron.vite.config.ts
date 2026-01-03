@@ -18,10 +18,26 @@ export default defineConfig({
     build: {
       externalizeDeps: true,
     },
+    resolve: {
+      alias: {
+        '@renderer/*': resolve('src/renderer/src'),
+        '~/*': resolve('src/main'),
+        'root/*': resolve('./'),
+        '#/*': resolve('src/shared'),
+      },
+    },
   },
   preload: {
     build: {
       externalizeDeps: true,
+    },
+    resolve: {
+      alias: {
+        '@renderer/*': resolve('src/renderer/src'),
+        '~/*': resolve('src/main'),
+        'root/*': resolve('./'),
+        '#/*': resolve('src/shared'),
+      },
     },
   },
   renderer: {
@@ -37,6 +53,9 @@ export default defineConfig({
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
+        '~': resolve('src/main'),
+        root: resolve('./'),
+        '#': resolve('src/shared'),
       },
     },
     plugins: [

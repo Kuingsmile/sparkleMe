@@ -4,8 +4,8 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { promisify } from 'node:util'
 
-import { exePath, homeDir, taskDir } from '../utils/dirs'
-import { execWithElevation } from '../utils/elevation'
+import { exePath, homeDir, taskDir } from '~/utils/dirs'
+import { execWithElevation } from '~/utils/elevation'
 
 const appName = 'sparkleme'
 
