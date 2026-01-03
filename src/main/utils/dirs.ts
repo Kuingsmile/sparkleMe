@@ -11,6 +11,10 @@ import { checkCorePermissionSync } from '../core/manager'
 
 export const homeDir = app.getPath('home')
 const dirname = path.dirname(fileURLToPath(import.meta.url))
+const isWin = process.platform === 'win32'
+const isLinux = process.platform === 'linux'
+const isMac = process.platform === 'darwin'
+
 export function isPortable(): boolean {
   return existsSync(path.join(exeDir(), 'PORTABLE'))
 }
@@ -64,13 +68,9 @@ export function themesDir(): string {
 }
 
 export function mihomoIpcPath(): string {
-  if (process.platform === 'win32') {
-    return '\\\\.\\pipe\\SparkleMe\\mihomo'
-  }
+  if (isWin) return '\\\\.\\pipe\\SparkleMe\\mihomo'
   const { core = 'mihomo' } = getAppConfigSync()
-  if (core === 'system') {
-    return '/tmp/sparkleme-mihomo-external.sock'
-  }
+  if (core === 'system') return '/tmp/sparkleme-mihomo-external.sock'
   if (!checkCorePermissionSync(core as 'mihomo' | 'mihomo-alpha')) {
     return '/tmp/sparkleme-mihomo-api-noperm.sock'
   }
@@ -78,19 +78,14 @@ export function mihomoIpcPath(): string {
 }
 
 export function serviceIpcPath(): string {
-  if (process.platform === 'win32') {
-    return '\\\\.\\pipe\\sparkleme\\service'
-  }
+  if (isWin) return '\\\\.\\pipe\\sparkleme\\service'
   return '/tmp/sparkleme-service.sock'
 }
 
-export function mihomoCoreDir(): string {
-  return path.join(resourcesDir(), 'sidecar')
-}
+export const mihomoCoreDir = (): string => path.join(resourcesDir(), 'sidecar')
 
 export function mihomoCorePath(core: string): string {
   if (core === 'mihomo' || core === 'mihomo-alpha') {
-    const isWin = process.platform === 'win32'
     return path.join(mihomoCoreDir(), `${core}${isWin ? '.exe' : ''}`)
   }
   if (core === 'system') {
@@ -110,7 +105,6 @@ function systemCorePath(): string {
 }
 
 export function servicePath(): string {
-  const isWin = process.platform === 'win32'
   return path.join(resourcesFilesDir(), `sparkleme-service${isWin ? '.exe' : ''}`)
 }
 
@@ -184,7 +178,6 @@ export function substoreLogPath(): string {
 
 function hasCommand(command: string): boolean {
   try {
-    const isWin = process.platform === 'win32'
     const whichCmd = isWin ? 'where' : 'which'
     execSync(`${whichCmd} ${command}`, { encoding: 'utf8', stdio: 'pipe' })
     return true
@@ -194,9 +187,6 @@ function hasCommand(command: string): boolean {
 }
 
 export function findSystemMihomo(): string[] {
-  const isWin = process.platform === 'win32'
-  const isLinux = process.platform === 'linux'
-  const isMac = process.platform === 'darwin'
   const foundPaths: string[] = []
   const searchNames = ['mihomo', 'clash']
 
@@ -212,9 +202,7 @@ export function findSystemMihomo(): string[] {
           }
         }
       }
-    } catch (_error) {
-      // ignore
-    }
+    } catch (_error) {}
   }
 
   if (!isWin) {
@@ -238,9 +226,7 @@ export function findSystemMihomo(): string[] {
               }
             }
           }
-        } catch (_error) {
-          // ignore
-        }
+        } catch (_error) {}
       }
     }
   }
@@ -259,9 +245,7 @@ export function findSystemMihomo(): string[] {
               foundPaths.push(binPath)
             }
           }
-        } catch (_error) {
-          // ignore
-        }
+        } catch (_error) {}
       }
     }
   }

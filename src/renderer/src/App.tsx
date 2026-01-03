@@ -351,7 +351,7 @@ const App: React.FC = () => {
           >
             <div className={`flex justify-between p-2 ${!useWindowFrame && platform === 'darwin' ? 'ml-[60px]' : ''}`}>
               <div className='flex ml-1'>
-                <h3 className='text-lg font-bold leading-[32px]'>Sparkle</h3>
+                <h3 className='text-lg font-bold leading-[32px]'>SparkleMe</h3>
               </div>
               {latest && latest.version && <UpdaterButton latest={latest} />}
               <Button
