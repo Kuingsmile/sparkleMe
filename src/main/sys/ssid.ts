@@ -7,30 +7,19 @@ import { getAppConfig, patchControledMihomoConfig } from '~/config'
 import { getDefaultDevice } from '~/core/manager'
 import { patchMihomoConfig } from '~/core/mihomoApi'
 import { mainWindow } from '~/index'
+import { simpleTry } from '~/utils/common'
 
 export async function getCurrentSSID(): Promise<string | undefined> {
-  if (process.platform === 'win32') {
-    try {
-      return await getSSIDByNetsh()
-    } catch {
-      return undefined
-    }
+  const handlers: Record<string, (() => Promise<string | undefined>)[]> = {
+    win32: [getSSIDByNetsh],
+    linux: [getSSIDByIwconfig],
+    darwin: [getSSIDByAirport, getSSIDByNetworksetup],
   }
-  if (process.platform === 'linux') {
-    try {
-      return await getSSIDByIwconfig()
-    } catch {
-      return undefined
-    }
+
+  if (handlers[process.platform]) {
+    return await simpleTry(handlers[process.platform][0], handlers[process.platform][1])
   }
-  if (process.platform === 'darwin') {
-    try {
-      return await getSSIDByAirport()
-    } catch {
-      return await getSSIDByNetworksetup()
-    }
-  }
-  return undefined
+  return
 }
 
 let lastSSID: string | undefined

@@ -112,8 +112,6 @@ export function getAppConfigSync(): AppConfig {
     if (typeof data === 'object' && data !== null) {
       return decryptConfig(data)
     }
-    return defaultConfig
-  } catch (_e) {
-    return defaultConfig
-  }
+  } catch (_e) {}
+  return defaultConfig
 }

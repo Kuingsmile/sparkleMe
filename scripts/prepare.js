@@ -314,7 +314,7 @@ const resolveMonitor = async () => {
   await downloadFile(`https://github.com/Kuingsmile/TrafficMonitor-auto/releases/download/monitor/${arch}.zip`, tempZip)
   const zip = new AdmZip(tempZip)
   const resDir = path.join(cwd, 'extra', 'files')
-  const targetPath = path.join(resDir, 'TrafficMonitor')
+  const targetPath = path.join(resDir)
   if (fs.existsSync(targetPath)) {
     fs.rmSync(targetPath, { recursive: true })
   }
