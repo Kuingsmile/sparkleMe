@@ -23,8 +23,8 @@ export async function startMonitor(detached = false): Promise<void> {
   await stopMonitor()
   const { showTraffic = false } = await getAppConfig()
   if (!showTraffic) return
-  child = spawn(path.join(resourcesFilesDir(), 'TrafficMonitor/TrafficMonitor.exe'), [], {
-    cwd: path.join(resourcesFilesDir(), 'TrafficMonitor'),
+  child = spawn(path.join(resourcesFilesDir(), 'TrafficMonitor/TrafficMonitor/TrafficMonitor.exe'), [], {
+    cwd: path.join(resourcesFilesDir(), 'TrafficMonitor/TrafficMonitor'),
     detached,
     stdio: detached ? 'ignore' : undefined,
   })
