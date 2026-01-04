@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Button, Card, CardBody, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@heroui/react'
-import { openFile, restartCore } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import dayjs from 'dayjs'
 import React, { Key, useEffect, useMemo, useState } from 'react'
 import { IoMdMore, IoMdRefresh } from 'react-icons/io'
@@ -100,7 +100,7 @@ const OverrideItem: React.FC<Props> = props => {
         break
       }
       case 'open-file': {
-        openFile('override', info.id, info.ext)
+        ipc.openFile('override', info.id, info.ext)
         break
       }
       case 'exec-log': {
@@ -189,7 +189,7 @@ const OverrideItem: React.FC<Props> = props => {
                       setUpdating(true)
                       try {
                         await addOverrideItem(info)
-                        await restartCore()
+                        await ipc.restartCore()
                       } catch (e) {
                         alert(e)
                       } finally {

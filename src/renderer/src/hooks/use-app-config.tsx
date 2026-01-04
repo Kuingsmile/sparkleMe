@@ -1,4 +1,4 @@
-import { getAppConfig, patchAppConfig as patch } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { createContext, ReactNode, useContext } from 'react'
 import useSWR from 'swr'
 
@@ -11,11 +11,11 @@ interface AppConfigContextType {
 const AppConfigContext = createContext<AppConfigContextType | undefined>(undefined)
 
 export const AppConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { data: appConfig, mutate: mutateAppConfig } = useSWR('getConfig', () => getAppConfig())
+  const { data: appConfig, mutate: mutateAppConfig } = useSWR('getConfig', () => ipc.getAppConfig())
 
   const patchAppConfig = async (value: Partial<AppConfig>): Promise<void> => {
     try {
-      await patch(value)
+      await ipc.patchAppConfig(value)
     } catch (e) {
       alert(e)
     } finally {

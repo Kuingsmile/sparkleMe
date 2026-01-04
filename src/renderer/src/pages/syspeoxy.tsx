@@ -7,7 +7,7 @@ import ByPassEditorModal from '@renderer/components/sysproxy/bypass-editor-modal
 import PacEditorModal from '@renderer/components/sysproxy/pac-editor-modal'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
-import { openUWPTool, triggerSysProxy } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { Key, useEffect, useState } from 'react'
 import { IoIosHelpCircle } from 'react-icons/io'
 
@@ -86,7 +86,7 @@ const Sysproxy: React.FC = () => {
     setChanged(false)
     if (values.enable) {
       try {
-        await triggerSysProxy(values.enable, onlyActiveDevice)
+        await ipc.triggerSysProxy(values.enable, onlyActiveDevice)
       } catch (e) {
         alert(e)
         await patchAppConfig({ sysProxy: { enable: false } })
@@ -156,7 +156,7 @@ const Sysproxy: React.FC = () => {
             <Button
               size='sm'
               onPress={async () => {
-                await openUWPTool()
+                await ipc.openUWPTool()
               }}
             >
               打开 UWP 工具

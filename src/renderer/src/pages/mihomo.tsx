@@ -12,23 +12,7 @@ import ServiceModal from '@renderer/components/mihomo/service-modal'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import { platform } from '@renderer/utils/init'
-import {
-  checkElevateTask,
-  deleteElevateTask,
-  findSystemMihomo,
-  initService,
-  installService,
-  manualGrantCorePermition,
-  mihomoUpgrade,
-  notDialogQuit,
-  relaunchApp,
-  restartCore,
-  restartService,
-  revokeCorePermission,
-  startService,
-  stopService,
-  uninstallService,
-} from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import PubSub from 'pubsub-js'
 import React, { useEffect, useState } from 'react'
 import { IoMdCloudDownload } from 'react-icons/io'
@@ -40,7 +24,8 @@ const getSystemCorePaths = async (): Promise<string[]> => {
   if (systemCorePathsCache !== null) return systemCorePathsCache
   if (cachePromise !== null) return cachePromise
 
-  cachePromise = findSystemMihomo()
+  cachePromise = ipc
+    .findSystemMihomo()
     .then(paths => {
       systemCorePathsCache = paths
       cachePromise = null
@@ -82,13 +67,13 @@ const Mihomo: React.FC = () => {
 
   const onChangeNeedRestart = async (patch: Partial<MihomoConfig>): Promise<void> => {
     await patchControledMihomoConfig(patch)
-    await restartCore()
+    await ipc.restartCore()
   }
 
   const handleConfigChangeWithRestart = async (key: string, value: unknown): Promise<void> => {
     try {
       await patchAppConfig({ [key]: value })
-      await restartCore()
+      await ipc.restartCore()
       PubSub.publish('mihomo-core-changed')
     } catch (e) {
       alert(e)
@@ -98,7 +83,7 @@ const Mihomo: React.FC = () => {
   const handleCoreUpgrade = async (): Promise<void> => {
     try {
       setUpgrading(true)
-      await mihomoUpgrade()
+      await ipc.mihomoUpgrade()
       setTimeout(() => PubSub.publish('mihomo-core-changed'), 2000)
     } catch (e) {
       if (typeof e === 'string' && e.includes('already using latest version')) {
@@ -132,7 +117,7 @@ const Mihomo: React.FC = () => {
   const handlePermissionModeChange = async (key: string): Promise<void> => {
     if (platform === 'win32') {
       if (key !== 'elevated') {
-        if (await checkElevateTask()) {
+        if (await ipc.checkElevateTask()) {
           setPendingPermissionMode(key)
           setShowUnGrantConfirm(true)
         } else {
@@ -161,17 +146,17 @@ const Mihomo: React.FC = () => {
       onPress: async () => {
         try {
           if (platform === 'win32') {
-            await deleteElevateTask()
+            await ipc.deleteElevateTask()
             new Notification('任务计划已取消注册')
           } else {
-            await revokeCorePermission()
+            await ipc.revokeCorePermission()
             new Notification('内核权限已撤销')
           }
           await patchAppConfig({
             corePermissionMode: pendingPermissionMode as 'elevated' | 'service',
           })
 
-          await restartCore()
+          await ipc.restartCore()
         } catch (e) {
           alert(e)
         }
@@ -185,12 +170,12 @@ const Mihomo: React.FC = () => {
             color: 'danger' as const,
             onPress: async () => {
               try {
-                await deleteElevateTask()
+                await ipc.deleteElevateTask()
                 new Notification('任务计划已取消注册')
                 await patchAppConfig({
                   corePermissionMode: pendingPermissionMode as 'elevated' | 'service',
                 })
-                await relaunchApp()
+                await ipc.relaunchApp()
               } catch (e) {
                 alert(e)
               }
@@ -211,7 +196,7 @@ const Mihomo: React.FC = () => {
             await patchAppConfig({
               corePermissionMode: pendingPermissionMode as 'elevated' | 'service',
             })
-            await notDialogQuit()
+            await ipc.notDialogQuit()
           }}
         />
       )}
@@ -228,18 +213,18 @@ const Mihomo: React.FC = () => {
           onChange={setShowPermissionModal}
           onRevoke={async () => {
             if (platform === 'win32') {
-              await deleteElevateTask()
+              await ipc.deleteElevateTask()
               new Notification('任务计划已取消注册')
             } else {
-              await revokeCorePermission()
+              await ipc.revokeCorePermission()
               new Notification('内核权限已撤销')
             }
-            await restartCore()
+            await ipc.restartCore()
           }}
           onGrant={async () => {
-            await manualGrantCorePermition()
+            await ipc.manualGrantCorePermition()
             new Notification('内核授权成功')
-            await restartCore()
+            await ipc.restartCore()
           }}
         />
       )}
@@ -247,27 +232,27 @@ const Mihomo: React.FC = () => {
         <ServiceModal
           onChange={setShowServiceModal}
           onInit={async () => {
-            await initService()
+            await ipc.initService()
             new Notification('服务初始化成功')
           }}
           onInstall={async () => {
-            await installService()
+            await ipc.installService()
             new Notification('服务安装成功')
           }}
           onUninstall={async () => {
-            await uninstallService()
+            await ipc.uninstallService()
             new Notification('服务卸载成功')
           }}
           onStart={async () => {
-            await startService()
+            await ipc.startService()
             new Notification('服务启动成功')
           }}
           onRestart={async () => {
-            await restartService()
+            await ipc.restartService()
             new Notification('服务重启成功')
           }}
           onStop={async () => {
-            await stopService()
+            await ipc.stopService()
             new Notification('服务停止成功')
           }}
         />

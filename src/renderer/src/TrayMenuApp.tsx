@@ -1,11 +1,10 @@
 import { Accordion, AccordionItem, Button, Chip, ScrollShadow } from '@heroui/react'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { useGroups } from '@renderer/hooks/use-groups'
+import { calcTraffic } from '@renderer/utils/calc'
+import { ipc } from '@renderer/utils/ipc'
 import { useEffect, useMemo, useState } from 'react'
 import { IoCheckmarkCircle, IoClose, IoRefresh } from 'react-icons/io5'
-
-import { useAppConfig } from './hooks/use-app-config'
-import { useGroups } from './hooks/use-groups'
-import { calcTraffic } from './utils/calc'
-import { mihomoChangeProxy, mihomoCloseAllConnections, mihomoGroupDelay } from './utils/ipc'
 
 interface TrafficData {
   up: number
@@ -40,7 +39,7 @@ const TrayMenuApp: React.FC = () => {
   const handleTestDelay = async (groupName: string, testUrl?: string): Promise<void> => {
     setTestingGroup(groupName)
     try {
-      await mihomoGroupDelay(groupName, testUrl)
+      await ipc.mihomoGroupDelay(groupName, testUrl)
       mutate()
     } catch (_e) {
       // ignore
@@ -51,9 +50,9 @@ const TrayMenuApp: React.FC = () => {
 
   const handleSelectProxy = async (groupName: string, proxyName: string): Promise<void> => {
     try {
-      await mihomoChangeProxy(groupName, proxyName)
+      await ipc.mihomoChangeProxy(groupName, proxyName)
       if (autoCloseConnection) {
-        await mihomoCloseAllConnections()
+        await ipc.mihomoCloseAllConnections()
       }
       mutate()
     } catch (_e) {

@@ -3,12 +3,7 @@ import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import debounce from '@renderer/utils/debounce'
-import {
-  startSubStoreBackendServer,
-  startSubStoreFrontendServer,
-  stopSubStoreBackendServer,
-  stopSubStoreFrontendServer,
-} from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import { isValidCron } from 'cron-validator'
 import React, { useEffect, useState } from 'react'
 
@@ -61,11 +56,11 @@ const SubStoreConfig: React.FC = () => {
             try {
               await patchAppConfig({ useSubStore: v })
               if (v) {
-                await startSubStoreFrontendServer()
-                await startSubStoreBackendServer()
+                await ipc.startSubStoreFrontendServer()
+                await ipc.startSubStoreBackendServer()
               } else {
-                await stopSubStoreFrontendServer()
-                await stopSubStoreBackendServer()
+                await ipc.stopSubStoreFrontendServer()
+                await ipc.stopSubStoreBackendServer()
               }
             } catch (e) {
               alert(e)
@@ -86,8 +81,8 @@ const SubStoreConfig: React.FC = () => {
                   } else {
                     await patchAppConfig({ subStoreHost: '127.0.0.1' })
                   }
-                  await startSubStoreFrontendServer()
-                  await startSubStoreBackendServer()
+                  await ipc.startSubStoreFrontendServer()
+                  await ipc.startSubStoreBackendServer()
                 } catch (e) {
                   alert(e)
                 }
@@ -102,9 +97,9 @@ const SubStoreConfig: React.FC = () => {
                 try {
                   await patchAppConfig({ useCustomSubStore: v })
                   if (v) {
-                    await stopSubStoreBackendServer()
+                    await ipc.stopSubStoreBackendServer()
                   } else {
-                    await startSubStoreBackendServer()
+                    await ipc.startSubStoreBackendServer()
                   }
                 } catch (e) {
                   alert(e)
@@ -134,7 +129,7 @@ const SubStoreConfig: React.FC = () => {
                   onValueChange={async v => {
                     try {
                       await patchAppConfig({ useProxyInSubStore: v })
-                      await startSubStoreBackendServer()
+                      await ipc.startSubStoreBackendServer()
                     } catch (e) {
                       alert(e)
                     }

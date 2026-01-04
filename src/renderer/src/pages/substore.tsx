@@ -1,15 +1,7 @@
 import { Button } from '@heroui/react'
 import BasePage from '@renderer/components/base/base-page'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import {
-  downloadSubStore,
-  startSubStoreBackendServer,
-  startSubStoreFrontendServer,
-  stopSubStoreBackendServer,
-  stopSubStoreFrontendServer,
-  subStoreFrontendPort,
-  subStorePort,
-} from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 import { HiExternalLink } from 'react-icons/hi'
 import { IoMdCloudDownload } from 'react-icons/io'
@@ -21,8 +13,8 @@ const SubStore: React.FC = () => {
   const [frontendPort, setFrontendPort] = useState<number | undefined>()
   const [isUpdating, setIsUpdating] = useState(false)
   const getPort = async (): Promise<void> => {
-    setBackendPort(await subStorePort())
-    setFrontendPort(await subStoreFrontendPort())
+    setBackendPort(await ipc.subStorePort())
+    setFrontendPort(await ipc.subStoreFrontendPort())
   }
   useEffect(() => {
     getPort()
@@ -47,13 +39,13 @@ const SubStore: React.FC = () => {
                 try {
                   new Notification('Sub-Store 更新中...')
                   setIsUpdating(true)
-                  await downloadSubStore()
-                  await stopSubStoreBackendServer()
-                  await startSubStoreBackendServer()
+                  await ipc.downloadSubStore()
+                  await ipc.stopSubStoreBackendServer()
+                  await ipc.startSubStoreBackendServer()
                   await new Promise(resolve => setTimeout(resolve, 1000))
                   setFrontendPort(0)
-                  await stopSubStoreFrontendServer()
-                  await startSubStoreFrontendServer()
+                  await ipc.stopSubStoreFrontendServer()
+                  await ipc.startSubStoreFrontendServer()
                   await getPort()
                   new Notification('Sub-Store 更新完成')
                 } catch (e) {

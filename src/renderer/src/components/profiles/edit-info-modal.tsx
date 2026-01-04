@@ -16,7 +16,7 @@ import {
 } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useOverrideConfig } from '@renderer/hooks/use-override-config'
-import { restartCore } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 import { FaPlus } from 'react-icons/fa6'
 import { IoIosHelpCircle } from 'react-icons/io'
@@ -50,7 +50,7 @@ const EditInfoModal: React.FC<Props> = props => {
 
       await updateProfileItem(itemToSave)
       if (item.id && isCurrent) {
-        await restartCore()
+        await ipc.restartCore()
       }
       onClose()
     } catch (e) {

@@ -1,6 +1,6 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { getProfileStr, setProfileStr } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -34,7 +34,7 @@ const EditFileModal: React.FC<Props> = props => {
   }
 
   const getContent = async (): Promise<void> => {
-    const data = await getProfileStr(id)
+    const data = await ipc.getProfileStr(id)
     setCurrData(data)
     setOriginalData(data)
   }
@@ -116,7 +116,7 @@ const EditFileModal: React.FC<Props> = props => {
               size='sm'
               color='primary'
               onPress={async () => {
-                await setProfileStr(id, currData)
+                await ipc.setProfileStr(id, currData)
                 onClose()
               }}
             >

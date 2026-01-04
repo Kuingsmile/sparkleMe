@@ -1,4 +1,4 @@
-import { getControledMihomoConfig, patchControledMihomoConfig as patch } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { createContext, ReactNode, useContext } from 'react'
 import useSWR from 'swr'
 
@@ -12,12 +12,12 @@ const ControledMihomoConfigContext = createContext<ControledMihomoConfigContextT
 
 export const ControledMihomoConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { data: controledMihomoConfig, mutate: mutateControledMihomoConfig } = useSWR('getControledMihomoConfig', () =>
-    getControledMihomoConfig(),
+    ipc.getControledMihomoConfig(),
   )
 
   const patchControledMihomoConfig = async (value: Partial<MihomoConfig>): Promise<void> => {
     try {
-      await patch(value)
+      await ipc.patchControledMihomoConfig(value)
     } catch (e) {
       alert(e)
     } finally {

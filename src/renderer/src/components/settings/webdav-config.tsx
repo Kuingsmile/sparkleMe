@@ -1,7 +1,7 @@
 import { Button, Input } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import debounce from '@renderer/utils/debounce'
-import { listWebdavBackups, webdavBackup } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 
 import SettingCard from '../base/base-setting-card'
@@ -23,7 +23,7 @@ const WebdavConfig: React.FC = () => {
   const handleBackup = async (): Promise<void> => {
     setBackuping(true)
     try {
-      await webdavBackup()
+      await ipc.webdavBackup()
       new window.Notification('备份成功', { body: '备份文件已上传至 WebDAV' })
     } catch (e) {
       alert(e)
@@ -35,7 +35,7 @@ const WebdavConfig: React.FC = () => {
   const handleRestore = async (): Promise<void> => {
     try {
       setRestoring(true)
-      const filenames = await listWebdavBackups()
+      const filenames = await ipc.listWebdavBackups()
       setFilenames(filenames)
       setRestoreOpen(true)
     } catch (e) {

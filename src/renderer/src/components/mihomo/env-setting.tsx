@@ -1,7 +1,7 @@
 import { Button, Switch } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
-import { restartCore } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 
 import EditableList from '../base/base-list-editor'
@@ -14,7 +14,7 @@ const EnvSetting: React.FC = () => {
   const handleConfigChangeWithRestart = async (key: string, value: unknown): Promise<void> => {
     try {
       await patchAppConfig({ [key]: value })
-      await restartCore()
+      await ipc.restartCore()
     } catch (e) {
       alert(e)
     } finally {

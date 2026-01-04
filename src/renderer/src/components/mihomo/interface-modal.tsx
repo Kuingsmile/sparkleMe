@@ -1,6 +1,6 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Snippet } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { getInterfaces } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 
 interface Props {
@@ -12,7 +12,7 @@ const InterfaceModal: React.FC<Props> = props => {
   const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [info, setInfo] = useState<Record<string, NetworkInterfaceInfo[]>>({})
   const getInfo = async (): Promise<void> => {
-    setInfo(await getInterfaces())
+    setInfo(await ipc.getInterfaces())
   }
 
   useEffect(() => {

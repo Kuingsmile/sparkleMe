@@ -7,7 +7,7 @@ import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import { useGroups } from '@renderer/hooks/use-groups'
 import { includesIgnoreCase } from '@renderer/utils/includes'
-import { getImageDataURL, mihomoChangeProxy, mihomoCloseAllConnections, mihomoProxyDelay } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FaLocationCrosshairs } from 'react-icons/fa6'
 import { IoIosArrowBack } from 'react-icons/io'
@@ -65,9 +65,9 @@ const Proxies: React.FC = () => {
 
   const onChangeProxy = useCallback(
     async (group: string, proxy: string): Promise<void> => {
-      await mihomoChangeProxy(group, proxy)
+      await ipc.mihomoChangeProxy(group, proxy)
       if (autoCloseConnection) {
-        await mihomoCloseAllConnections(group)
+        await ipc.mihomoCloseAllConnections(group)
       }
       mutate()
     },
@@ -75,7 +75,7 @@ const Proxies: React.FC = () => {
   )
 
   const onProxyDelay = useCallback(async (proxy: string, url?: string): Promise<ControllerProxiesDelay> => {
-    return await mihomoProxyDelay(proxy, url)
+    return await ipc.mihomoProxyDelay(proxy, url)
   }, [])
 
   const onGroupDelay = useCallback(
@@ -97,7 +97,7 @@ const Proxies: React.FC = () => {
       for (const proxy of allProxies[index]) {
         const promise = Promise.resolve().then(async () => {
           try {
-            await mihomoProxyDelay(proxy.name, groups[index].testUrl)
+            await ipc.mihomoProxyDelay(proxy.name, groups[index].testUrl)
           } catch {
             // ignore
           } finally {
@@ -196,7 +196,7 @@ const Proxies: React.FC = () => {
         groups[index].icon.startsWith('http') &&
         !localStorage.getItem(groups[index].icon)
       ) {
-        getImageDataURL(groups[index].icon).then(dataURL => {
+        ipc.getImageDataURL(groups[index].icon).then(dataURL => {
           localStorage.setItem(groups[index].icon, dataURL)
           mutate()
         })

@@ -20,7 +20,7 @@ import UpdaterButton from '@renderer/components/updater/updater-button'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import routes from '@renderer/routes'
 import { platform } from '@renderer/utils/init'
-import { applyTheme, checkUpdate, setNativeTheme, setTitleBarOverlay } from '@renderer/utils/ipc'
+import { applyTheme, ipc } from '@renderer/utils/ipc'
 import { TitleBarOverlayOptions } from 'electron'
 import { useTheme } from 'next-themes'
 import { useEffect, useRef, useState } from 'react'
@@ -78,7 +78,7 @@ const App: React.FC = () => {
       try {
         options.color = window.getComputedStyle(document.documentElement).backgroundColor
         options.symbolColor = window.getComputedStyle(document.documentElement).color
-        setTitleBarOverlay(options)
+        ipc.setTitleBarOverlay(options)
       } catch {
         // ignore
       }
@@ -86,7 +86,7 @@ const App: React.FC = () => {
   }
   const { data: latest } = useSWR(
     autoCheckUpdate ? ['checkUpdate', updateChannel] : undefined,
-    autoCheckUpdate ? checkUpdate : (): undefined => {},
+    autoCheckUpdate ? ipc.checkUpdate : (): undefined => {},
     {
       refreshInterval: 1000 * 60 * 10,
     },
@@ -113,7 +113,7 @@ const App: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    setNativeTheme(appTheme)
+    ipc.setNativeTheme(appTheme)
     setTheme(appTheme)
     setTitlebar()
   }, [appTheme, systemTheme])

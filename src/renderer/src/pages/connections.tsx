@@ -9,8 +9,7 @@ import { calcTraffic } from '@renderer/utils/calc'
 import { cropAndPadTransparent } from '@renderer/utils/image'
 import { includesIgnoreCase } from '@renderer/utils/includes'
 import { platform } from '@renderer/utils/init'
-import { mihomoCloseAllConnections, mihomoCloseConnection } from '@renderer/utils/ipc'
-import { getAppName, getIconDataURL } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import dayjs from 'dayjs'
 import React, { Key, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CgClose, CgTrash } from 'react-icons/cg'
@@ -139,12 +138,12 @@ const Connections: React.FC = () => {
   }, [])
 
   const closeAllConnections = useCallback((): void => {
-    tab === 'active' ? mihomoCloseAllConnections() : trashAllClosedConnection()
+    tab === 'active' ? ipc.mihomoCloseAllConnections() : trashAllClosedConnection()
   }, [tab, trashAllClosedConnection])
 
   const closeConnection = useCallback(
     (id: string): void => {
-      tab === 'active' ? mihomoCloseConnection(id) : trashClosedConnection(id)
+      tab === 'active' ? ipc.mihomoCloseConnection(id) : trashClosedConnection(id)
     },
     [tab, trashClosedConnection],
   )
@@ -228,7 +227,7 @@ const Connections: React.FC = () => {
       processingAppNames.current.add(path)
 
       try {
-        const appName = await getAppName(path)
+        const appName = await ipc.getAppName(path)
         if (appName) {
           setAppNameCache(prev => ({ ...prev, [path]: appName }))
         }
@@ -257,7 +256,7 @@ const Connections: React.FC = () => {
       processingIcons.current.add(path)
 
       try {
-        const rawBase64 = await getIconDataURL(path)
+        const rawBase64 = await ipc.getIconDataURL(path)
         if (!rawBase64) return
 
         const fullDataURL = rawBase64.startsWith('data:') ? rawBase64 : `data:image/png;base64,${rawBase64}`

@@ -1,6 +1,6 @@
 import { Button, Code, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Progress } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { downloadAndInstallUpdate } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 import { FiDownload, FiX } from 'react-icons/fi'
 import ReactMarkdown from 'react-markdown'
@@ -24,7 +24,7 @@ const UpdaterModal: React.FC<Props> = props => {
   const onUpdate = async (): Promise<void> => {
     try {
       setDownloading(true)
-      await downloadAndInstallUpdate(version)
+      await ipc.downloadAndInstallUpdate(version)
     } catch (e) {
       alert(e)
       setDownloading(false)

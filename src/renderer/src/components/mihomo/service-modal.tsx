@@ -12,7 +12,7 @@ import {
   Spinner,
 } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { serviceStatus, testServiceConnection } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useCallback, useEffect, useState } from 'react'
 
 interface Props {
@@ -39,7 +39,7 @@ const ServiceModal: React.FC<Props> = props => {
     if (status === 'running') {
       try {
         setConnectionStatus('checking')
-        const connected = await testServiceConnection()
+        const connected = await ipc.testServiceConnection()
         setConnectionStatus(connected ? 'connected' : 'disconnected')
       } catch {
         setConnectionStatus('disconnected')
@@ -52,7 +52,7 @@ const ServiceModal: React.FC<Props> = props => {
   useEffect(() => {
     const checkStatus = async (): Promise<void> => {
       try {
-        const result = await serviceStatus()
+        const result = await ipc.serviceStatus()
         setStatus(result)
       } catch {
         setStatus('not-installed')
@@ -72,13 +72,13 @@ const ServiceModal: React.FC<Props> = props => {
 
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      let result = await serviceStatus()
+      let result = await ipc.serviceStatus()
 
       if (isStartAction) {
         let retries = 5
         while (retries > 0 && result === 'stopped') {
           await new Promise(resolve => setTimeout(resolve, 1000))
-          result = await serviceStatus()
+          result = await ipc.serviceStatus()
           retries--
         }
       }
@@ -88,7 +88,7 @@ const ServiceModal: React.FC<Props> = props => {
     } catch (e) {
       const errorMsg = String(e)
       if (errorMsg.includes('用户取消操作') || errorMsg.includes('UserCancelledError')) {
-        const result = await serviceStatus()
+        const result = await ipc.serviceStatus()
         setStatus(result)
         await checkServiceConnection()
         return

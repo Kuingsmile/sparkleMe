@@ -1,6 +1,6 @@
 import { Button, Input, Select, SelectItem, Switch, Tooltip } from '@heroui/react'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import { mihomoUpgradeUI, restartCore } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import { isValidListenAddress } from '@renderer/utils/validate'
 import React, { useState } from 'react'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
@@ -39,7 +39,7 @@ const ControllerSetting: React.FC = () => {
   const upgradeUI = async (): Promise<void> => {
     try {
       setUpgrading(true)
-      await mihomoUpgradeUI()
+      await ipc.mihomoUpgradeUI()
       new Notification('面板更新成功')
     } catch (e) {
       alert(e)
@@ -49,7 +49,7 @@ const ControllerSetting: React.FC = () => {
   }
   const onChangeNeedRestart = async (patch: Partial<MihomoConfig>): Promise<void> => {
     await patchControledMihomoConfig(patch)
-    await restartCore()
+    await ipc.restartCore()
     if ('external-ui-url' in patch) {
       setTimeout(async () => {
         await upgradeUI()

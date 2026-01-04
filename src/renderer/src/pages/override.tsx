@@ -5,7 +5,7 @@ import BasePage from '@renderer/components/base/base-page'
 import EditInfoModal from '@renderer/components/override/edit-info-modal'
 import OverrideItem from '@renderer/components/override/override-item'
 import { useOverrideConfig } from '@renderer/hooks/use-override-config'
-import { getFilePath, readTextFile } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import { useEffect, useRef, useState } from 'react'
 import { FaPlus } from 'react-icons/fa6'
 import { HiOutlineDocumentText } from 'react-icons/hi'
@@ -100,7 +100,7 @@ const Override: React.FC = () => {
         ) {
           try {
             const path = window.api.webUtils.getPathForFile(file)
-            const content = await readTextFile(path)
+            const content = await ipc.readTextFile(path)
             await addOverrideItem({
               name: file.name,
               type: 'local',
@@ -202,9 +202,9 @@ const Override: React.FC = () => {
               onAction={async key => {
                 if (key === 'open') {
                   try {
-                    const files = await getFilePath(['js', 'yaml'])
+                    const files = await ipc.getFilePath(['js', 'yaml'])
                     if (files?.length) {
-                      const content = await readTextFile(files[0])
+                      const content = await ipc.readTextFile(files[0])
                       const fileName = files[0].split('/').pop()?.split('\\').pop()
                       await addOverrideItem({
                         name: fileName,

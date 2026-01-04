@@ -1,5 +1,5 @@
 import { Button, Card, CardBody } from '@heroui/react'
-import { mihomoUnfixedProxy } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useMemo, useState } from 'react'
 import { FaMapPin } from 'react-icons/fa6'
 
@@ -78,7 +78,7 @@ const ProxyItem: React.FC<Props> = props => {
                     title='取消固定'
                     color='danger'
                     onPress={async () => {
-                      await mihomoUnfixedProxy(group.name)
+                      await ipc.mihomoUnfixedProxy(group.name)
                       mutateProxies()
                     }}
                     variant='light'
@@ -120,7 +120,7 @@ const ProxyItem: React.FC<Props> = props => {
                       title='取消固定'
                       color='danger'
                       onPress={async () => {
-                        await mihomoUnfixedProxy(group.name)
+                        await ipc.mihomoUnfixedProxy(group.name)
                         mutateProxies()
                       }}
                       variant='light'

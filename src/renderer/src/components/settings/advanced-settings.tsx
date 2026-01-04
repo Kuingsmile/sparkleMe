@@ -1,13 +1,7 @@
 import { Button, Input, Select, SelectItem, Switch, Tab, Tabs, Tooltip } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
-import {
-  copyEnv,
-  patchControledMihomoConfig,
-  restartCore,
-  startNetworkDetection,
-  stopNetworkDetection,
-} from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 import { BiCopy } from 'react-icons/bi'
 import { IoIosHelpCircle } from 'react-icons/io'
@@ -105,7 +99,7 @@ const AdvancedSettings: React.FC = () => {
       <SettingItem
         title='复制环境变量类型'
         actions={envType.map(type => (
-          <Button key={type} title={type} isIconOnly size='sm' variant='light' onPress={() => copyEnv(type)}>
+          <Button key={type} title={type} isIconOnly size='sm' variant='light' onPress={() => ipc.copyEnv(type)}>
             <BiCopy className='text-lg' />
           </Button>
         ))}
@@ -147,7 +141,7 @@ const AdvancedSettings: React.FC = () => {
                 await patchAppConfig({
                   mihomoCpuPriority: v.currentKey as Priority,
                 })
-                await restartCore()
+                await ipc.restartCore()
               } catch (e) {
                 alert(e)
               }
@@ -169,8 +163,8 @@ const AdvancedSettings: React.FC = () => {
           onValueChange={async v => {
             try {
               await patchAppConfig({ controlDns: v })
-              await patchControledMihomoConfig({})
-              await restartCore()
+              await ipc.patchControledMihomoConfig({})
+              await ipc.restartCore()
             } catch (e) {
               alert(e)
             }
@@ -184,8 +178,8 @@ const AdvancedSettings: React.FC = () => {
           onValueChange={async v => {
             try {
               await patchAppConfig({ controlSniff: v })
-              await patchControledMihomoConfig({})
-              await restartCore()
+              await ipc.patchControledMihomoConfig({})
+              await ipc.restartCore()
             } catch (e) {
               alert(e)
             }
@@ -209,9 +203,9 @@ const AdvancedSettings: React.FC = () => {
           onValueChange={v => {
             patchAppConfig({ networkDetection: v })
             if (v) {
-              startNetworkDetection()
+              ipc.startNetworkDetection()
             } else {
-              stopNetworkDetection()
+              ipc.stopNetworkDetection()
             }
           }}
         />
@@ -227,7 +221,7 @@ const AdvancedSettings: React.FC = () => {
                   className='mr-2'
                   onPress={async () => {
                     await patchAppConfig({ networkDetectionInterval: interval })
-                    await startNetworkDetection()
+                    await ipc.startNetworkDetection()
                   }}
                 >
                   确认
@@ -253,7 +247,7 @@ const AdvancedSettings: React.FC = () => {
                 color='primary'
                 onPress={async () => {
                   await patchAppConfig({ networkDetectionBypass: bypass })
-                  await startNetworkDetection()
+                  await ipc.startNetworkDetection()
                 }}
               >
                 确认

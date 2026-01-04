@@ -1,12 +1,6 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import {
-  getCurrentProfileStr,
-  getOverrideProfileStr,
-  getProfileConfig,
-  getRawProfileStr,
-  getRuntimeConfigStr,
-} from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useCallback, useEffect, useState } from 'react'
 import useSWR from 'swr'
 
@@ -26,13 +20,13 @@ const ConfigViewer: React.FC<Props> = ({ onClose }) => {
   const [isOverride, setIsOverride] = useState(false)
   const [sideBySide, setSideBySide] = useState(false)
 
-  const { data: config } = useSWR('getProfileConfig', getProfileConfig)
+  const { data: config } = useSWR('getProfileConfig', ipc.getProfileConfig)
 
   const fetchConfigs = useCallback(async () => {
-    setRuntimeConfig(await getRuntimeConfigStr())
-    setRawProfile(await getRawProfileStr())
-    setProfileConfig(await getCurrentProfileStr())
-    setOverrideConfig(await getOverrideProfileStr())
+    setRuntimeConfig(await ipc.getRuntimeConfigStr())
+    setRawProfile(await ipc.getRawProfileStr())
+    setProfileConfig(await ipc.getCurrentProfileStr())
+    setOverrideConfig(await ipc.getOverrideProfileStr())
   }, [config])
 
   useEffect(() => {

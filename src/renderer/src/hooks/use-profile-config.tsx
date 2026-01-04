@@ -1,11 +1,4 @@
-import {
-  addProfileItem as add,
-  changeCurrentProfile as change,
-  getProfileConfig,
-  removeProfileItem as remove,
-  setProfileConfig as set,
-  updateProfileItem as update,
-} from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { createContext, ReactNode, useContext, useEffect } from 'react'
 import useSWR from 'swr'
 
@@ -22,11 +15,11 @@ interface ProfileConfigContextType {
 const ProfileConfigContext = createContext<ProfileConfigContextType | undefined>(undefined)
 
 export const ProfileConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { data: profileConfig, mutate: mutateProfileConfig } = useSWR('getProfileConfig', () => getProfileConfig())
+  const { data: profileConfig, mutate: mutateProfileConfig } = useSWR('getProfileConfig', () => ipc.getProfileConfig())
 
   const setProfileConfig = async (config: ProfileConfig): Promise<void> => {
     try {
-      await set(config)
+      await ipc.setProfileConfig(config)
     } catch (e) {
       alert(e)
     } finally {
@@ -37,7 +30,7 @@ export const ProfileConfigProvider: React.FC<{ children: ReactNode }> = ({ child
 
   const addProfileItem = async (item: Partial<ProfileItem>): Promise<void> => {
     try {
-      await add(item)
+      await ipc.addProfileItem(item)
     } catch (e) {
       alert(e)
     } finally {
@@ -48,7 +41,7 @@ export const ProfileConfigProvider: React.FC<{ children: ReactNode }> = ({ child
 
   const removeProfileItem = async (id: string): Promise<void> => {
     try {
-      await remove(id)
+      await ipc.removeProfileItem(id)
     } catch (e) {
       alert(e)
     } finally {
@@ -59,7 +52,7 @@ export const ProfileConfigProvider: React.FC<{ children: ReactNode }> = ({ child
 
   const updateProfileItem = async (item: ProfileItem): Promise<void> => {
     try {
-      await update(item)
+      await ipc.updateProfileItem(item)
     } catch (e) {
       alert(e)
     } finally {
@@ -70,7 +63,7 @@ export const ProfileConfigProvider: React.FC<{ children: ReactNode }> = ({ child
 
   const changeCurrentProfile = async (id: string): Promise<void> => {
     try {
-      await change(id)
+      await ipc.changeCurrentProfile(id)
     } catch (e) {
       alert(e)
     } finally {

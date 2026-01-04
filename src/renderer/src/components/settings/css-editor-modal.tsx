@@ -1,7 +1,7 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { BaseEditor } from '@renderer/components/base/base-editor-lazy'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { readTheme } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 interface Props {
   theme: string
@@ -15,7 +15,7 @@ const CSSEditorModal: React.FC<Props> = props => {
 
   useEffect(() => {
     if (theme) {
-      readTheme(theme).then(css => {
+      ipc.readTheme(theme).then(css => {
         setCurrData(css)
       })
     }

@@ -1,6 +1,6 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { getOverride, restartCore, setOverride } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 
 import ConfirmModal from '../base/base-confirm'
@@ -32,7 +32,7 @@ const EditFileModal: React.FC<Props> = props => {
   }
 
   const getContent = async (): Promise<void> => {
-    const data = await getOverride(id, language === 'javascript' ? 'js' : 'yaml')
+    const data = await ipc.getOverride(id, language === 'javascript' ? 'js' : 'yaml')
     setCurrData(data)
     setOriginalData(data)
   }
@@ -94,8 +94,8 @@ const EditFileModal: React.FC<Props> = props => {
               color='primary'
               onPress={async () => {
                 try {
-                  await setOverride(id, language === 'javascript' ? 'js' : 'yaml', currData)
-                  await restartCore()
+                  await ipc.setOverride(id, language === 'javascript' ? 'js' : 'yaml', currData)
+                  await ipc.restartCore()
                   onClose()
                 } catch (e) {
                   alert(e)

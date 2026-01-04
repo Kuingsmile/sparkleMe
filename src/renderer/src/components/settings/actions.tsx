@@ -1,14 +1,7 @@
 import { Button, Tooltip } from '@heroui/react'
 import { startTour } from '@renderer/utils/driver'
 import { version } from '@renderer/utils/init'
-import {
-  cancelUpdate,
-  checkUpdate,
-  createHeapSnapshot,
-  quitApp,
-  quitWithoutCore,
-  resetAppConfig,
-} from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import { useEffect, useState } from 'react'
 import { IoIosHelpCircle } from 'react-icons/io'
 import { useNavigate } from 'react-router-dom'
@@ -48,7 +41,7 @@ const Actions: React.FC = () => {
 
   const handleCancelUpdate = async (): Promise<void> => {
     try {
-      await cancelUpdate()
+      await ipc.cancelUpdate()
       setUpdateStatus({ downloading: false, progress: 0 })
     } catch (_e) {
       // ignore
@@ -78,7 +71,7 @@ const Actions: React.FC = () => {
           }
           confirmText='确认删除'
           cancelText='取消'
-          onConfirm={resetAppConfig}
+          onConfirm={ipc.resetAppConfig}
         />
       )}
       <SettingCard>
@@ -94,7 +87,7 @@ const Actions: React.FC = () => {
             onPress={async () => {
               try {
                 setCheckingUpdate(true)
-                const version = await checkUpdate()
+                const version = await ipc.checkUpdate()
                 if (version) {
                   setNewVersion(version.version)
                   setChangelog(version.changelog)
@@ -153,7 +146,7 @@ const Actions: React.FC = () => {
           }
           divider
         >
-          <Button size='sm' onPress={createHeapSnapshot}>
+          <Button size='sm' onPress={ipc.createHeapSnapshot}>
             创建堆快照
           </Button>
         </SettingItem>
@@ -168,12 +161,12 @@ const Actions: React.FC = () => {
           }
           divider
         >
-          <Button size='sm' onPress={quitWithoutCore}>
+          <Button size='sm' onPress={ipc.quitWithoutCore}>
             退出
           </Button>
         </SettingItem>
         <SettingItem title='退出应用' divider>
-          <Button size='sm' onPress={quitApp}>
+          <Button size='sm' onPress={ipc.quitApp}>
             退出应用
           </Button>
         </SettingItem>

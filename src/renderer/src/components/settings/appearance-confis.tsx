@@ -1,21 +1,7 @@
 import { Button, Select, SelectItem, Switch, Tab, Tabs, Tooltip } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
-import {
-  applyTheme,
-  closeFloatingWindow,
-  closeTrayIcon,
-  fetchThemes,
-  getFilePath,
-  importThemes,
-  relaunchApp,
-  resolveThemes,
-  setDockVisible,
-  showFloatingWindow,
-  showTrayIcon,
-  startMonitor,
-  writeTheme,
-} from '@renderer/utils/ipc'
+import { applyTheme, ipc } from '@renderer/utils/ipc'
 import { useTheme } from 'next-themes'
 import React, { useEffect, useRef, useState } from 'react'
 import { BiSolidFileImport } from 'react-icons/bi'
@@ -47,7 +33,7 @@ const AppearanceConfig: React.FC = () => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    resolveThemes().then(themes => {
+    ipc.resolveThemes().then(themes => {
       setCustomThemes(themes)
     })
   }, [])
@@ -67,7 +53,7 @@ const AppearanceConfig: React.FC = () => {
           theme={customTheme}
           onCancel={() => setOpenCSSEditor(false)}
           onConfirm={async (css: string) => {
-            await writeTheme(customTheme, css)
+            await ipc.writeTheme(customTheme, css)
             await applyTheme(customTheme)
             setOpenCSSEditor(false)
           }}
@@ -96,7 +82,7 @@ const AppearanceConfig: React.FC = () => {
 
               setLocalShowFloating(v)
               if (v) {
-                await showFloatingWindow()
+                await ipc.showFloatingWindow()
                 timeoutRef.current = setTimeout(async () => {
                   if (localShowFloating) {
                     await patchAppConfig({ showFloatingWindow: v })
@@ -105,7 +91,7 @@ const AppearanceConfig: React.FC = () => {
                 }, 1000)
               } else {
                 patchAppConfig({ showFloatingWindow: v })
-                await closeFloatingWindow()
+                await ipc.closeFloatingWindow()
               }
             }}
           />
@@ -129,9 +115,9 @@ const AppearanceConfig: React.FC = () => {
                 onValueChange={async v => {
                   await patchAppConfig({ disableTray: v })
                   if (v) {
-                    closeTrayIcon()
+                    ipc.closeTrayIcon()
                   } else {
-                    showTrayIcon()
+                    ipc.showTrayIcon()
                   }
                 }}
               />
@@ -155,7 +141,7 @@ const AppearanceConfig: React.FC = () => {
                 isSelected={showTraffic}
                 onValueChange={async v => {
                   await patchAppConfig({ showTraffic: v })
-                  await startMonitor()
+                  await ipc.startMonitor()
                 }}
               />
             </SettingItem>
@@ -169,7 +155,7 @@ const AppearanceConfig: React.FC = () => {
                 isSelected={useDockIcon}
                 onValueChange={async v => {
                   await patchAppConfig({ useDockIcon: v })
-                  setDockVisible(v)
+                  ipc.setDockVisible(v)
                 }}
               />
             </SettingItem>
@@ -181,7 +167,7 @@ const AppearanceConfig: React.FC = () => {
             isSelected={useWindowFrame}
             onValueChange={async v => {
               await patchAppConfig({ useWindowFrame: v })
-              await relaunchApp()
+              await ipc.relaunchApp()
             }}
           />
         </SettingItem>
@@ -213,8 +199,8 @@ const AppearanceConfig: React.FC = () => {
                 onPress={async () => {
                   setFetching(true)
                   try {
-                    await fetchThemes()
-                    setCustomThemes(await resolveThemes())
+                    await ipc.fetchThemes()
+                    setCustomThemes(await ipc.resolveThemes())
                   } catch (e) {
                     alert(e)
                   } finally {
@@ -230,11 +216,11 @@ const AppearanceConfig: React.FC = () => {
                 title='导入主题'
                 variant='light'
                 onPress={async () => {
-                  const files = await getFilePath(['css'])
+                  const files = await ipc.getFilePath(['css'])
                   if (!files) return
                   try {
-                    await importThemes(files)
-                    setCustomThemes(await resolveThemes())
+                    await ipc.importThemes(files)
+                    setCustomThemes(await ipc.resolveThemes())
                   } catch (e) {
                     alert(e)
                   }

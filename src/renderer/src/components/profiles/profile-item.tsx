@@ -15,7 +15,7 @@ import {
 } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { calcPercent, calcTraffic } from '@renderer/utils/calc'
-import { openFile } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import dayjs from 'dayjs'
 import React, { Key, useEffect, useMemo, useState } from 'react'
 import { IoMdMore, IoMdRefresh } from 'react-icons/io'
@@ -130,7 +130,7 @@ const ProfileItem: React.FC<Props> = props => {
         break
       }
       case 'open-file': {
-        openFile('profile', info.id)
+        ipc.openFile('profile', info.id)
         break
       }
       case 'delete': {

@@ -12,7 +12,7 @@ import {
   Switch,
 } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { restartCore } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 
 import SettingItem from '../base/base-setting-item'
@@ -37,7 +37,7 @@ const EditInfoModal: React.FC<Props> = props => {
 
       await updateOverrideItem(itemToSave)
       if (item.id) {
-        await restartCore()
+        await ipc.restartCore()
       }
       onClose()
     } catch (e) {

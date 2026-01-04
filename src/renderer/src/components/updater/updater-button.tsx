@@ -1,5 +1,5 @@
 import { Button } from '@heroui/react'
-import { cancelUpdate } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 import { GrUpgrade } from 'react-icons/gr'
 
@@ -39,7 +39,7 @@ const UpdaterButton: React.FC<Props> = props => {
 
   const handleCancelUpdate = async (): Promise<void> => {
     try {
-      await cancelUpdate()
+      await ipc.cancelUpdate()
       setUpdateStatus({ downloading: false, progress: 0 })
     } catch (_e) {
       // ignore

@@ -1,7 +1,7 @@
 import { Button, Divider } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
-import { isAlwaysOnTop, setAlwaysOnTop } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri'
 interface Props {
@@ -19,8 +19,8 @@ const BasePage = forwardRef<HTMLDivElement, Props>((props, ref) => {
   const [onTop, setOnTop] = useState(saveOnTop)
 
   const updateAlwaysOnTop = async (): Promise<void> => {
-    setOnTop(await isAlwaysOnTop())
-    saveOnTop = await isAlwaysOnTop()
+    setOnTop(await ipc.isAlwaysOnTop())
+    saveOnTop = await ipc.isAlwaysOnTop()
   }
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const BasePage = forwardRef<HTMLDivElement, Props>((props, ref) => {
               variant='light'
               color={onTop ? 'primary' : 'default'}
               onPress={async () => {
-                await setAlwaysOnTop(!onTop)
+                await ipc.setAlwaysOnTop(!onTop)
                 await updateAlwaysOnTop()
               }}
               startContent={onTop ? <RiPushpin2Fill className='text-lg' /> : <RiPushpin2Line className='text-lg' />}

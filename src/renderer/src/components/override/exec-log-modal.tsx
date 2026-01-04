@@ -1,6 +1,6 @@
 import { Button, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { getOverride } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 
 interface Props {
@@ -14,7 +14,7 @@ const ExecLogModal: React.FC<Props> = props => {
   const [logs, setLogs] = useState<string[]>([])
 
   const getLog = async (): Promise<void> => {
-    setLogs((await getOverride(id, 'log')).split('\n').filter(Boolean))
+    setLogs((await ipc.getOverride(id, 'log')).split('\n').filter(Boolean))
   }
 
   useEffect(() => {

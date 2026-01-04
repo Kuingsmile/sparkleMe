@@ -1,10 +1,9 @@
+import MihomoIcon from '@renderer/components/base/mihomo-icon'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
+import { calcTraffic } from '@renderer/utils/calc'
+import { ipc } from '@renderer/utils/ipc'
 import { useEffect, useMemo, useState } from 'react'
-
-import MihomoIcon from './components/base/mihomo-icon'
-import { useAppConfig } from './hooks/use-app-config'
-import { useControledMihomoConfig } from './hooks/use-controled-mihomo-config'
-import { calcTraffic } from './utils/calc'
-import { showContextMenu, triggerMainWindow } from './utils/ipc'
 
 const FloatingApp: React.FC = () => {
   const { appConfig } = useAppConfig()
@@ -50,7 +49,7 @@ const FloatingApp: React.FC = () => {
   }, [spinSpeed, spinFloatingIcon])
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('mihomoTraffic', async (_e, info: ControllerTraffic) => {
+    window.Electron.ipcRenderer.on('mihomoTraffic', async (_e, info: ControllerTraffic) => {
       setUpload(info.up)
       setDownload(info.down)
     })
@@ -66,10 +65,10 @@ const FloatingApp: React.FC = () => {
           <div
             onContextMenu={e => {
               e.preventDefault()
-              showContextMenu()
+              ipc.showContextMenu()
             }}
             onClick={() => {
-              triggerMainWindow()
+              ipc.triggerMainWindow()
             }}
             style={
               spinFloatingIcon

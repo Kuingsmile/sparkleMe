@@ -1,10 +1,4 @@
-import {
-  addOverrideItem as add,
-  getOverrideConfig,
-  removeOverrideItem as remove,
-  setOverrideConfig as set,
-  updateOverrideItem as update,
-} from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { createContext, ReactNode, useContext, useEffect } from 'react'
 import useSWR from 'swr'
 
@@ -20,11 +14,13 @@ interface OverrideConfigContextType {
 const OverrideConfigContext = createContext<OverrideConfigContextType | undefined>(undefined)
 
 export const OverrideConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { data: overrideConfig, mutate: mutateOverrideConfig } = useSWR('getOverrideConfig', () => getOverrideConfig())
+  const { data: overrideConfig, mutate: mutateOverrideConfig } = useSWR('getOverrideConfig', () =>
+    ipc.getOverrideConfig(),
+  )
 
   const setOverrideConfig = async (config: OverrideConfig): Promise<void> => {
     try {
-      await set(config)
+      await ipc.setOverrideConfig(config)
     } catch (e) {
       alert(e)
     } finally {
@@ -34,7 +30,7 @@ export const OverrideConfigProvider: React.FC<{ children: ReactNode }> = ({ chil
 
   const addOverrideItem = async (item: Partial<OverrideItem>): Promise<void> => {
     try {
-      await add(item)
+      await ipc.addOverrideItem(item)
     } catch (e) {
       alert(e)
     } finally {
@@ -44,7 +40,7 @@ export const OverrideConfigProvider: React.FC<{ children: ReactNode }> = ({ chil
 
   const removeOverrideItem = async (id: string): Promise<void> => {
     try {
-      await remove(id)
+      await ipc.removeOverrideItem(id)
     } catch (e) {
       alert(e)
     } finally {
@@ -54,7 +50,7 @@ export const OverrideConfigProvider: React.FC<{ children: ReactNode }> = ({ chil
 
   const updateOverrideItem = async (item: OverrideItem): Promise<void> => {
     try {
-      await update(item)
+      await ipc.updateOverrideItem(item)
     } catch (e) {
       alert(e)
     } finally {

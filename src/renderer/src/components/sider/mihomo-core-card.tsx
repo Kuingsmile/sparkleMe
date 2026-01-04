@@ -3,7 +3,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { calcTraffic } from '@renderer/utils/calc'
-import { mihomoVersion, restartCore } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import PubSub from 'pubsub-js'
 import React, { useEffect, useState } from 'react'
 import { IoMdRefresh } from 'react-icons/io'
@@ -19,7 +19,7 @@ const MihomoCoreCard: React.FC<Props> = props => {
   const { appConfig } = useAppConfig()
   const { iconOnly } = props
   const { mihomoCoreCardStatus = 'col-span-2', disableAnimation = false } = appConfig || {}
-  const { data: version, mutate } = useSWR('mihomoVersion', mihomoVersion, {
+  const { data: version, mutate } = useSWR('mihomoVersion', ipc.mihomoVersion, {
     errorRetryInterval: 200,
     errorRetryCount: 10,
   })
@@ -112,7 +112,7 @@ const MihomoCoreCard: React.FC<Props> = props => {
                 onPress={async () => {
                   try {
                     setRestarting(true)
-                    await restartCore()
+                    await ipc.restartCore()
                     await new Promise(resolve => setTimeout(resolve, 2000))
                     setRestarting(false)
                   } catch (e) {

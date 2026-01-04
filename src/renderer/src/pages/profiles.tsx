@@ -18,7 +18,7 @@ import ProfileItem from '@renderer/components/profiles/profile-item'
 import ProfileSettingModal from '@renderer/components/profiles/profile-setting-modal'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useProfileConfig } from '@renderer/hooks/use-profile-config'
-import { getFilePath, readTextFile, subStoreCollections, subStoreSubs } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import type { KeyboardEvent } from 'react'
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FaPlus } from 'react-icons/fa6'
@@ -66,11 +66,11 @@ const Profiles: React.FC = () => {
   )
   const { data: subs = [], mutate: mutateSubs } = useSWR(
     useSubStore ? 'subStoreSubs' : undefined,
-    useSubStore ? subStoreSubs : (): undefined => {},
+    useSubStore ? ipc.subStoreSubs : (): undefined => {},
   )
   const { data: collections = [], mutate: mutateCollections } = useSWR(
     useSubStore ? 'subStoreCollections' : undefined,
-    useSubStore ? subStoreCollections : (): undefined => {},
+    useSubStore ? ipc.subStoreCollections : (): undefined => {},
   )
   const subStoreMenuItems = useMemo(() => {
     const items: { icon?: ReactNode; key: string; children: ReactNode; divider: boolean }[] = [
@@ -186,7 +186,7 @@ const Profiles: React.FC = () => {
         ) {
           try {
             const path = window.api.webUtils.getPathForFile(file)
-            const content = await readTextFile(path)
+            const content = await ipc.readTextFile(path)
             await addProfileItem({ name: file.name, type: 'local', file: content })
           } catch (e) {
             alert('文件导入失败' + e)
@@ -388,9 +388,9 @@ const Profiles: React.FC = () => {
                 switch (key) {
                   case 'open': {
                     try {
-                      const files = await getFilePath(['yml', 'yaml'])
+                      const files = await ipc.getFilePath(['yml', 'yaml'])
                       if (files?.length) {
-                        const content = await readTextFile(files[0])
+                        const content = await ipc.readTextFile(files[0])
                         const fileName = files[0].split('/').pop()?.split('\\').pop()
                         await addProfileItem({ name: fileName, type: 'local', file: content })
                       }

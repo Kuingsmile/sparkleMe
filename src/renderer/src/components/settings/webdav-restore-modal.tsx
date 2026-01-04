@@ -1,6 +1,6 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { relaunchApp, webdavDelete, webdavRestore } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 import { MdDeleteForever } from 'react-icons/md'
 interface Props {
@@ -39,8 +39,8 @@ const WebdavRestoreModal: React.FC<Props> = props => {
                   onPress={async () => {
                     setRestoring(true)
                     try {
-                      await webdavRestore(filename)
-                      await relaunchApp()
+                      await ipc.webdavRestore(filename)
+                      await ipc.relaunchApp()
                     } catch (e) {
                       alert(`恢复失败：${e}`)
                     } finally {
@@ -57,7 +57,7 @@ const WebdavRestoreModal: React.FC<Props> = props => {
                   className='ml-2'
                   onPress={async () => {
                     try {
-                      await webdavDelete(filename)
+                      await ipc.webdavDelete(filename)
                       setFilenames(filenames.filter(name => name !== filename))
                     } catch (e) {
                       alert(`删除失败：${e}`)

@@ -3,7 +3,7 @@ import InterfaceModal from '@renderer/components/mihomo/interface-modal'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import { platform } from '@renderer/utils/init'
-import { restartCore, startSubStoreBackendServer, triggerSysProxy } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 import { FaNetworkWired } from 'react-icons/fa'
 
@@ -51,7 +51,7 @@ const PortSetting: React.FC = () => {
 
   const onChangeNeedRestart = async (patch: Partial<MihomoConfig>): Promise<void> => {
     await patchControledMihomoConfig(patch)
-    await restartCore()
+    await ipc.restartCore()
   }
 
   return (
@@ -68,9 +68,9 @@ const PortSetting: React.FC = () => {
                 isDisabled={hasPortConflict()}
                 onPress={async () => {
                   await onChangeNeedRestart({ 'mixed-port': mixedPortInput })
-                  await startSubStoreBackendServer()
+                  await ipc.startSubStoreBackendServer()
                   if (sysProxy?.enable) {
-                    triggerSysProxy(true, onlyActiveDevice)
+                    ipc.triggerSysProxy(true, onlyActiveDevice)
                   }
                 }}
               >

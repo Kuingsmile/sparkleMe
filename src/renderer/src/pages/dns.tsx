@@ -6,7 +6,7 @@ import SettingItem from '@renderer/components/base/base-setting-item'
 import AdvancedDnsSetting from '@renderer/components/dns/advanced-dns-setting'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import { restartCore } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import { isValidDnsServer, isValidDomainWildcard, isValidIPv4Cidr, isValidIPv6Cidr } from '@renderer/utils/validate'
 import React, { Key, useState } from 'react'
 
@@ -85,7 +85,7 @@ const DNS: React.FC = () => {
     try {
       setChanged(false)
       await patchControledMihomoConfig(patch)
-      await restartCore()
+      await ipc.restartCore()
     } catch (e) {
       alert(e)
     }

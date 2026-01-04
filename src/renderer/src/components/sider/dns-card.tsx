@@ -4,7 +4,7 @@ import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
 import BorderSwitch from '@renderer/components/base/border-swtich'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import { patchMihomoConfig } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React from 'react'
 import { LuServer } from 'react-icons/lu'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -35,7 +35,7 @@ const DNSCard: React.FC<Props> = props => {
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
   const onChange = async (enable: boolean): Promise<void> => {
     await patchControledMihomoConfig({ dns: { enable } })
-    await patchMihomoConfig({ dns: { enable } })
+    await ipc.patchMihomoConfig({ dns: { enable } })
   }
 
   if (iconOnly) {

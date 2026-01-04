@@ -1,5 +1,5 @@
 import { Select, SelectItem } from '@heroui/react'
-import { getInterfaces } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 
 const InterfaceSelect: React.FC<{
@@ -10,7 +10,7 @@ const InterfaceSelect: React.FC<{
   const [ifaces, setIfaces] = useState<string[]>([])
   useEffect(() => {
     const fetchInterfaces = async (): Promise<void> => {
-      const names = Object.keys(await getInterfaces())
+      const names = Object.keys(await ipc.getInterfaces())
       setIfaces(names.filter(name => !exclude.includes(name)))
     }
     fetchInterfaces()

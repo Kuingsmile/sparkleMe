@@ -2,7 +2,7 @@ import { Button, Input, Switch, Tab, Tabs } from '@heroui/react'
 import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import { mihomoUpgradeGeo } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import { useEffect, useMemo, useState } from 'react'
 import { IoMdRefresh } from 'react-icons/io'
 
@@ -130,7 +130,7 @@ const GeoData: React.FC = () => {
             onPress={async () => {
               setUpdating(true)
               try {
-                await mihomoUpgradeGeo()
+                await ipc.mihomoUpgradeGeo()
                 new Notification('Geo 数据库更新成功')
               } catch (e) {
                 alert(e)

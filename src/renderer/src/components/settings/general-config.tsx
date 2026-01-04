@@ -1,6 +1,6 @@
 import { Button, Switch, Tab, Tabs, Tooltip } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { checkAutoRun, disableAutoRun, enableAutoRun, relaunchApp } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 import { IoIosHelpCircle } from 'react-icons/io'
 import useSWR from 'swr'
@@ -10,7 +10,7 @@ import SettingCard from '../base/base-setting-card'
 import SettingItem from '../base/base-setting-item'
 
 const GeneralConfig: React.FC = () => {
-  const { data: enable, mutate: mutateEnable } = useSWR('checkAutoRun', checkAutoRun)
+  const { data: enable, mutate: mutateEnable } = useSWR('checkAutoRun', ipc.checkAutoRun)
   const { appConfig, patchAppConfig } = useAppConfig()
   const {
     silentStart = false,
@@ -47,7 +47,7 @@ const GeneralConfig: React.FC = () => {
             if (!pendingDisableGPU) {
               await patchAppConfig({ disableAnimation: false })
             }
-            await relaunchApp()
+            await ipc.relaunchApp()
           }}
         />
       )}
@@ -59,9 +59,9 @@ const GeneralConfig: React.FC = () => {
             onValueChange={async v => {
               try {
                 if (v) {
-                  await enableAutoRun()
+                  await ipc.enableAutoRun()
                 } else {
-                  await disableAutoRun()
+                  await ipc.disableAutoRun()
                 }
               } catch (e) {
                 alert(e)

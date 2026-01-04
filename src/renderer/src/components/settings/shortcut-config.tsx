@@ -1,7 +1,7 @@
 import { Button, Input } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
-import { registerShortcut } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { KeyboardEvent, useEffect, useState } from 'react'
 
 import SettingCard from '../base/base-setting-card'
@@ -187,7 +187,7 @@ const ShortcutInput: React.FC<{
           size='sm'
           onPress={async () => {
             try {
-              if (await registerShortcut(value, inputValue, action)) {
+              if (await ipc.registerShortcut(value, inputValue, action)) {
                 await patchAppConfig({ [action]: inputValue })
                 window.electron.ipcRenderer.send('updateTrayMenu')
               } else {

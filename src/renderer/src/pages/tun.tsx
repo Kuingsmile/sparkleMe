@@ -6,7 +6,7 @@ import SettingItem from '@renderer/components/base/base-setting-item'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import { platform } from '@renderer/utils/init'
-import { restartCore, setupFirewall } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { Key, useState } from 'react'
 
 const Tun: React.FC = () => {
@@ -47,7 +47,7 @@ const Tun: React.FC = () => {
 
   const onSave = async (patch: Partial<MihomoConfig>): Promise<void> => {
     await patchControledMihomoConfig(patch)
-    await restartCore()
+    await ipc.restartCore()
     setChanged(false)
   }
 
@@ -93,9 +93,9 @@ const Tun: React.FC = () => {
                 onPress={async () => {
                   setLoading(true)
                   try {
-                    await setupFirewall()
+                    await ipc.setupFirewall()
                     new Notification('防火墙重设成功')
-                    await restartCore()
+                    await ipc.restartCore()
                   } catch (e) {
                     alert(e)
                   } finally {

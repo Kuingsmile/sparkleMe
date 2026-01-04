@@ -1,6 +1,6 @@
 import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { restartMihomoConnections } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React from 'react'
 
 import SettingItem from '../base/base-setting-item'
@@ -59,7 +59,7 @@ const ConnectionSettingModal: React.FC<Props> = props => {
                 if (isNaN(num)) num = 500
                 if (num < 100) num = 100
                 await patchAppConfig({ connectionInterval: num })
-                await restartMihomoConnections()
+                await ipc.restartMihomoConnections()
               }}
             />
           </SettingItem>

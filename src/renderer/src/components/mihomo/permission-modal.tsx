@@ -13,12 +13,7 @@ import {
 } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
-import {
-  checkCorePermission,
-  checkElevateTask,
-  manualGrantCorePermition,
-  revokeCorePermission,
-} from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 
 interface Props {
@@ -38,7 +33,7 @@ const PermissionModal: React.FC<Props> = props => {
 
   const checkPermissions = async (): Promise<void> => {
     try {
-      const result = isWindows ? await checkElevateTask() : await checkCorePermission()
+      const result = isWindows ? await ipc.checkElevateTask() : await ipc.checkCorePermission()
       setHasPermission(result)
     } catch {
       setHasPermission(isWindows ? false : { mihomo: false, 'mihomo-alpha': false })
@@ -72,9 +67,9 @@ const PermissionModal: React.FC<Props> = props => {
     setLoading({ ...loading, [coreName]: true })
     try {
       if (isGrant) {
-        await manualGrantCorePermition([coreName])
+        await ipc.manualGrantCorePermition([coreName])
       } else {
-        await revokeCorePermission([coreName])
+        await ipc.revokeCorePermission([coreName])
       }
       await checkPermissions()
     } catch (e) {

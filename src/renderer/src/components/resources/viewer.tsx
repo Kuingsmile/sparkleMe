@@ -1,6 +1,6 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { getFileStr, setFileStr } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import yaml from 'js-yaml'
 import React, { useEffect, useState } from 'react'
 
@@ -24,10 +24,10 @@ const Viewer: React.FC<Props> = props => {
   const getContent = async (): Promise<void> => {
     let fileContent: string
     if (type === 'Inline') {
-      fileContent = await getFileStr('config.yaml')
+      fileContent = await ipc.getFileStr('config.yaml')
       language = 'yaml'
     } else {
-      fileContent = await getFileStr(path)
+      fileContent = await ipc.getFileStr(path)
     }
     try {
       const parsedYaml = yaml.load(fileContent)
@@ -101,7 +101,7 @@ const Viewer: React.FC<Props> = props => {
               size='sm'
               color='primary'
               onPress={async () => {
-                await setFileStr(path, currData)
+                await ipc.setFileStr(path, currData)
                 onClose()
               }}
             >

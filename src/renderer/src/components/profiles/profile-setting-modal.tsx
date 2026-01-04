@@ -13,7 +13,7 @@ import {
 } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import debounce from '@renderer/utils/debounce'
-import { getGistUrl, getUserAgent } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React, { useEffect, useRef, useState } from 'react'
 import { BiCopy } from 'react-icons/bi'
 import { IoIosHelpCircle } from 'react-icons/io'
@@ -41,7 +41,7 @@ const ProfileSettingModal: React.FC<Props> = props => {
   useEffect(() => {
     if (!userAgentFetched.current) {
       userAgentFetched.current = true
-      getUserAgent().then(ua => {
+      ipc.getUserAgent().then(ua => {
         setDefaultUserAgent(ua)
       })
     }
@@ -120,7 +120,7 @@ const ProfileSettingModal: React.FC<Props> = props => {
                 variant='light'
                 onPress={async () => {
                   try {
-                    const url = await getGistUrl()
+                    const url = await ipc.getGistUrl()
                     if (url !== '') {
                       await navigator.clipboard.writeText(`${url}/raw/sparkleme.yaml`)
                     }

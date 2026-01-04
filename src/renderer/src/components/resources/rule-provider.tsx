@@ -1,6 +1,6 @@
 import { Button, Chip } from '@heroui/react'
 import { getHash } from '@renderer/utils/hash'
-import { getRuntimeConfig, mihomoRuleProviders, mihomoUpdateRuleProviders } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import dayjs from 'dayjs'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { CgLoadbarDoc } from 'react-icons/cg'
@@ -25,7 +25,7 @@ const RuleProvider: React.FC = () => {
     if (showDetails.title) {
       const fetchProviderPath = async (name: string): Promise<void> => {
         try {
-          const providers = await getRuntimeConfig()
+          const providers = await ipc.getRuntimeConfig()
           const provider = providers?.['rule-providers']?.[name] as ProxyProviderConfig
           if (provider) {
             setShowDetails(prev => ({
@@ -42,7 +42,7 @@ const RuleProvider: React.FC = () => {
     }
   }, [showDetails.title])
 
-  const { data, mutate } = useSWR('mihomoRuleProviders', mihomoRuleProviders, {
+  const { data, mutate } = useSWR('mihomoRuleProviders', ipc.mihomoRuleProviders, {
     errorRetryInterval: 200,
     errorRetryCount: 10,
   })
@@ -71,7 +71,7 @@ const RuleProvider: React.FC = () => {
       return [...prev]
     })
     try {
-      await mihomoUpdateRuleProviders(name)
+      await ipc.mihomoUpdateRuleProviders(name)
       mutate()
     } catch (e) {
       new Notification(`${name} 更新失败\n${e}`)

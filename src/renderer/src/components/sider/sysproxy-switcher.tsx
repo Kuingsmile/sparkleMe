@@ -4,7 +4,7 @@ import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
 import BorderSwitch from '@renderer/components/base/border-swtich'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import { triggerSysProxy } from '@renderer/utils/ipc'
+import { ipc } from '@renderer/utils/ipc'
 import React from 'react'
 import { AiOutlineGlobal } from 'react-icons/ai'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -44,7 +44,7 @@ const SysproxySwitcher: React.FC<Props> = props => {
   const onChange = async (enable: boolean): Promise<void> => {
     if (mode === 'manual' && disabled) return
     try {
-      await triggerSysProxy(enable, onlyActiveDevice)
+      await ipc.triggerSysProxy(enable, onlyActiveDevice)
       await patchAppConfig({ sysProxy: { enable } })
       window.electron.ipcRenderer.send('updateFloatingWindow')
       window.electron.ipcRenderer.send('updateTrayMenu')

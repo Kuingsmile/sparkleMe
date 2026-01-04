@@ -1,30 +1,28 @@
 import '@renderer/assets/traymenu.css'
 
 import { HeroUIProvider } from '@heroui/react'
+import BaseErrorBoundary from '@renderer/components/base/base-error-boundary'
+import { ProviderComposer, ProviderConfig } from '@renderer/components/ProviderComposer'
+import { AppConfigProvider } from '@renderer/hooks/use-app-config'
+import { ControledMihomoConfigProvider } from '@renderer/hooks/use-controled-mihomo-config'
+import { GroupsProvider } from '@renderer/hooks/use-groups'
 import TrayMenuApp from '@renderer/TrayMenuApp'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import BaseErrorBoundary from './components/base/base-error-boundary'
-import { AppConfigProvider } from './hooks/use-app-config'
-import { ControledMihomoConfigProvider } from './hooks/use-controled-mihomo-config'
-import { GroupsProvider } from './hooks/use-groups'
+const providers: ProviderConfig[] = [
+  React.StrictMode,
+  HeroUIProvider,
+  [NextThemesProvider, { attribute: 'class', enableSystem: true, defaultTheme: 'dark' }],
+  BaseErrorBoundary,
+  AppConfigProvider,
+  ControledMihomoConfigProvider,
+  GroupsProvider,
+]
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <HeroUIProvider>
-      <NextThemesProvider attribute='class' enableSystem defaultTheme='dark'>
-        <BaseErrorBoundary>
-          <AppConfigProvider>
-            <ControledMihomoConfigProvider>
-              <GroupsProvider>
-                <TrayMenuApp />
-              </GroupsProvider>
-            </ControledMihomoConfigProvider>
-          </AppConfigProvider>
-        </BaseErrorBoundary>
-      </NextThemesProvider>
-    </HeroUIProvider>
-  </React.StrictMode>,
+  <ProviderComposer providers={providers}>
+    <TrayMenuApp />
+  </ProviderComposer>,
 )
