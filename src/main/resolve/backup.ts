@@ -1,5 +1,6 @@
 import AdmZip from 'adm-zip'
 import dayjs from 'dayjs'
+import { createClient } from 'webdav'
 
 import { getAppConfig } from '~/config'
 import {
@@ -14,71 +15,57 @@ import {
   themesDir,
 } from '~/utils/dirs'
 
-export async function webdavBackup(): Promise<boolean> {
-  const { createClient } = await import('webdav/dist/node/index.js')
+async function createWebdav() {
   const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkleme' } = await getAppConfig()
-  const zip = new AdmZip()
+  return {
+    client: createClient(webdavUrl, {
+      username: webdavUsername,
+      password: webdavPassword,
+    }),
+    webdavDir,
+  }
+}
 
-  zip.addLocalFile(appConfigPath())
-  zip.addLocalFile(controledMihomoConfigPath())
-  zip.addLocalFile(profileConfigPath())
-  zip.addLocalFile(overrideConfigPath())
-  zip.addLocalFolder(themesDir(), 'themes')
-  zip.addLocalFolder(profilesDir(), 'profiles')
-  zip.addLocalFolder(overrideDir(), 'override')
-  zip.addLocalFolder(subStoreDir(), 'substore')
+export async function webdavBackup(): Promise<boolean> {
+  const { client, webdavDir } = await createWebdav()
+  const zip = new AdmZip()
+  const configFiles = [appConfigPath(), controledMihomoConfigPath(), profileConfigPath(), overrideConfigPath()]
+  const configFolders = {
+    themes: themesDir(),
+    profiles: profilesDir(),
+    override: overrideDir(),
+    substore: subStoreDir(),
+  }
+  for (const filePath of configFiles) {
+    zip.addLocalFile(filePath)
+  }
+  for (const [folderName, folderPath] of Object.entries(configFolders)) {
+    zip.addLocalFolder(folderPath, folderName)
+  }
   const date = new Date()
   const zipFileName = `${process.platform}_${dayjs(date).format('YYYY-MM-DD_HH-mm-ss')}.zip`
 
-  const client = createClient(webdavUrl, {
-    username: webdavUsername,
-    password: webdavPassword,
-  })
   try {
     await client.createDirectory(webdavDir)
-  } catch {
-    // ignore
-  }
+  } catch {}
 
   return await client.putFileContents(`${webdavDir}/${zipFileName}`, zip.toBuffer())
 }
 
 export async function webdavRestore(filename: string): Promise<void> {
-  const { createClient } = await import('webdav/dist/node/index.js')
-  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkleme' } = await getAppConfig()
-
-  const client = createClient(webdavUrl, {
-    username: webdavUsername,
-    password: webdavPassword,
-  })
+  const { client, webdavDir } = await createWebdav()
   const zipData = await client.getFileContents(`${webdavDir}/${filename}`)
   const zip = new AdmZip(zipData as Buffer)
   zip.extractAllTo(dataDir(), true)
 }
 
 export async function listWebdavBackups(): Promise<string[]> {
-  const { createClient } = await import('webdav/dist/node/index.js')
-  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkleme' } = await getAppConfig()
-
-  const client = createClient(webdavUrl, {
-    username: webdavUsername,
-    password: webdavPassword,
-  })
+  const { client, webdavDir } = await createWebdav()
   const files = await client.getDirectoryContents(webdavDir, { glob: '*.zip' })
-  if (Array.isArray(files)) {
-    return files.map(file => file.basename)
-  } else {
-    return files.data.map(file => file.basename)
-  }
+  return Array.isArray(files) ? files.map(file => file.basename) : files.data.map(file => file.basename)
 }
 
 export async function webdavDelete(filename: string): Promise<void> {
-  const { createClient } = await import('webdav/dist/node/index.js')
-  const { webdavUrl = '', webdavUsername = '', webdavPassword = '', webdavDir = 'sparkleme' } = await getAppConfig()
-
-  const client = createClient(webdavUrl, {
-    username: webdavUsername,
-    password: webdavPassword,
-  })
+  const { client, webdavDir } = await createWebdav()
   await client.deleteFile(`${webdavDir}/${filename}`)
 }
