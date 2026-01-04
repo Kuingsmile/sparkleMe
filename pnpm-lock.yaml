@@ -138,7 +138,7 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       electron:
-        specifier: ^37.10.3
+        specifier: 37.10.3
         version: 37.10.3
       electron-builder:
         specifier: 26.0.12
